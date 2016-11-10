@@ -3,10 +3,9 @@ class Field extends GameObject {
         super();
 
         this.hex = hex;
-        // if (hex.q == 0 && hex.r == 0) type = Field.TYPE_ORIGIN;
         this.type = type;
 
-        this.edgeLength = 15;
+        this.edgeLength = document.getElementById("canvas").width/50;
     }
 
     update() {
@@ -15,7 +14,7 @@ class Field extends GameObject {
 
     draw(ctx) {
         // calc corner points
-        const center = this.hexToPixel(this.hex);
+        const center = Hex.hexToPoint(this.hex, this.edgeLength);
         const p0 = new Point(center.x, center.y - this.edgeLength);                                                 // top
         const p1 = new Point(center.x + Math.getTrianglesHeight(this.edgeLength), center.y - this.edgeLength/2);    // top right
         const p2 = new Point(center.x + Math.getTrianglesHeight(this.edgeLength), center.y + this.edgeLength/2);    // bottom right
@@ -53,11 +52,7 @@ class Field extends GameObject {
             case Field.TYPE_MIDFIELD:
                 ctx.fillStyle = Color.FIELD_MIDFIELD_BACKGROUND;
                 break;
-            // case Field.TYPE_ORIGIN:
-            //     ctx.fillStyle = "white";
-                break;
             default:
-                debugger;
         }
         ctx.fill();
 
@@ -65,7 +60,11 @@ class Field extends GameObject {
         ctx.lineWidth = this.edgeLength / 10;
         // ctx.lineJoin = "round";
         // ctx.lineCap = "round";
-        ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+        if (this.isHovered) {
+            ctx.strokeStyle = Color.FIELD_BORDER_HOVER;
+        } else {
+            ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+        }
         // ctx.shadowBlur = 1;
         // ctx.shadowColor = "black";
         ctx.stroke();
@@ -73,26 +72,21 @@ class Field extends GameObject {
         if (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE) {
             // draw inner circles
             ctx.beginPath();
-            ctx.arc(center.x, center.y, 1, 0, 2*Math.PI, false);
+            const lineWidth = 2;
+            const radius = this.edgeLength/1.5;
+            ctx.arc(center.x, center.y, lineWidth, 0, 2*Math.PI, false);
             ctx.strokeStyle = Color.FIELD_HOLE_CIRCLES;
-            for (var i = 0; i < 2; i++) {
-                ctx.lineWidth = 10 * (i+1);
+            const amountOfCircles = 2;
+            for (var i = 0; i < amountOfCircles; i++) {
+                ctx.lineWidth = radius * (i+1);
                 ctx.stroke();
             }
         }
 
         // // draw coords
-        // ctx.font="10px Georgia";
+        // ctx.font="20px Georgia";
         // ctx.fillStyle="black"
-        // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-11, center.y);
-    }
-
-    hexToPixel(hex) {
-        const canvas = document.getElementById("canvas");
-        const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
-        const x = originFieldAnchor.x + this.edgeLength * Math.sqrt(3) * (hex.q + (hex.r%2 ? 0.5 : 0));
-        const y = originFieldAnchor.y + this.edgeLength * 3/2 * hex.r;
-        return new Point(x, y);
+        // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-20, center.y);
     }
 }
 

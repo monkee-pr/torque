@@ -1,9 +1,5 @@
-class Board extends GameObject {
+class Board {
     constructor() {
-        super();
-
-        const x = document;
-
         this.fields = [
             new Field(new Hex(-11, -1)),
             new Field(new Hex(-11, 0)),
@@ -229,13 +225,5 @@ class Board extends GameObject {
             new Field(new Hex(10, 2)),
             new Field(new Hex(11, 0)),
         ];
-    }
-
-    update() {
-
-    }
-
-    draw(ctx) {
-        this.fields.forEach(f => f.draw(ctx));
     }
 }
