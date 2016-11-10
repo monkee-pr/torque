@@ -1,8 +1,14 @@
 <html>
 <head>
+    <script src="src/tools/Math.js"></script>
+    <script src="src/components/Hex.js"></script>
+    <script src="src/components/Point.js"></script>
+    <script src="src/components/Color.js"></script>
     <script src="src/Game.js"></script>
     <script src="src/GamePanel.js"></script>
-    <script src="src/Board.js"></script>
+    <script src="src/gameObjects/GameObject.js"></script>
+    <script src="src/gameObjects/Board.js"></script>
+    <script src="src/gameObjects/Field.js"></script>
     <style type="text/css">
         html, body {
             padding: 0;
@@ -26,6 +32,6 @@
     </style>
 </head>
 <body onload="new Game()">
-<canvas id="c" width="640" height="480" onkeydown="keyPressed" onkeyup="keyReleased"></canvas>
+<canvas id="canvas" width="640" height="480" onkeydown="keyPressed" onkeyup="keyReleased"></canvas>
 </body>
 </html>

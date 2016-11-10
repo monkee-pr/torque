@@ -1,16 +1,16 @@
 class GamePanel {
-    contructor(ctx) {
-        this.ctx = ctx;
-
+    constructor() {
         this.gameObjects = [];
 
-        this.board = new Board();
+        this.addGameObject(new Board());
     }
 
     addGameObject(go) {
         if (!(go instanceof GameObject)) {
-            console.error(go + " is not an insance of GameObject");
+            console.error(go + " is not an instance of GameObject");
             return;
+        } else {
+            this.gameObjects.push(go);
         }
     }
     removeGameObject(go) {
@@ -21,7 +21,7 @@ class GamePanel {
 
     }
 
-    draw() {
-
+    draw(ctx) {
+        this.gameObjects.forEach(go => go.draw(ctx));
     }
 }
