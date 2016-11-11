@@ -22,9 +22,10 @@ class Ball extends GameObject {
 
         // draw circle shaped ball
         ctx.beginPath();
-        const radius = size/1.75;
+        const radius = size * 0.75;
         ctx.arc(center.x, center.y, radius, 0, 2*Math.PI, false);
         ctx.fillStyle = Color.BALL;
+        ctx.closePath();
         ctx.fill();
     }
 

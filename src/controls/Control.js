@@ -9,7 +9,7 @@ Control.mouseMove = (e, gp) => {
     const size = GameObject.BASE_SIZE;
     const hex = Point.pointToHex(point, size);
     // console.log(hex);
-    
+
     // gp.layers.forEach(go => {
     //     if (go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
     //         go.isHovered = true;
@@ -40,14 +40,18 @@ Control.click = (e, gp) => {
 }
 
 Control.scroll = (e, gp) => {
-    console.log(e);
-    const dir = e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0;
-    const stepSize = 0.1;
-    const step = stepSize * dir;
-    // const step = e.deltaY / 100;
 
-    const minScale = 0.5;
-    const maxScale = 2;
+    const scrollable = GamePanel.cameraMode == GamePanel.CAMERA_MODE_ISOMETRIC;
+    if (scrollable) {
+        console.log(e);
+        const dir = e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0;
+        const stepSize = 0.1;
+        const step = stepSize * dir;
+        // const step = e.deltaY / 100;
 
-    GamePanel.scale = Math.max(minScale, Math.min(maxScale, GamePanel.scale * (1 - (step))));
+        const minScale = 0.25;
+        const maxScale = 1;
+
+        GamePanel.scale = Math.max(minScale, Math.min(maxScale, GamePanel.scale * (1 - (step))));
+    }
 }

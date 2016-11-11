@@ -22,7 +22,7 @@ class Player extends GameObject {
 
         // draw circle shaped player
         ctx.beginPath();
-        const radius = GameObject.BASE_SIZE * 0.75 * this.scale;
+        const radius = size * 0.75;
         ctx.arc(center.x, center.y, radius, 0, 2*Math.PI, false);
         switch (this.team.id) {
             case Team.TEAM_1:
@@ -34,6 +34,7 @@ class Player extends GameObject {
             default:
                 console.error("invalid team id");
         }
+        ctx.closePath();
         ctx.fill();
     }
 

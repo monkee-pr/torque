@@ -80,9 +80,11 @@ class GamePanel {
         // this.gameObjects.forEach(go => go.draw(this.ctx));
 
         // draw canvas border
+        this.ctx.beginPath();
         this.ctx.lineWidth = 5;
         this.ctx.strokeStyle = "#000";
         this.ctx.rect(0, 0, this.cv.width, this.cv.height);
+        this.ctx.closePath();
         this.ctx.stroke();
     }
 }

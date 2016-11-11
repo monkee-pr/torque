@@ -22,5 +22,5 @@ class GameObject {
     }
 }
 
-GameObject.BASE_SIZE = 55;  // px for isometric camera mode
+GameObject.BASE_SIZE = 200;  // px for isometric camera mode
 // GameObject.BASE_SIZE = 40;  // px for top camera mode
