@@ -1,33 +1,42 @@
 class GamePanel {
-    constructor() {
-        this.gameObjects = [];
+    constructor(cv) {
+        this.cv = cv;
+        this.ctx = cv.getContext("2d");
 
-        this.gameObjects = [];
+        // layers for drawable objects
+        this.layers = new CanvasLayers();
+
+        this.setBackground(new Background(resources.sand));
 
         const board = new Board();
         board.fields.forEach(f => this.addGameObject(f));
-        this.addGameObject(new Ball(new Hex(3, 3)));
+        this.addGameObject(new Ball(new Hex(0, 0)));
 
-        const team1 = new Team(Team.TEAM_1);
-        const t1p1 = new Player(new Hex(-1, -1), team1);
-        team1.addPlayer(t1p1);
+        this.team1 = new Team(Team.TEAM_1);
+        const t1p1 = new Player(new Hex(-2, -1), this.team1);
+        // this.team1.addPlayer(t1p1);
         this.addGameObject(t1p1);
-        const t1p2 = new Player(new Hex(-1, 1), team1);
-        team1.addPlayer(t1p2);
+        const t1p2 = new Player(new Hex(-2, 1), this.team1);
+        // this.team1.addPlayer(t1p2);
         this.addGameObject(t1p2);
 
-        const team2 = new Team(Team.TEAM_2);
-        const t2p1 = new Player(new Hex(1, -1), team2);
-        team2.addPlayer(t2p1);
+        this.team2 = new Team(Team.TEAM_2);
+        const t2p1 = new Player(new Hex(1, -1), this.team2);
+        // this.team2.addPlayer(t2p1);
         this.addGameObject(t2p1);
-        const t2p2 = new Player(new Hex(1, 1), team2);
-        team2.addPlayer(t2p2);
+        const t2p2 = new Player(new Hex(1, 1), this.team2);
+        // this.team2.addPlayer(t2p2);
         this.addGameObject(t2p2);
 
-        this.teams = [
-            team1,
-            team2,
-        ];
+        // this.addUIElement(new Cursor());
+    }
+
+    setBackground(bg) {
+        if (!(bg instanceof Background)) {
+            console.error(bg + " is not an instance of Background");
+            return;
+        }
+        this.layers.layers[CanvasLayers.LAYER_BACKGROUND] = [bg];
     }
 
     addGameObject(go) {
@@ -35,24 +44,51 @@ class GamePanel {
             console.error(go + " is not an instance of GameObject");
             return;
         } else {
-            this.gameObjects.push(go);
+            let targetLayer = null;
+            if (go instanceof Field) {
+                targetLayer = CanvasLayers.LAYER_BOARD;
+            } else {
+                targetLayer = CanvasLayers.LAYER_GAME_OBJECTS;
+            }
+            this.layers.add(go, targetLayer);
         }
     }
     removeGameObject(go) {
-        const index = this.gameObjects.indexOf(go);
-        if (index >= -1) {
-            console.error(go + " is not an instance of GameObject");
+        this.layers.remove(go, CanvasLayers.LAYER_GAME_OBJECTS);
+    }
+
+    addUIElement(ui) {
+        if (!(ui instanceof GameObject)) {
+            console.error(ui + " is not an instance of UIElement");
             return;
         } else {
-            this.gameObjects.remove(index);
+            this.layers.add(ui, CanvasLayers.LAYER_BOARD);
         }
     }
 
     update() {
-        this.gameObjects.forEach(go => go.update());
+        // this.gameObjects.forEach(go => go.update());
+        this.layers.update();
     }
 
-    draw(ctx) {
-        this.gameObjects.forEach(go => go.draw(ctx));
+    draw() {
+        // start with fresh canvas
+        this.ctx.clearRect(0, 0, this.cv.width, this.cv.height);
+
+        // draw layers
+        this.layers.draw(this.ctx);
+        // this.gameObjects.forEach(go => go.draw(this.ctx));
+
+        // draw canvas border
+        this.ctx.lineWidth = 5;
+        this.ctx.strokeStyle = "#000";
+        this.ctx.rect(0, 0, this.cv.width, this.cv.height);
+        this.ctx.stroke();
     }
 }
+
+GamePanel.CAMERA_MODE_ISOMETRIC = 0;
+GamePanel.CAMERA_MODE_TOP = 1;
+
+GamePanel.scale = 1;
+GamePanel.cameraMode = true ? GamePanel.CAMERA_MODE_ISOMETRIC : GamePanel.CAMERA_MODE_TOP;

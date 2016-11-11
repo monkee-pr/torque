@@ -3,7 +3,7 @@ class Ball extends GameObject {
         const isMovable = true;
         super(isMovable);
 
-        this.edgeLength = document.getElementById("canvas").width/50;
+        this.edgeLength = GameObject;
 
         this.hex = hex;
 
@@ -12,16 +12,17 @@ class Ball extends GameObject {
     }
 
     update() {
-        // this.vq = 1;
+        super.update();
         this.move();
     }
 
     draw(ctx) {
-        const center = Hex.hexToPoint(this.hex, this.edgeLength);
+        const size = GameObject.BASE_SIZE * this.scale;
+        const center = Hex.hexToPoint(this.hex, size);
 
         // draw circle shaped ball
         ctx.beginPath();
-        const radius = this.edgeLength/1.5;
+        const radius = size/1.75;
         ctx.arc(center.x, center.y, radius, 0, 2*Math.PI, false);
         ctx.fillStyle = Color.BALL;
         ctx.fill();

@@ -4,8 +4,6 @@ class Player extends GameObject {
         const isSelectable = true;
         super(isMovable, isSelectable);
 
-        this.edgeLength = document.getElementById("canvas").width/50;
-
         this.hex = hex;
         this.team = team;
 
@@ -14,16 +12,17 @@ class Player extends GameObject {
     }
 
     update() {
-        // this.vq = 1;
+        super.update();
         this.move();
     }
 
     draw(ctx) {
-        const center = Hex.hexToPoint(this.hex, this.edgeLength);
+        const size = GameObject.BASE_SIZE * this.scale;
+        const center = Hex.hexToPoint(this.hex, size);
 
         // draw circle shaped player
         ctx.beginPath();
-        const radius = this.edgeLength/1.5;
+        const radius = GameObject.BASE_SIZE * 0.75 * this.scale;
         ctx.arc(center.x, center.y, radius, 0, 2*Math.PI, false);
         switch (this.team.id) {
             case Team.TEAM_1:
