@@ -3,6 +3,10 @@ class Hex {
         this.q = q;
         this.r = r;
     }
+
+    equals(hex) {
+        return this.q == hex.q && this.r == hex.r;
+    }
 }
 
 Hex.add = (hex1, hex2) => {

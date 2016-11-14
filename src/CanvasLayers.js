@@ -1,7 +1,7 @@
 class CanvasLayers {
     constructor() {
         this.layers = {
-            [CanvasLayers.LAYER_BACKGROUND] : [],
+            // [CanvasLayers.LAYER_BACKGROUND] : [],
             [CanvasLayers.LAYER_BOARD] : [],
             [CanvasLayers.LAYER_GAME_OBJECTS] : [],
             [CanvasLayers.LAYER_UI] : [],
@@ -39,11 +39,10 @@ class CanvasLayers {
         });
     }
 
-    draw(ctx) {
+    draw(ctx, cameraMode) {
         Object.toArray(this.layers).forEach((objects, layer) => {
 
-            const transform = GamePanel.cameraMode == GamePanel.CAMERA_MODE_ISOMETRIC;
-
+            const transform = cameraMode == Camera.MODE_ISOMETRIC;
             if (transform) {
                 // rotate layer (or not)
                 switch (layer) {
@@ -52,7 +51,7 @@ class CanvasLayers {
                         break;
                     case CanvasLayers.LAYER_BOARD:
                     case CanvasLayers.LAYER_GAME_OBJECTS:
-                        this.changeCameraAngle(1);
+                        Camera.changeAngleToMode(Camera.MODE_ISOMETRIC, ctx);
                         break;
                 }
             }
@@ -68,40 +67,11 @@ class CanvasLayers {
                         break;
                     case CanvasLayers.LAYER_BOARD:
                     case CanvasLayers.LAYER_GAME_OBJECTS:
-                        this.changeCameraAngle(0);
+                        Camera.changeAngleToMode(Camera.MODE_TOP, ctx);
                         break;
                 }
             }
         });
-    }
-
-    // rotates the canvas
-    changeCameraAngle(a) {
-
-        const canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d");
-
-        ctx.translate(canvas.width/2, canvas.height/2);
-        let deg = 0;
-        if (a == 1) {
-            ctx.scale(1, 0.5);
-            deg = -CanvasLayers.ROTATE_Z;
-        } else {
-            deg = CanvasLayers.ROTATE_Z;
-        }
-        // Move registration point to the center of the canvas
-        // ctx.translate(canvas.width/2, canvas.width/2);
-
-        // Rotate 1 degree
-        ctx.rotate(deg * Math.PI / 180);
-
-        // Move registration point back to the top left corner of canvas
-        // ctx.translate(-canvas.width/2, -canvas.width/2);
-
-        if (a != 1) {
-            ctx.scale(1, 2);
-        }
-        ctx.translate(-canvas.width/2, -canvas.height/2);
     }
 }
 CanvasLayers.LAYER_BACKGROUND = 0;

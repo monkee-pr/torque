@@ -3,13 +3,17 @@ class GamePanel {
         this.cv = cv;
         this.ctx = cv.getContext("2d");
 
+        this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_TOP);
+
         // layers for drawable objects
         this.layers = new CanvasLayers();
 
-        this.setBackground(new Background(resources.sand));
+        // this.setBackground(new Background(resources.sand));
 
         const board = new Board();
-        board.fields.forEach(f => this.addGameObject(f));
+        // board.fields.forEach(f => this.addGameObject(f));
+        this.addGameObject(board);
+
         this.addGameObject(new Ball(new Hex(0, 0)));
 
         this.team1 = new Team(Team.TEAM_1);
@@ -76,7 +80,7 @@ class GamePanel {
         this.ctx.clearRect(0, 0, this.cv.width, this.cv.height);
 
         // draw layers
-        this.layers.draw(this.ctx);
+        this.layers.draw(this.ctx, this.camera.getMode());
         // this.gameObjects.forEach(go => go.draw(this.ctx));
 
         // draw canvas border
@@ -88,9 +92,3 @@ class GamePanel {
         this.ctx.stroke();
     }
 }
-
-GamePanel.CAMERA_MODE_ISOMETRIC = 0;
-GamePanel.CAMERA_MODE_TOP = 1;
-
-GamePanel.scale = 1;
-GamePanel.cameraMode = true ? GamePanel.CAMERA_MODE_ISOMETRIC : GamePanel.CAMERA_MODE_TOP;

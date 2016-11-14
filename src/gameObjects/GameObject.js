@@ -5,11 +5,11 @@ class GameObject {
 
         this.isHovered = false;
 
-        this.scale = GamePanel.scale;
+        this.scale = Camera.scale;
     }
 
     update() {
-        this.scale = GamePanel.scale;
+        this.scale = Camera.scale;
         // if (this.isHovered) console.log("hovered"); console.log(this);
     }
 

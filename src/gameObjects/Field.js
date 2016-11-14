@@ -1,7 +1,8 @@
 class Field extends GameObject {
-    constructor(hex, type = Field.TYPE_REGULAR) {
+    constructor(board, hex, type = Field.TYPE_REGULAR) {
         super();
 
+        this.board = board;
         this.hex = hex;
         this.type = type;
     }
@@ -12,13 +13,13 @@ class Field extends GameObject {
 
     draw(ctx) {
         const scaledSize = GameObject.BASE_SIZE * this.scale;
-        
+
         // calc corner points
         const center = Hex.hexToPoint(this.hex, scaledSize);
-        const p0 = new Point(center.x, center.y - scaledSize);                                                 // top
+        const p0 = new Point(center.x, center.y - scaledSize);                                            // top
         const p1 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top right
         const p2 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom right
-        const p3 = new Point(center.x, center.y + scaledSize);                                                 // bottom
+        const p3 = new Point(center.x, center.y + scaledSize);                                            // bottom
         const p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
         const p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
 
@@ -60,12 +61,13 @@ class Field extends GameObject {
         if (fill) ctx.fill();
 
         // draw border
-        ctx.lineWidth = Field.BORDER_WIDTH * this.scale;
         // ctx.lineJoin = "round";
         // ctx.lineCap = "round";
         if (this.isHovered) {
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 10;
             ctx.strokeStyle = Color.FIELD_BORDER_HOVER;
         } else {
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale;
             ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
         }
         // ctx.shadowBlur = 1;
@@ -86,10 +88,82 @@ class Field extends GameObject {
             }
         }
 
-        // // draw coords
-        // ctx.font="20px Georgia";
-        // ctx.fillStyle="black"
-        // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-20, center.y);
+        // draw coords
+        const fontSize = (GameObject.BASE_SIZE / 2 * this.scale);
+        ctx.font = fontSize + "px Georgia";
+        ctx.fillStyle="black"
+        ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
+    }
+
+    getNeighborAt(direction) {
+        const hex = this.hex;
+        const x = this.hex.r % 2;
+        const evenRow = this.hex.r % 2 == 0;
+
+        let neighborHex = null;
+        switch (direction) {
+            case Board.DIRECTION_TOP_RIGHT:
+                neighborHex = new Hex(hex.q + 1, hex.r + (evenRow ? 0 : -1));
+                break;
+            case Board.DIRECTION_RIGHT:
+                neighborHex = new Hex(hex.q + 1, hex.r);
+                break;
+            case Board.DIRECTION_BOTTOM_RIGHT:
+                neighborHex = new Hex(hex.q + 1, hex.r + (evenRow ? 0 : 1));
+                break;
+            case Board.DIRECTION_BOTTOM_LEFT:
+                neighborHex = new Hex(hex.q - 1, hex.r - (evenRow ? 1 : 0));
+                break;
+            case Board.DIRECTION_LEFT:
+                neighborHex = new Hex(hex.q - 1, hex.r);
+                break;
+            case Board.DIRECTION_TOP_LEFT:
+                neighborHex = new Hex(hex.q - 1, hex.r - (evenRow ? -1 : 0));
+                break;
+            default:
+                console.error("Invalid direction");
+        }
+
+        let neighbor = null;
+        this.board.fields.forEach(f => {
+            if (neighbor == null) {
+                if (f.hex.equals(neighborHex)) {
+                    neighbor = f;
+                }
+            }
+        });
+
+        return neighbor;
+    }
+
+    hasNeighborAt(direction) {
+        const neighbor = getNeighborAt(direction);
+
+        return neighbor != null;
+    }
+
+    getNeighborFields() {
+        const directions = [
+            Board.DIRECTION_TOP_RIGHT,
+            Board.DIRECTION_RIGHT,
+            Board.DIRECTION_BOTTOM_RIGHT,
+            Board.DIRECTION_BOTTOM_LEFT,
+            Board.DIRECTION_LEFT,
+            Board.DIRECTION_TOP_LEFT,
+        ];
+
+        const neighbors = directions.map(d => this.getNeighborAt(d)).filter(n => n != null);
+
+        return neighbors;
+    }
+
+    isBorderField() {
+
+        return directions.length != directionsWithNeighbor.length;
+    }
+
+    onClick() {
+        console.log(getNeighborFields);
     }
 }
 
@@ -100,4 +174,4 @@ Field.TYPE_SUPER_HOT_ZONE = "super_hot_zone";
 Field.TYPE_PIT = "pit";
 Field.TYPE_MIDFIELD = "midfield";
 
-Field.BORDER_WIDTH = GameObject.BASE_SIZE / 20;
+Field.BORDER_WIDTH = GameObject.BASE_SIZE / 40;

@@ -11,7 +11,7 @@ Color.FIELD_MIDFIELD_BACKGROUND = "#fe0"
 
 // objects
 Color.BALL = "black"
-Color.PLAYER_TEAM_1 = "red";
+Color.PLAYER_TEAM_1 = "green";
 Color.PLAYER_TEAM_2 = "blue";
 
 // UI

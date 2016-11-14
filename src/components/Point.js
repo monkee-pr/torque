@@ -4,10 +4,11 @@ class Point {
         this.y = y;
     }
 }
-Point.pointToHex = (point, edgeLength) => {
+Point.pointToHex = (point, size) => {
     const canvas = document.getElementById("canvas");
-    const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
-    const r = Math.round((point.y - originFieldAnchor.y) * 2/3 / edgeLength);
-    const q = Math.round((point.x - originFieldAnchor.x) / (edgeLength * Math.sqrt(3)) - (r%2 ? 0.5 : 0));
+    const originFieldAnchor = new Point(canvas.clientWidth / 2, canvas.clientHeight / 2);
+    const r = Math.round((point.y - originFieldAnchor.y) / size);
+    const q = Math.round((point.x - originFieldAnchor.x) / (size) - (r%2 == 0 ? 0 : 0.5));
+    // debugger;
     return new Hex(q, r);
 }
