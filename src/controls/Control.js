@@ -18,7 +18,7 @@ Control.mouseMove = (e, gp) => {
         reversedGameObjects.forEach(go => {
             if (!brk && go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
                 go.isHovered = true;
-                console.log(go);
+                // console.log(go);
                 brk = true;
             } else {
                 go.isHovered = false;

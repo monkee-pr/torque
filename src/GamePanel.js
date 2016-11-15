@@ -67,7 +67,6 @@ class GamePanel {
     addUIElement(ui) {
         if (!(ui instanceof GameObject)) {
             console.error(ui + " is not an instance of UIElement");
-            return;
         } else {
             this.layers.add(ui, CanvasLayers.LAYER_BOARD);
         }
@@ -97,8 +96,12 @@ class GamePanel {
 
     selectPlayer(player) {
         if (this.selectedPlayer == player) {
+            player.selected = false;
             this.selectedPlayer = null;
         } else if (this.selectedPlayer == null) {
+            if (player.isSelectable) {
+                player.selected = true;
+            }
             this.selectedPlayer = player;
         } else {
             console.log("other player selected");

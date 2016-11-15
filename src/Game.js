@@ -3,13 +3,6 @@ class Game {
         this.cv = document.getElementById("canvas");
         this.ctx = this.cv.getContext("2d");
 
-        // stretch and rotate canvas to isometric perspective
-        // this.ctx.scale(1,0.5);
-
-        // set camera
-        // this.camera = new Camera(Camera.VIEW_ISOMETRIC);
-        // this.camera = new Camera(Camera.VIEW_TOP);
-
         // create game panel
         this.gp = new GamePanel(this.cv);
 

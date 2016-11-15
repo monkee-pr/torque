@@ -57,7 +57,8 @@ class CanvasLayers {
             }
 
             // draw layer's objects
-            objects.forEach(object => object.draw(ctx));
+            objects.forEach(object => object.draw(ctx, cameraMode));
+            // if (layer == CanvasLayers.LAYER_BOARD) debugger;
 
             if (transform) {
                 // rotate layer back (or not)
@@ -91,10 +92,10 @@ class CanvasLayers {
         return hoverableObjects;
     }
 }
-CanvasLayers.LAYER_BACKGROUND = 0;
-CanvasLayers.LAYER_BOARD = 1;
-CanvasLayers.LAYER_GAME_OBJECTS = 2;
-CanvasLayers.LAYER_UI = 3;
+// CanvasLayers.LAYER_BACKGROUND = 0;
+CanvasLayers.LAYER_BOARD = 0;
+CanvasLayers.LAYER_GAME_OBJECTS = 1;
+CanvasLayers.LAYER_UI = 2;
 
 // rotation in degrees
 CanvasLayers.ROTATE_Z = 45;

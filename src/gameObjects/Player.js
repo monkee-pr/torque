@@ -41,11 +41,12 @@ class Player extends GameObject {
         if (this.isSelected) {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
             ctx.strokeStyle = Color.FIELD_BORDER_SELECT;
+            ctx.stroke();
         } else if (this.isHovered) {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
             ctx.strokeStyle = Color.FIELD_BORDER_HOVER;
+            ctx.stroke();
         }
-        ctx.stroke();
     }
 
     move() {
@@ -60,5 +61,9 @@ class Player extends GameObject {
 
     onClick(gp) {
         gp.selectPlayer(this);
+    }
+
+    getField() {
+
     }
 }

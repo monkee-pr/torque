@@ -247,7 +247,7 @@ class Board extends GameObject {
         this.fields.forEach(f => f.update());
     }
 
-    draw(ctx) {
+    draw(ctx, cameraMode) {
         // define path to fill with background's pattern
         ctx.beginPath();
         this.fields.forEach(f => {
@@ -273,7 +273,14 @@ class Board extends GameObject {
         ctx.closePath();
 
         // draw background as pattern
+        const transform = cameraMode == Camera.MODE_ISOMETRIC;
+        if (transform) {
+            Camera.changeAngleToMode(Camera.MODE_TOP_DOWN, ctx);
+        }
         this.background.draw(ctx);
+        if (transform) {
+            Camera.changeAngleToMode(Camera.MODE_ISOMETRIC, ctx);
+        }
 
         this.fields.forEach(f => f.draw(ctx));
     }
