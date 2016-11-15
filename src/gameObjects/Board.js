@@ -232,14 +232,14 @@ class Board extends GameObject {
     }
 
     update() {
-        // reset all fields' highlighted status
-        this.fields.forEach(f => f.isHighlighted = false);
+        // reset all fields' selected status
+        this.fields.forEach(f => f.isSelected = false);
 
-        // set highlighted status of selected field's neighbors
+        // set selected status of selected field's neighbors
         this.fields.forEach(f => {
             if (f == this.selectedField) {
-                const neighbors = f.getNeighborFields();
-                neighbors.forEach(n => n.isHighlighted = true);
+                const neighbors = f.getNeighbors();
+                neighbors.forEach(n => n.isSelected = true);
             }
         });
 
@@ -256,12 +256,12 @@ class Board extends GameObject {
 
             // calc corner points
             const center = Hex.hexToPoint(f.hex, scaledSize);
-            const p0 = new Point(center.x, center.y - scaledSize);                                                 // top
-            const p1 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top right
-            const p2 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom right
-            const p3 = new Point(center.x, center.y + scaledSize);                                                 // bottom
-            const p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
-            const p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
+            const p0 = new Point(center.x, center.y - scaledSize);                                          // top
+            const p1 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);  // top right
+            const p2 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);  // bottom right
+            const p3 = new Point(center.x, center.y + scaledSize);                                          // bottom
+            const p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);  // bottom left
+            const p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);  // top left
 
             ctx.moveTo(p0.x, p0.y);
             ctx.lineTo(p1.x, p1.y);
@@ -272,8 +272,20 @@ class Board extends GameObject {
         });
         ctx.closePath();
 
+        // draw background as pattern
         this.background.draw(ctx);
 
         this.fields.forEach(f => f.draw(ctx));
+    }
+
+    selectField(field) {
+        if (this.selectedField == field) {
+            this.selectedField = null;
+        } else if (this.selectedField == null) {
+            this.selectedField = field;
+        } else if (field.isSelected) {
+            console.log("move field");
+            this.selectedField = null;
+        }
     }
 }

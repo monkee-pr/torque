@@ -1,7 +1,7 @@
 class CanvasLayers {
     constructor() {
         this.layers = {
-            [CanvasLayers.LAYER_BACKGROUND] : [],
+            // [CanvasLayers.LAYER_BACKGROUND] : [],
             [CanvasLayers.LAYER_BOARD] : [],
             [CanvasLayers.LAYER_GAME_OBJECTS] : [],
             [CanvasLayers.LAYER_UI] : [],
@@ -67,11 +67,28 @@ class CanvasLayers {
                         break;
                     case CanvasLayers.LAYER_BOARD:
                     case CanvasLayers.LAYER_GAME_OBJECTS:
-                        Camera.changeAngleToMode(Camera.MODE_TOP, ctx);
+                        Camera.changeAngleToMode(Camera.MODE_TOP_DOWN, ctx);
                         break;
                 }
             }
         });
+    }
+
+    getSelectableObjects() {
+        const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
+
+        const selectableObjects = gameObjects.filter(o => o.isSelectable);
+
+        return selectableObjects;
+    }
+
+    getHoverableObjects() {
+        const fields = this.layers[CanvasLayers.LAYER_BOARD].map(b => b.fields).reduce((a, b) => a.concat(b));
+        const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
+
+        const hoverableObjects = fields.concat(gameObjects);
+
+        return hoverableObjects;
     }
 }
 CanvasLayers.LAYER_BACKGROUND = 0;

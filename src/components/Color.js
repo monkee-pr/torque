@@ -17,4 +17,4 @@ Color.PLAYER_TEAM_2 = "blue";
 // UI
 Color.FIELD_BORDER_REGULAR = "#777"
 Color.FIELD_BORDER_HOVER = "black";
-Color.FIELD_BORDER_HIGHLIGHT = "cyan";
+Color.FIELD_BORDER_SELECT = "cyan";

@@ -12,13 +12,14 @@ Control.mouseMove = (e, gp) => {
     if (!(hoveredHex && hoveredHex.equals(hex))) {
         hoveredHex = hex;
 
-        // this doesn't work because of board instead of fields
-        const hoverableGOs = Object.toArray(gp.layers.layers).reduce((a, b) => {
-            return a.concat(b);
-        });
-        hoverableGOs.forEach(go => {
-            if (go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
+        const hoverableObjects = gp.layers.getHoverableObjects();
+        const reversedGameObjects = hoverableObjects.slice().reverse();
+        let brk = false;
+        reversedGameObjects.forEach(go => {
+            if (!brk && go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
                 go.isHovered = true;
+                console.log(go);
+                brk = true;
             } else {
                 go.isHovered = false;
             }
@@ -35,27 +36,12 @@ Control.click = (e, gp) => {
     const size = GameObject.BASE_SIZE * Camera.scale;
     const hex = Point.pointToHex(point, size);
 
-    // // this doesn't work because of board instead of fields
-    // const hoverableGOs = Object.toArray(gp.layers.layers).reduce((a, b) => {
-    //     return a.concat(b);
-    // });
-    // hoverableGOs.forEach(go => {
-    //     if (go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
-    //         go.isHovered = true;
-    //         console.log(go);
-    //     } else {
-    //         go.isHovered = false;
-    //     }
-    // });
-
     // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
-    const clickableObjects = Object.toArray(gp.layers.layers).reduce((a, b) => {
-        return a.concat(b);
-    });
+    const clickableObjects = gp.layers.getSelectableObjects();
     const reversedGameObjects = clickableObjects.slice().reverse();
     let brk = false;
     reversedGameObjects.forEach(go => {
-        if (!brk && go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
+        if (!brk && go.isSelectable && go.hex != null && hex.equals(go.hex)) {
             go.onClick(gp);
             brk = true;
         }

@@ -7,7 +7,7 @@ class Field extends GameObject {
         this.type = type;
 
         this.isHovered = false;
-        this.isHighlighted = false;
+        this.isSelected = false;
     }
 
     update() {
@@ -66,11 +66,11 @@ class Field extends GameObject {
         // draw border
         // ctx.lineJoin = "round";
         // ctx.lineCap = "round";
-        if (this.isHighlighted) {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 10;
-            ctx.strokeStyle = Color.FIELD_BORDER_HIGHLIGHT;
+        if (this.isSelected) {
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
+            ctx.strokeStyle = Color.FIELD_BORDER_SELECT;
         } else if (this.isHovered) {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 10;
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
             ctx.strokeStyle = Color.FIELD_BORDER_HOVER;
         } else {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale;
@@ -94,41 +94,17 @@ class Field extends GameObject {
             }
         }
 
-        // draw coords
-        const fontSize = (GameObject.BASE_SIZE / 2 * this.scale);
-        ctx.font = fontSize + "px Georgia";
-        ctx.fillStyle="black"
-        ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
+        // // draw coords
+        // const fontSize = (GameObject.BASE_SIZE / 2 * this.scale);
+        // ctx.font = fontSize + "px Georgia";
+        // ctx.fillStyle="black"
+        // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
     }
 
     getNeighborAt(direction) {
         const hex = this.hex;
-        const x = this.hex.r % 2;
-        const evenRow = this.hex.r % 2 == 0;
 
-        let neighborHex = null;
-        switch (direction) {
-            case Field.DIRECTION_TOP_RIGHT:
-                neighborHex = new Hex(hex.q + (hex.r&1), hex.r - 1);
-                break;
-            case Field.DIRECTION_RIGHT:
-                neighborHex = new Hex(hex.q + 1, hex.r);
-                break;
-            case Field.DIRECTION_BOTTOM_RIGHT:
-                neighborHex = new Hex(hex.q + (hex.r&1), hex.r + 1);
-                break;
-            case Field.DIRECTION_BOTTOM_LEFT:
-                neighborHex = new Hex(hex.q - (!(hex.r&1)), hex.r + 1);
-                break;
-            case Field.DIRECTION_LEFT:
-                neighborHex = new Hex(hex.q - 1, hex.r);
-                break;
-            case Field.DIRECTION_TOP_LEFT:
-                neighborHex = new Hex(hex.q - (!(hex.r&1)), hex.r - 1);
-                break;
-            default:
-                console.error("Invalid direction");
-        }
+        const neighborHex = Hex.getNeighborAt(hex, direction);
 
         let neighbor = null;
         this.board.fields.forEach(f => {
@@ -143,42 +119,48 @@ class Field extends GameObject {
     }
 
     hasNeighborAt(direction) {
-        const neighbor = getNeighborAt(direction);
+        const neighbor = this.getNeighborAt(direction);
 
         return neighbor != null;
     }
 
-    getNeighborFields() {
+    getNeighbors() {
         const directions = [
-            Field.DIRECTION_TOP_RIGHT,
-            Field.DIRECTION_RIGHT,
-            Field.DIRECTION_BOTTOM_RIGHT,
-            Field.DIRECTION_BOTTOM_LEFT,
-            Field.DIRECTION_LEFT,
-            Field.DIRECTION_TOP_LEFT,
+            Hex.DIRECTION_TOP_RIGHT,
+            Hex.DIRECTION_RIGHT,
+            Hex.DIRECTION_BOTTOM_RIGHT,
+            Hex.DIRECTION_BOTTOM_LEFT,
+            Hex.DIRECTION_LEFT,
+            Hex.DIRECTION_TOP_LEFT,
         ];
 
         const neighbors = directions.map(d => this.getNeighborAt(d)).filter(n => n != null);
+        // const neighbors = Hex.getNeighbors(this);
 
         return neighbors;
     }
 
-    isBorderField() {
+    // isBorderField() {
+    //     return directions.length != directionsWithNeighbor.length;
+    // }
 
-        return directions.length != directionsWithNeighbor.length;
+    isNeighborOf(field) {
+        const compareHex = field.hex;
+
+        const neighbors = this.getNeighbors();
+        for (var i = 0; i < neighbors.length; i++) {
+            if (neighbors[i].hex.equals(compareHex)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     onClick() {
-        this.board.selectedField = this;
+        // this.board.selectField(this);
     }
 }
-
-Field.DIRECTION_TOP_RIGHT = "top-right";
-Field.DIRECTION_RIGHT = "right";
-Field.DIRECTION_BOTTOM_RIGHT = "bottom-right";
-Field.DIRECTION_BOTTOM_LEFT = "bottom-left";
-Field.DIRECTION_LEFT = "left";
-Field.DIRECTION_TOP_LEFT = "top-left";
 
 Field.TYPE_REGULAR = "regular";
 Field.TYPE_HOLE = "hole";
@@ -187,4 +169,4 @@ Field.TYPE_SUPER_HOT_ZONE = "super_hot_zone";
 Field.TYPE_PIT = "pit";
 Field.TYPE_MIDFIELD = "midfield";
 
-Field.BORDER_WIDTH = GameObject.BASE_SIZE / 40;
+Field.BORDER_WIDTH = GameObject.BASE_SIZE / 40 * 2;

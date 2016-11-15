@@ -4,13 +4,14 @@ class GameObject {
         this.isSelectable = isSelectable;
 
         this.isHovered = false;
+        this.isSelected = false;
 
         this.scale = Camera.scale;
     }
 
     update() {
         this.scale = Camera.scale;
-        // if (this.isHovered) console.log("hovered"); console.log(this);
+        // if (this.isHovered) console.log(this.hex);
     }
 
     draw(ctx) {

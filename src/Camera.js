@@ -14,7 +14,7 @@ class Camera {
         if (mode == Camera.MODE_ISOMETRIC) {
             Camera.MIN_SCALE = 0.25;
             Camera.MAX_SCALE = 1;
-        } else if (mode == Camera.MODE_TOP) {
+        } else if (mode == Camera.MODE_TOP_DOWN) {
             Camera.MIN_SCALE = 0.2;
             Camera.MAX_SCALE = 0.2;
         }
@@ -40,7 +40,7 @@ Camera.changeAngleToMode = (mode, ctx) => {
             deg = CanvasLayers.ROTATE_Z;
         }
         ctx.rotate(deg * Math.PI / 180);
-        if (mode == Camera.MODE_TOP) {
+        if (mode == Camera.MODE_TOP_DOWN) {
             ctx.scale(1, 2);
         }
 
@@ -52,7 +52,7 @@ Camera.changeAngleToMode = (mode, ctx) => {
 Camera.scale = 1;
 
 Camera.MODE_ISOMETRIC = "isometric";
-Camera.MODE_TOP = "top";
+Camera.MODE_TOP_DOWN = "top-down";
 
 Camera.MIN_SCALE = 0.25;
 Camera.MAX_SCALE = 1;

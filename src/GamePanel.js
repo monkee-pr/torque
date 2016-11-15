@@ -3,17 +3,17 @@ class GamePanel {
         this.cv = cv;
         this.ctx = cv.getContext("2d");
 
-        this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_TOP);
+        this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_TOP_DOWN);
         // this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_ISOMETRIC);
 
         // layers for drawable objects
         this.layers = new CanvasLayers();
 
-        this.setBackground(new Background(resources.sand));
+        // this.setBackground(new Background(resources.sand));
 
         const board = new Board();
         this.addGameObject(board);
-        board.fields.forEach(f => this.addGameObject(f));
+        // board.fields.forEach(f => this.addGameObject(f));
 
         this.addGameObject(new Ball(new Hex(0, 0)));
 
@@ -34,7 +34,8 @@ class GamePanel {
         this.addGameObject(t2p2);
 
         // this.addUIElement(new Cursor());
-        console.log(this.layers);
+
+        this.selectedPlayer = null;
     }
 
     setBackground(bg) {
@@ -92,5 +93,16 @@ class GamePanel {
         this.ctx.rect(0, 0, this.cv.width, this.cv.height);
         this.ctx.closePath();
         this.ctx.stroke();
+    }
+
+    selectPlayer(player) {
+        if (this.selectedPlayer == player) {
+            this.selectedPlayer = null;
+        } else if (this.selectedPlayer == null) {
+            this.selectedPlayer = player;
+        } else {
+            console.log("other player selected");
+        }
+        console.log(this.selectedPlayer);
     }
 }

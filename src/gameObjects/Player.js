@@ -36,6 +36,16 @@ class Player extends GameObject {
         }
         ctx.closePath();
         ctx.fill();
+
+        // draw border
+        if (this.isSelected) {
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
+            ctx.strokeStyle = Color.FIELD_BORDER_SELECT;
+        } else if (this.isHovered) {
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
+            ctx.strokeStyle = Color.FIELD_BORDER_HOVER;
+        }
+        ctx.stroke();
     }
 
     move() {
@@ -46,5 +56,9 @@ class Player extends GameObject {
         // reset movement
         this.vq = 0;
         this.vr = 0;
+    }
+
+    onClick(gp) {
+        gp.selectPlayer(this);
     }
 }
