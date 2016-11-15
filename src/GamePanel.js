@@ -4,15 +4,16 @@ class GamePanel {
         this.ctx = cv.getContext("2d");
 
         this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_TOP);
+        // this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_ISOMETRIC);
 
         // layers for drawable objects
         this.layers = new CanvasLayers();
 
-        // this.setBackground(new Background(resources.sand));
+        this.setBackground(new Background(resources.sand));
 
         const board = new Board();
-        // board.fields.forEach(f => this.addGameObject(f));
         this.addGameObject(board);
+        board.fields.forEach(f => this.addGameObject(f));
 
         this.addGameObject(new Ball(new Hex(0, 0)));
 
@@ -33,6 +34,7 @@ class GamePanel {
         this.addGameObject(t2p2);
 
         // this.addUIElement(new Cursor());
+        console.log(this.layers);
     }
 
     setBackground(bg) {
@@ -49,7 +51,7 @@ class GamePanel {
             return;
         } else {
             let targetLayer = null;
-            if (go instanceof Field) {
+            if (go instanceof Field || go instanceof Board) {
                 targetLayer = CanvasLayers.LAYER_BOARD;
             } else {
                 targetLayer = CanvasLayers.LAYER_GAME_OBJECTS;

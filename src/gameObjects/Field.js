@@ -5,6 +5,9 @@ class Field extends GameObject {
         this.board = board;
         this.hex = hex;
         this.type = type;
+
+        this.isHovered = false;
+        this.isHighlighted = false;
     }
 
     update() {
@@ -63,7 +66,10 @@ class Field extends GameObject {
         // draw border
         // ctx.lineJoin = "round";
         // ctx.lineCap = "round";
-        if (this.isHovered) {
+        if (this.isHighlighted) {
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 10;
+            ctx.strokeStyle = Color.FIELD_BORDER_HIGHLIGHT;
+        } else if (this.isHovered) {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 10;
             ctx.strokeStyle = Color.FIELD_BORDER_HOVER;
         } else {
@@ -102,23 +108,23 @@ class Field extends GameObject {
 
         let neighborHex = null;
         switch (direction) {
-            case Board.DIRECTION_TOP_RIGHT:
-                neighborHex = new Hex(hex.q + 1, hex.r + (evenRow ? 0 : -1));
+            case Field.DIRECTION_TOP_RIGHT:
+                neighborHex = new Hex(hex.q + (hex.r&1), hex.r - 1);
                 break;
-            case Board.DIRECTION_RIGHT:
+            case Field.DIRECTION_RIGHT:
                 neighborHex = new Hex(hex.q + 1, hex.r);
                 break;
-            case Board.DIRECTION_BOTTOM_RIGHT:
-                neighborHex = new Hex(hex.q + 1, hex.r + (evenRow ? 0 : 1));
+            case Field.DIRECTION_BOTTOM_RIGHT:
+                neighborHex = new Hex(hex.q + (hex.r&1), hex.r + 1);
                 break;
-            case Board.DIRECTION_BOTTOM_LEFT:
-                neighborHex = new Hex(hex.q - 1, hex.r - (evenRow ? 1 : 0));
+            case Field.DIRECTION_BOTTOM_LEFT:
+                neighborHex = new Hex(hex.q - (!(hex.r&1)), hex.r + 1);
                 break;
-            case Board.DIRECTION_LEFT:
+            case Field.DIRECTION_LEFT:
                 neighborHex = new Hex(hex.q - 1, hex.r);
                 break;
-            case Board.DIRECTION_TOP_LEFT:
-                neighborHex = new Hex(hex.q - 1, hex.r - (evenRow ? -1 : 0));
+            case Field.DIRECTION_TOP_LEFT:
+                neighborHex = new Hex(hex.q - (!(hex.r&1)), hex.r - 1);
                 break;
             default:
                 console.error("Invalid direction");
@@ -144,12 +150,12 @@ class Field extends GameObject {
 
     getNeighborFields() {
         const directions = [
-            Board.DIRECTION_TOP_RIGHT,
-            Board.DIRECTION_RIGHT,
-            Board.DIRECTION_BOTTOM_RIGHT,
-            Board.DIRECTION_BOTTOM_LEFT,
-            Board.DIRECTION_LEFT,
-            Board.DIRECTION_TOP_LEFT,
+            Field.DIRECTION_TOP_RIGHT,
+            Field.DIRECTION_RIGHT,
+            Field.DIRECTION_BOTTOM_RIGHT,
+            Field.DIRECTION_BOTTOM_LEFT,
+            Field.DIRECTION_LEFT,
+            Field.DIRECTION_TOP_LEFT,
         ];
 
         const neighbors = directions.map(d => this.getNeighborAt(d)).filter(n => n != null);
@@ -163,9 +169,16 @@ class Field extends GameObject {
     }
 
     onClick() {
-        console.log(getNeighborFields);
+        this.board.selectedField = this;
     }
 }
+
+Field.DIRECTION_TOP_RIGHT = "top-right";
+Field.DIRECTION_RIGHT = "right";
+Field.DIRECTION_BOTTOM_RIGHT = "bottom-right";
+Field.DIRECTION_BOTTOM_LEFT = "bottom-left";
+Field.DIRECTION_LEFT = "left";
+Field.DIRECTION_TOP_LEFT = "top-left";
 
 Field.TYPE_REGULAR = "regular";
 Field.TYPE_HOLE = "hole";

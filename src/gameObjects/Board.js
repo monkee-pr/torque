@@ -3,6 +3,7 @@ class Board extends GameObject {
         super();
 
         this.background = new Background(resources.sand);
+        this.selectedField = null;
         this.fields = [
             new Field(this, new Hex(-11, -1)),
             new Field(this, new Hex(-11, 0)),
@@ -231,6 +232,18 @@ class Board extends GameObject {
     }
 
     update() {
+        // reset all fields' highlighted status
+        this.fields.forEach(f => f.isHighlighted = false);
+
+        // set highlighted status of selected field's neighbors
+        this.fields.forEach(f => {
+            if (f == this.selectedField) {
+                const neighbors = f.getNeighborFields();
+                neighbors.forEach(n => n.isHighlighted = true);
+            }
+        });
+
+        // update fields
         this.fields.forEach(f => f.update());
     }
 
@@ -264,9 +277,3 @@ class Board extends GameObject {
         this.fields.forEach(f => f.draw(ctx));
     }
 }
-Board.DIRECTION_TOP_RIGHT = "top-right";
-Board.DIRECTION_RIGHT = "right";
-Board.DIRECTION_BOTTOM_RIGHT = "bottom-right";
-Board.DIRECTION_BOTTOM_LEFT = "bottom-left";
-Board.DIRECTION_LEFT = "left";
-Board.DIRECTION_TOP_LEFT = "top-left";

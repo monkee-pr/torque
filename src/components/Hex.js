@@ -16,7 +16,8 @@ Hex.add = (hex1, hex2) => {
 Hex.hexToPoint = (hex, size) => {
     const canvas = document.getElementById("canvas");
     const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
-    const x = originFieldAnchor.x + size * Math.sqrt(3) * (hex.q + (hex.r%2 ? 0.5 : 0));
-    const y = originFieldAnchor.y + size * 3/2 * hex.r;
+    const x = size * Math.sqrt(3) * (hex.q + 0.5 * (hex.r&1)) + originFieldAnchor.x;
+    const y = size * 3/2 * hex.r + originFieldAnchor.y;
+    // console.log(hex.r + " - " + (hex.r&1));
     return new Point(x, y);
 }

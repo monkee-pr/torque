@@ -1,7 +1,7 @@
 class CanvasLayers {
     constructor() {
         this.layers = {
-            // [CanvasLayers.LAYER_BACKGROUND] : [],
+            [CanvasLayers.LAYER_BACKGROUND] : [],
             [CanvasLayers.LAYER_BOARD] : [],
             [CanvasLayers.LAYER_GAME_OBJECTS] : [],
             [CanvasLayers.LAYER_UI] : [],
