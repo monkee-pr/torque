@@ -1,8 +1,9 @@
 class Player extends GameObject {
-    constructor(hex, team) {
+    constructor(hex, type, team) {
         super();
 
         this.hex = hex;
+        this.type = type;
         this.team = team;
 
         this.vq = 0;
@@ -22,10 +23,30 @@ class Player extends GameObject {
         // image for iso perspective
         switch (this.team.id) {
             case Team.TEAM_1:
-                this.image = resources.player1;
+                switch (this.type) {
+                    case Player.TYPE_1:
+                        this.image = resources.team1Player1;
+                        break;
+                    case Player.TYPE_2:
+                        this.image = resources.team1Player2;
+                        break;
+                    case Player.TYPE_3:
+                        this.image = resources.team1Player3;
+                        break;
+                }
                 break;
             case Team.TEAM_2:
-                this.image = resources.player2;
+                switch (this.type) {
+                    case Player.TYPE_1:
+                        this.image = resources.team2Player1;
+                        break;
+                    case Player.TYPE_2:
+                        this.image = resources.team2Player2;
+                        break;
+                    case Player.TYPE_3:
+                        this.image = resources.team2Player3;
+                        break;
+                }
                 break;
         }
     }
@@ -166,3 +187,7 @@ class Player extends GameObject {
 
     }
 }
+
+Player.TYPE_1 = "type-1";
+Player.TYPE_2 = "type-2";
+Player.TYPE_3 = "type-3";

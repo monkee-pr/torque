@@ -6,6 +6,12 @@ class Field extends GameObject {
         this.hex = hex;
         this.type = type;
 
+        if (hex.q < 0) {
+            this.teamSide = Team.TEAM_1;
+        } else {
+            this.teamSide = Team.TEAM_2;
+        }
+
         // color for top down perspective
         let fill = true;
         switch (this.type) {
@@ -33,7 +39,14 @@ class Field extends GameObject {
                 break;
             case Field.TYPE_HOLE:
             {
-                this.image = resources.tileGoalRed;
+                switch (this.teamSide) {
+                    case Team.TEAM_1:
+                        this.image = resources.tileGoalBlue;
+                        break;
+                    case Team.TEAM_2:
+                        this.image = resources.tileGoalRed;
+                        break;
+                }
                 break;
             }
             case Field.TYPE_HOT_ZONE:

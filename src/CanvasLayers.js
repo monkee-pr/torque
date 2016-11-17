@@ -41,37 +41,8 @@ class CanvasLayers {
 
     draw(ctx, cameraMode) {
         Object.toArray(this.layers).forEach((objects, layer) => {
-
-            // const transform = cameraMode == Camera.MODE_ISOMETRIC;
-            // if (transform) {
-            //     // rotate layer (or not)
-            //     switch (layer) {
-            //         case CanvasLayers.LAYER_BACKGROUND:
-            //         case CanvasLayers.LAYER_UI:
-            //             break;
-            //         case CanvasLayers.LAYER_BOARD:
-            //         case CanvasLayers.LAYER_GAME_OBJECTS:
-            //             Camera.changeAngleToMode(Camera.MODE_ISOMETRIC, ctx);
-            //             break;
-            //     }
-            // }
-
             // draw layer's objects
             objects.forEach(object => object.draw(ctx, cameraMode));
-            // if (layer == CanvasLayers.LAYER_BOARD) debugger;
-
-            // if (transform) {
-            //     // rotate layer back (or not)
-            //     switch (layer) {
-            //         case CanvasLayers.LAYER_BACKGROUND:
-            //         case CanvasLayers.LAYER_UI:
-            //             break;
-            //         case CanvasLayers.LAYER_BOARD:
-            //         case CanvasLayers.LAYER_GAME_OBJECTS:
-            //             Camera.changeAngleToMode(Camera.MODE_TOP_DOWN, ctx);
-            //             break;
-            //     }
-            // }
         });
     }
 

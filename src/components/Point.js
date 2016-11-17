@@ -30,19 +30,22 @@ class Point {
         return new Point(scaledX + originFieldAnchor.x, scaledY + originFieldAnchor.y);
     }
 
-    // toRegular(point) {
-    //     const canvas = document.getElementById("canvas");
-    //     const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
-    //
-    //     const radians = Camera.ROTATE_Z * (Math.PI/180);
-    //     const rotatedX = this.x * Math.cos(radians) - this.y * Math.sin(radians);
-    //     const rotatedY = this.x * Math.sin(radians) + this.y * Math.cos(radians);
-    //
-    //     const scaledX = rotatedX;
-    //     const scaledY = rotatedY / Camera.SCALE_Y;
-    //
-    //     return new Point(rotatedX, rotatedY);
-    // }
+    toRegular() {
+        const canvas = document.getElementById("canvas");
+        const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
+
+        const relativeX = this.x - originFieldAnchor.x;
+        const relativeY = this.y - originFieldAnchor.y;
+
+        const scaledX = relativeX;
+        const scaledY = relativeY / Camera.SCALE_Y;
+
+        const radians = Camera.ROTATE_Z * (Math.PI/180);
+        const rotatedX = scaledX * Math.cos(radians) - scaledY * Math.sin(radians);
+        const rotatedY = scaledX * Math.sin(radians) + scaledY * Math.cos(radians);
+
+        return new Point(rotatedX + originFieldAnchor.x, rotatedY + originFieldAnchor.y);
+    }
 }
 
 Point.pointToHex = (point, size, iso = false) => {

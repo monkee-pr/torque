@@ -18,18 +18,18 @@ class GamePanel {
         this.addGameObject(new Ball(new Hex(0, 0)));
 
         this.team1 = new Team(Team.TEAM_1);
-        const t1p1 = new Player(new Hex(-2, -1), this.team1);
+        const t1p1 = new Player(new Hex(-2, -1), Player.TYPE_1, this.team1);
         // this.team1.addPlayer(t1p1);
         this.addGameObject(t1p1);
-        const t1p2 = new Player(new Hex(-2, 1), this.team1);
+        const t1p2 = new Player(new Hex(-2, 1), Player.TYPE_2, this.team1);
         // this.team1.addPlayer(t1p2);
         this.addGameObject(t1p2);
 
         this.team2 = new Team(Team.TEAM_2);
-        const t2p1 = new Player(new Hex(1, -1), this.team2);
+        const t2p1 = new Player(new Hex(1, -1), Player.TYPE_1, this.team2);
         // this.team2.addPlayer(t2p1);
         this.addGameObject(t2p1);
-        const t2p2 = new Player(new Hex(1, 1), this.team2);
+        const t2p2 = new Player(new Hex(1, 1), Player.TYPE_2, this.team2);
         // this.team2.addPlayer(t2p2);
         this.addGameObject(t2p2);
 

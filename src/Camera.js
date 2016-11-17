@@ -23,32 +23,6 @@ class Camera {
     }
 }
 
-// rotates and scales the canvas
-Camera.changeAngleToMode = (mode, ctx) => {
-    // if (mode != this.mode) {
-    //     const canvas = ctx.canvas;
-    //
-    //     // move anchor point to center for rotation
-    //     ctx.translate(canvas.width/2, canvas.height/2);
-    //
-    //     // rotate and scale
-    //     let deg = 0;
-    //     if (mode == Camera.MODE_ISOMETRIC) {
-    //         ctx.scale(1, 0.5);
-    //         deg = -CanvasLayers.ROTATE_Z;
-    //     } else {
-    //         deg = CanvasLayers.ROTATE_Z;
-    //     }
-    //     ctx.rotate(deg * Math.PI / 180);
-    //     if (mode == Camera.MODE_TOP_DOWN) {
-    //         ctx.scale(1, 2);
-    //     }
-    //
-    //     // reset anchor point
-    //     ctx.translate(-canvas.width/2, -canvas.height/2);
-    // }
-}
-
 Camera.scale = 1;
 
 Camera.MODE_ISOMETRIC = "isometric";

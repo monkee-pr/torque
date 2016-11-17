@@ -8,10 +8,13 @@ function loadResources(doneFunc) {
         {name: "tileGoalRed", src: "res/tiles/tile_goal_red.png"},
         {name: "tileGoalBlue", src: "res/tiles/tile_goal_blue.png"},
         {name: "tileMidfield", src: "res/tiles/tile_middle.png"},
-        {name: "player1", src: "res/objects/player1.png"},
-        {name: "player2", src: "res/objects/player2.png"},
+        {name: "team1Player1", src: "res/objects/team_1_player_1.png"},
+        {name: "team1Player2", src: "res/objects/team_1_player_2.png"},
+        {name: "team1Player3", src: "res/objects/team_1_player_3.png"},
+        {name: "team2Player1", src: "res/objects/team_2_player_1.png"},
+        {name: "team2Player2", src: "res/objects/team_2_player_2.png"},
+        {name: "team2Player3", src: "res/objects/team_2_player_3.png"},
         {name: "ball", src: "res/objects/ball.png"},
-        {name: "charakter", src: "res/objects/charakter.png"},
     ]
 
     let soundQueue = [

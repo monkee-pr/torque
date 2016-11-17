@@ -6,8 +6,10 @@ Control.mouseMove = (e, gp) => {
     const y = target.height / target.clientHeight * e.clientY;
     const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
 
+    const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular() : point;
+
     const size = GameObject.BASE_SIZE * Camera.scale;
-    const hex = Point.pointToHex(point, size, gp.camera.mode);
+    const hex = Point.pointToHex(perspectivePoint, size);
 
     if (!(hoveredHex && hoveredHex.equals(hex))) {
         hoveredHex = hex;
@@ -33,8 +35,10 @@ Control.click = (e, gp) => {
     const y = target.height / target.clientHeight * e.clientY;
     const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
 
+    const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular() : point;
+
     const size = GameObject.BASE_SIZE * Camera.scale;
-    const hex = Point.pointToHex(point, size, gp.camera.mode);
+    const hex = Point.pointToHex(perspectivePoint, size);
 
     // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
     const clickableObjects = gp.layers.getSelectableObjects();
