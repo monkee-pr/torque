@@ -1,10 +1,7 @@
 class GameObject {
-    constructor(isMovable = false, isSelectable = false) {
-        this.isMovable = isMovable;
-        this.isSelectable = isSelectable;
-
+    constructor() {
         this.isHovered = false;
-        this.isSelected = false;
+        this.isHighlighted = false;
 
         this.scale = Camera.scale;
     }
@@ -23,4 +20,4 @@ class GameObject {
     }
 }
 
-GameObject.BASE_SIZE = 200;  // px for isometric camera mode
+GameObject.BASE_SIZE = 250;  // px for isometric camera mode

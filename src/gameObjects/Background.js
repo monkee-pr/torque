@@ -16,7 +16,11 @@ class Background extends GameObject {
         //         ctx.drawImage(this.image, x*this.image.width*this.scale, y*this.image.height*this.scale, this.image.width*this.scale, this.image.height*this.scale);
         //     }
         // }
-
+        const ratio = (100*Camera.scale) + "%";
+        this.image.width = ratio;
+        this.image.height = ratio;
+        const x = this.image;
+        const y = x.style;
         var pat = ctx.createPattern(this.image, "repeat");
         ctx.fillStyle = pat;
         ctx.fill();

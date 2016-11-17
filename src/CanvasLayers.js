@@ -42,45 +42,43 @@ class CanvasLayers {
     draw(ctx, cameraMode) {
         Object.toArray(this.layers).forEach((objects, layer) => {
 
-            const transform = cameraMode == Camera.MODE_ISOMETRIC;
-            if (transform) {
-                // rotate layer (or not)
-                switch (layer) {
-                    case CanvasLayers.LAYER_BACKGROUND:
-                    case CanvasLayers.LAYER_UI:
-                        break;
-                    case CanvasLayers.LAYER_BOARD:
-                    case CanvasLayers.LAYER_GAME_OBJECTS:
-                        Camera.changeAngleToMode(Camera.MODE_ISOMETRIC, ctx);
-                        break;
-                }
-            }
+            // const transform = cameraMode == Camera.MODE_ISOMETRIC;
+            // if (transform) {
+            //     // rotate layer (or not)
+            //     switch (layer) {
+            //         case CanvasLayers.LAYER_BACKGROUND:
+            //         case CanvasLayers.LAYER_UI:
+            //             break;
+            //         case CanvasLayers.LAYER_BOARD:
+            //         case CanvasLayers.LAYER_GAME_OBJECTS:
+            //             Camera.changeAngleToMode(Camera.MODE_ISOMETRIC, ctx);
+            //             break;
+            //     }
+            // }
 
             // draw layer's objects
             objects.forEach(object => object.draw(ctx, cameraMode));
             // if (layer == CanvasLayers.LAYER_BOARD) debugger;
 
-            if (transform) {
-                // rotate layer back (or not)
-                switch (layer) {
-                    case CanvasLayers.LAYER_BACKGROUND:
-                    case CanvasLayers.LAYER_UI:
-                        break;
-                    case CanvasLayers.LAYER_BOARD:
-                    case CanvasLayers.LAYER_GAME_OBJECTS:
-                        Camera.changeAngleToMode(Camera.MODE_TOP_DOWN, ctx);
-                        break;
-                }
-            }
+            // if (transform) {
+            //     // rotate layer back (or not)
+            //     switch (layer) {
+            //         case CanvasLayers.LAYER_BACKGROUND:
+            //         case CanvasLayers.LAYER_UI:
+            //             break;
+            //         case CanvasLayers.LAYER_BOARD:
+            //         case CanvasLayers.LAYER_GAME_OBJECTS:
+            //             Camera.changeAngleToMode(Camera.MODE_TOP_DOWN, ctx);
+            //             break;
+            //     }
+            // }
         });
     }
 
     getSelectableObjects() {
         const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
 
-        const selectableObjects = gameObjects.filter(o => o.isSelectable);
-
-        return selectableObjects;
+        return gameObjects;
     }
 
     getHoverableObjects() {
@@ -96,8 +94,3 @@ class CanvasLayers {
 CanvasLayers.LAYER_BOARD = 0;
 CanvasLayers.LAYER_GAME_OBJECTS = 1;
 CanvasLayers.LAYER_UI = 2;
-
-// rotation in degrees
-CanvasLayers.ROTATE_Z = 45;
-CanvasLayers.ROTATE_Y = 60;
-CanvasLayers.ROTATE_X = 0;

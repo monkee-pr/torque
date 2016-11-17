@@ -3,8 +3,8 @@ class GamePanel {
         this.cv = cv;
         this.ctx = cv.getContext("2d");
 
-        this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_TOP_DOWN);
-        // this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_ISOMETRIC);
+        // this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_TOP_DOWN);
+        this.camera = new Camera(Hex.hexToPoint(new Hex(0, 0)), Camera.MODE_ISOMETRIC);
 
         // layers for drawable objects
         this.layers = new CanvasLayers();
@@ -88,24 +88,40 @@ class GamePanel {
         // draw canvas border
         this.ctx.beginPath();
         this.ctx.lineWidth = 5;
-        this.ctx.strokeStyle = "#000";
+        this.ctx.strokeStyle = Color.GAME_BORDER;
         this.ctx.rect(0, 0, this.cv.width, this.cv.height);
         this.ctx.closePath();
         this.ctx.stroke();
     }
 
+    getBoard() {
+        return this.layers.layers[CanvasLayers.LAYER_BOARD][0];
+    }
+
     selectPlayer(player) {
+        // highlight player
         if (this.selectedPlayer == player) {
-            player.selected = false;
+            player.isHighlighted = false;
             this.selectedPlayer = null;
+            // } else if (this.selectedPlayer != player) {
+            //     if (this.selectedPlayer != null) {
+            //         this.selectedPlayer.isHighlighted = false;
+            //     }
+            //     player.isHighlighted = true;
+            //     this.selectedPlayer = player;
         } else if (this.selectedPlayer == null) {
-            if (player.isSelectable) {
-                player.selected = true;
-            }
+            player.isHighlighted = true;
             this.selectedPlayer = player;
+
+            // highlight neighbor fields
+            const field = this.getBoard().fields.filter(f => f.hex.equals(player.hex))[0];
+            const neighbors = field.getNeighbors();
+            neighbors.forEach(n => n.isHighlighted = true);
         } else {
-            console.log("other player selected");
+            // console.log("other player selected");
         }
+
+        console.log("selectedPlayer");
         console.log(this.selectedPlayer);
     }
 }

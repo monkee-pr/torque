@@ -6,25 +6,74 @@ class Field extends GameObject {
         this.hex = hex;
         this.type = type;
 
-        this.isHovered = false;
-        this.isSelected = false;
+        // color for top down perspective
+        let fill = true;
+        switch (this.type) {
+            case Field.TYPE_REGULAR:
+                break;
+            case Field.TYPE_HOLE:
+                this.color = Color.FIELD_HOLE_BACKGROUND;
+                break;
+            case Field.TYPE_HOT_ZONE:
+                break;
+            case Field.TYPE_SUPER_HOT_ZONE:
+                this.color = Color.FIELD_SUPER_HOT_ZONE_BACKGROUND;
+                break;
+            case Field.TYPE_PIT:
+                this.color = Color.FIELD_PIT_BACKGROUND;
+                break;
+            case Field.TYPE_MIDFIELD:
+                this.color = Color.FIELD_MIDFIELD_BACKGROUND;
+                break;
+        }
+
+        // image for iso perspective
+        switch (this.type) {
+            case Field.TYPE_REGULAR:
+                break;
+            case Field.TYPE_HOLE:
+            {
+                this.image = resources.tileGoalRed;
+                break;
+            }
+            case Field.TYPE_HOT_ZONE:
+                break;
+            case Field.TYPE_SUPER_HOT_ZONE:
+                break;
+            case Field.TYPE_PIT:
+                break;
+            case Field.TYPE_MIDFIELD:
+            {
+                this.image = resources.tileMidfield;
+                break;
+            }
+        }
     }
 
     update() {
         super.update();
     }
 
-    draw(ctx) {
+    draw(ctx, cameraMode) {
         const scaledSize = GameObject.BASE_SIZE * this.scale;
 
+        const center = Hex.hexToPoint(this.hex, scaledSize);//, cameraMode == Camera.MODE_ISOMETRIC);
+
         // calc corner points
-        const center = Hex.hexToPoint(this.hex, scaledSize);
-        const p0 = new Point(center.x, center.y - scaledSize);                                            // top
-        const p1 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top right
-        const p2 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom right
-        const p3 = new Point(center.x, center.y + scaledSize);                                            // bottom
-        const p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
-        const p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
+        let p0 = new Point(center.x, center.y - scaledSize);                                            // top
+        let p1 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top right
+        let p2 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom right
+        let p3 = new Point(center.x, center.y + scaledSize);                                            // bottom
+        let p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
+        let p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
+        if (cameraMode == Camera.MODE_ISOMETRIC) {
+            p0 = p0.toIso();
+            p1 = p1.toIso();
+            p2 = p2.toIso();
+            p3 = p3.toIso();
+            p4 = p4.toIso();
+            p5 = p5.toIso();
+        }
 
         // define border
         ctx.beginPath();
@@ -36,63 +85,47 @@ class Field extends GameObject {
         ctx.lineTo(p5.x, p5.y);
         ctx.closePath();
 
-        // fill area
-        let fill = true;
-        switch (this.type) {
-            case Field.TYPE_REGULAR:
-                // ctx.fillStyle = Color.FIELD_REGULAR_BACKGROUND;
-                fill = false;
-                break;
-            case Field.TYPE_HOLE:
-                ctx.fillStyle = Color.FIELD_HOLE_BACKGROUND;
-                break;
-            case Field.TYPE_HOT_ZONE:
-                // ctx.fillStyle = Color.FIELD_HOT_ZONE_BACKGROUND;
-                fill = false;
-                break;
-            case Field.TYPE_SUPER_HOT_ZONE:
-                ctx.fillStyle = Color.FIELD_SUPER_HOT_ZONE_BACKGROUND;
-                break;
-            case Field.TYPE_PIT:
-                ctx.fillStyle = Color.FIELD_PIT_BACKGROUND;
-                break;
-            case Field.TYPE_MIDFIELD:
-                ctx.fillStyle = Color.FIELD_MIDFIELD_BACKGROUND;
-                break;
-            default:
+        if (cameraMode == Camera.MODE_TOP_DOWN) {
+            // fill area
+            if (this.color) {
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            if (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE) {
+                // draw inner circles
+                ctx.beginPath();
+                const lineWidth = Field.BORDER_WIDTH * this.scale;
+                const radius = scaledSize/1.5;
+                ctx.arc(center.x, center.y, lineWidth, 0, 2*Math.PI, false);
+                ctx.strokeStyle = Color.FIELD_HOLE_CIRCLES;
+                const amountOfCircles = 2;
+                for (var i = 0; i < amountOfCircles; i++) {
+                    ctx.lineWidth = radius * (i+1);
+                    ctx.stroke();
+                }
+            }
+        } else if (cameraMode == Camera.MODE_ISOMETRIC) {
+            if (this.image != null) {
+                const point = Hex.hexToPoint(this.hex, GameObject.BASE_SIZE * this.scale).toIso();
+                const width = this.image.width * this.scale;
+                const height = this.image.height * this.scale;
+                ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
+            }
         }
-        if (fill) ctx.fill();
 
         // draw border
-        // ctx.lineJoin = "round";
-        // ctx.lineCap = "round";
-        if (this.isSelected) {
+        if (this.isHighlighted) {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
-            ctx.strokeStyle = Color.FIELD_BORDER_SELECT;
+            ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
         } else if (this.isHovered) {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
-            ctx.strokeStyle = Color.FIELD_BORDER_HOVER;
+            ctx.strokeStyle = Color.BORDER_HOVER;
         } else {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale;
             ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
         }
-        // ctx.shadowBlur = 1;
-        // ctx.shadowColor = "black";
         ctx.stroke();
-
-        if (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE) {
-            // draw inner circles
-            ctx.beginPath();
-            const lineWidth = Field.BORDER_WIDTH * this.scale;
-            const radius = scaledSize/1.5;
-            ctx.arc(center.x, center.y, lineWidth, 0, 2*Math.PI, false);
-            ctx.strokeStyle = Color.FIELD_HOLE_CIRCLES;
-            const amountOfCircles = 2;
-            for (var i = 0; i < amountOfCircles; i++) {
-                ctx.lineWidth = radius * (i+1);
-                ctx.stroke();
-            }
-        }
 
         // // draw coords
         // const fontSize = (GameObject.BASE_SIZE / 2 * this.scale);

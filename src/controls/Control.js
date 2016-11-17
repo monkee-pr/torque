@@ -7,7 +7,7 @@ Control.mouseMove = (e, gp) => {
     const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
 
     const size = GameObject.BASE_SIZE * Camera.scale;
-    const hex = Point.pointToHex(point, size);
+    const hex = Point.pointToHex(point, size, gp.camera.mode);
 
     if (!(hoveredHex && hoveredHex.equals(hex))) {
         hoveredHex = hex;
@@ -34,14 +34,14 @@ Control.click = (e, gp) => {
     const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
 
     const size = GameObject.BASE_SIZE * Camera.scale;
-    const hex = Point.pointToHex(point, size);
+    const hex = Point.pointToHex(point, size, gp.camera.mode);
 
     // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
     const clickableObjects = gp.layers.getSelectableObjects();
     const reversedGameObjects = clickableObjects.slice().reverse();
     let brk = false;
     reversedGameObjects.forEach(go => {
-        if (!brk && go.isSelectable && go.hex != null && hex.equals(go.hex)) {
+        if (!brk && go.hex != null && hex.equals(go.hex)) {
             go.onClick(gp);
             brk = true;
         }
