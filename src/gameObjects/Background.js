@@ -9,20 +9,21 @@ class Background extends GameObject {
     }
 
     draw(ctx) {
-        // const ratioX = Math.ceil(canvas.width / this.image.width)+10;
-        // const ratioY = Math.ceil(canvas.height / this.image.height)+10;
-        // for (var x = -5; x < ratioX; x++) {
-        //     for (var y = -5; y < ratioY; y++) {
-        //         ctx.drawImage(this.image, x*this.image.width*this.scale, y*this.image.height*this.scale, this.image.width*this.scale, this.image.height*this.scale);
-        //     }
-        // }
-        const ratio = (100*Camera.scale) + "%";
-        this.image.width = ratio;
-        this.image.height = ratio;
-        const x = this.image;
-        const y = x.style;
-        var pat = ctx.createPattern(this.image, "repeat");
-        ctx.fillStyle = pat;
+        const tempCanvas = document.createElement("canvas"),
+        tCtx = tempCanvas.getContext("2d");
+
+        const width = this.image.width * this.scale;
+        const height = this.image.height * this.scale;
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        tCtx.drawImage(this.image, 0, 0, width, height);
+
+        ctx.fillStyle = ctx.createPattern(tempCanvas, "repeat");
+
+        // anchor the pattern in the center
+        const canvas = ctx.canvas;
+        ctx.translate(canvas.width/2, canvas.height/2);
         ctx.fill();
+        ctx.translate(-canvas.width/2, -canvas.height/2);
     }
 }

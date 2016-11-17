@@ -232,6 +232,9 @@ class Board extends GameObject {
     }
 
     update() {
+        // update background
+        this.background.update();
+
         // reset all fields' selected status
         this.fields.forEach(f => f.isHighlighted = false);
 
