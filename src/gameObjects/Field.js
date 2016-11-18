@@ -67,10 +67,12 @@ class Field extends GameObject {
         super.update();
     }
 
-    draw(ctx, cameraMode) {
+    draw(ctx, gp) {
+        const cameraMode = gp.camera.getMode();
+        const cameraPosition = gp.camera.position;
         const scaledSize = GameObject.BASE_SIZE * this.scale;
 
-        const center = Hex.hexToPoint(this.hex, scaledSize);//, cameraMode == Camera.MODE_ISOMETRIC);
+        const center = Hex.hexToPoint(cameraPosition, this.hex);
 
         // calc corner points
         let p0 = new Point(center.x, center.y - scaledSize);                                            // top
@@ -80,12 +82,12 @@ class Field extends GameObject {
         let p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
         let p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
         if (cameraMode == Camera.MODE_ISOMETRIC) {
-            p0 = p0.toIso();
-            p1 = p1.toIso();
-            p2 = p2.toIso();
-            p3 = p3.toIso();
-            p4 = p4.toIso();
-            p5 = p5.toIso();
+            p0 = p0.toIso(gp.camera.position);
+            p1 = p1.toIso(gp.camera.position);
+            p2 = p2.toIso(gp.camera.position);
+            p3 = p3.toIso(gp.camera.position);
+            p4 = p4.toIso(gp.camera.position);
+            p5 = p5.toIso(gp.camera.position);
         }
 
         // define border
@@ -120,7 +122,7 @@ class Field extends GameObject {
             }
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
-                const point = Hex.hexToPoint(this.hex, GameObject.BASE_SIZE * this.scale).toIso();
+                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
                 const width = this.image.width * this.scale;
                 const height = this.image.height * this.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
@@ -215,4 +217,4 @@ Field.TYPE_SUPER_HOT_ZONE = "super_hot_zone";
 Field.TYPE_PIT = "pit";
 Field.TYPE_MIDFIELD = "midfield";
 
-Field.BORDER_WIDTH = GameObject.BASE_SIZE / 40 * 2;
+Field.BORDER_WIDTH = GameObject.BASE_SIZE / 50;

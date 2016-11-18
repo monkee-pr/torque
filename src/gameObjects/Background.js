@@ -8,7 +8,7 @@ class Background extends GameObject {
         super.update();
     }
 
-    draw(ctx) {
+    draw(ctx, anchor) {
         const tempCanvas = document.createElement("canvas"),
         tCtx = tempCanvas.getContext("2d");
 
@@ -22,8 +22,8 @@ class Background extends GameObject {
 
         // anchor the pattern in the center
         const canvas = ctx.canvas;
-        ctx.translate(canvas.width/2, canvas.height/2);
+        ctx.translate(anchor.x/2, anchor.xy/2);
         ctx.fill();
-        ctx.translate(-canvas.width/2, -canvas.height/2);
+        ctx.translate(-anchor.x/2, -anchor.xy/2);
     }
 }

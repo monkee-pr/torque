@@ -13,15 +13,13 @@ Hex.add = (hex1, hex2) => {
     return new Hex(hex1.q + hex2.q, hex1.r + hex2.r);
 }
 
-Hex.hexToPoint = (hex, size) => {   //, iso = false
-    const canvas = document.getElementById("canvas");
-    const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
-
+Hex.hexToPoint = (anchor, hex) => {
+    const size = GameObject.BASE_SIZE * Camera.scale;
     const baseX = size * Math.sqrt(3) * (hex.q + 0.5 * (hex.r&1));
     const baseY = size * 3/2 * hex.r;
 
-    const x = baseX + originFieldAnchor.x;
-    const y = baseY + originFieldAnchor.y;
+    const x = baseX + anchor.x;
+    const y = baseY + anchor.y;
 
     return new Point(x, y);
 }

@@ -8,8 +8,11 @@ class Game {
 
         // add controls
         this.cv.addEventListener("mousemove", e => Control.mouseMove(e, this.gp));
+        this.cv.addEventListener("mousedown", e => Control.mouseDown(e, this.gp));
+        this.cv.addEventListener("mouseup", e => Control.mouseUp(e, this.gp));
         this.cv.addEventListener("click", e => Control.click(e, this.gp));
         this.cv.addEventListener("mousewheel", e => Control.scroll(e, this.gp));
+        this.cv.addEventListener("dragstart", e => Control.drag(e, this.gp));
 
 
         this.run();

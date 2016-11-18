@@ -250,7 +250,9 @@ class Board extends GameObject {
         this.fields.forEach(f => f.update());
     }
 
-    draw(ctx, cameraMode) {
+    draw(ctx, gp) {
+        const cameraMode = gp.camera.getMode();
+        const cameraPosition = gp.camera.position;
         // define path to fill with background's pattern
         ctx.beginPath();
         this.fields.forEach(f => {
@@ -258,7 +260,7 @@ class Board extends GameObject {
             const scaledSize = GameObject.BASE_SIZE * f.scale;
 
             // calc corner points
-            const center = Hex.hexToPoint(f.hex, scaledSize);
+            const center = Hex.hexToPoint(cameraPosition, f.hex);
             let p0 = new Point(center.x, center.y - scaledSize);                                          // top
             let p1 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);  // top right
             let p2 = new Point(center.x + Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);  // bottom right
@@ -266,12 +268,12 @@ class Board extends GameObject {
             let p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);  // bottom left
             let p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);  // top left
             if (cameraMode == Camera.MODE_ISOMETRIC) {
-                p0 = p0.toIso();
-                p1 = p1.toIso();
-                p2 = p2.toIso();
-                p3 = p3.toIso();
-                p4 = p4.toIso();
-                p5 = p5.toIso();
+                p0 = p0.toIso(gp.camera.position);
+                p1 = p1.toIso(gp.camera.position);
+                p2 = p2.toIso(gp.camera.position);
+                p3 = p3.toIso(gp.camera.position);
+                p4 = p4.toIso(gp.camera.position);
+                p5 = p5.toIso(gp.camera.position);
             }
 
             ctx.moveTo(p0.x, p0.y);
@@ -284,9 +286,12 @@ class Board extends GameObject {
         ctx.closePath();
 
         // draw background as pattern filling selected path
-        this.background.draw(ctx);
+        const backgroundAnchor = Hex.hexToPoint(cameraPosition, this.fields[0].hex);
+        console.log(backgroundAnchor);
+        const perspectiveAnchor = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? backgroundAnchor.toRegular(backgroundAnchor) : backgroundAnchor;
+        this.background.draw(ctx, perspectiveAnchor);
 
-        this.fields.forEach(f => f.draw(ctx, cameraMode));
+        this.fields.forEach(f => f.draw(ctx, gp));
     }
 
     selectField(field) {

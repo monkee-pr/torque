@@ -19,10 +19,12 @@ class Ball extends GameObject {
         this.move();
     }
 
-    draw(ctx, cameraMode) {
+    draw(ctx, gp) {
+        const cameraMode = gp.camera.getMode();
+        const cameraPosition = gp.camera.position;
         const scaledSize = GameObject.BASE_SIZE * this.scale;
 
-        const center = Hex.hexToPoint(this.hex, scaledSize);//, cameraMode == Camera.MODE_ISOMETRIC);
+        const center = Hex.hexToPoint(cameraPosition, this.hex);
 
         // calc corner points
         let p0 = new Point(center.x, center.y - scaledSize);                                            // top
@@ -32,12 +34,12 @@ class Ball extends GameObject {
         let p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
         let p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
         if (cameraMode == Camera.MODE_ISOMETRIC) {
-            p0 = p0.toIso();
-            p1 = p1.toIso();
-            p2 = p2.toIso();
-            p3 = p3.toIso();
-            p4 = p4.toIso();
-            p5 = p5.toIso();
+            p0 = p0.toIso(cameraPosition);
+            p1 = p1.toIso(cameraPosition);
+            p2 = p2.toIso(cameraPosition);
+            p3 = p3.toIso(cameraPosition);
+            p4 = p4.toIso(cameraPosition);
+            p5 = p5.toIso(cameraPosition);
         }
 
         // define border
@@ -72,7 +74,7 @@ class Ball extends GameObject {
             }
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
-                const point = Hex.hexToPoint(this.hex, GameObject.BASE_SIZE * this.scale).toIso();
+                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
                 const width = this.image.width * this.scale;
                 const height = this.image.height * this.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
@@ -91,24 +93,6 @@ class Ball extends GameObject {
             ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
         }
         ctx.stroke();
-
-
-
-
-
-
-
-
-        // const size = GameObject.BASE_SIZE * this.scale;
-        // const center = Hex.hexToPoint(this.hex, size);
-        //
-        // // draw circle shaped ball
-        // ctx.beginPath();
-        // const radius = size * 0.75;
-        // ctx.arc(center.x, center.y, radius, 0, 2*Math.PI, false);
-        // ctx.fillStyle = Color.BALL;
-        // ctx.closePath();
-        // ctx.fill();
     }
 
     move() {

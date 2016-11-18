@@ -11,7 +11,7 @@ class GameObject {
         // if (this.isHovered) console.log(this.hex);
     }
 
-    draw(ctx) {
+    draw(ctx, gp) {
 
     }
 

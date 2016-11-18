@@ -1,7 +1,7 @@
 class CanvasLayers {
     constructor() {
         this.layers = {
-            // [CanvasLayers.LAYER_BACKGROUND] : [],
+            [CanvasLayers.LAYER_BACKGROUND] : [],
             [CanvasLayers.LAYER_BOARD] : [],
             [CanvasLayers.LAYER_GAME_OBJECTS] : [],
             [CanvasLayers.LAYER_UI] : [],
@@ -26,7 +26,7 @@ class CanvasLayers {
         objects.forEach(o => {
             const index = this.layers[layer].indexOf(o);
             if (index >= -1) {
-                this.layers[layer].remove(index);
+                this.layers[layer].splice(index, 1);
             } else {
                 console.error("GameObject was removed, but not found in CanvasLayer");
             }
@@ -39,10 +39,10 @@ class CanvasLayers {
         });
     }
 
-    draw(ctx, cameraMode) {
+    draw(ctx, gp) {
         Object.toArray(this.layers).forEach((objects, layer) => {
             // draw layer's objects
-            objects.forEach(object => object.draw(ctx, cameraMode));
+            objects.forEach(object => object.draw(ctx, gp));
         });
     }
 
@@ -61,7 +61,11 @@ class CanvasLayers {
         return hoverableObjects;
     }
 }
-// CanvasLayers.LAYER_BACKGROUND = 0;
-CanvasLayers.LAYER_BOARD = 0;
-CanvasLayers.LAYER_GAME_OBJECTS = 1;
-CanvasLayers.LAYER_UI = 2;
+CanvasLayers.LAYER_BACKGROUND = 0;
+CanvasLayers.LAYER_BOARD = 1;
+CanvasLayers.LAYER_GAME_OBJECTS = 2;
+CanvasLayers.LAYER_UI = 3;
+
+// CanvasLayers.LAYER_BOARD = 0;
+// CanvasLayers.LAYER_GAME_OBJECTS = 1;
+// CanvasLayers.LAYER_UI = 2;

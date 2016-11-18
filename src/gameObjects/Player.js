@@ -1,10 +1,37 @@
 class Player extends GameObject {
-    constructor(hex, type, team) {
+    constructor(gp, hex, id, team) {
         super();
 
+        this.gp = gp;
+
         this.hex = hex;
-        this.type = type;
+        this.id = id;
         this.team = team;
+
+        // exclude this in a DB later
+        let name, role, rank, stats, skills;
+        switch (this.id) {
+            case 0:
+                name = "player1Team" + this.team.id;
+                role = Player.ROLE_MAUL;
+                rank = 1;
+                break;
+            case 1:
+                name = "player2Team" + this.team.id;
+                role = Player.ROLE_BLADE;
+                rank = 1;
+                break;
+            case 2:
+                name = "player3Team" + this.team.id;
+                role = Player.ROLE_DART;
+                rank = 1;
+                break;
+        }
+        this.name = name;
+        this.role = role;
+        this.rank = rank;
+        this.stats = stats;
+        this.skills = skills;
 
         this.vq = 0;
         this.vr = 0;
@@ -23,27 +50,27 @@ class Player extends GameObject {
         // image for iso perspective
         switch (this.team.id) {
             case Team.TEAM_1:
-                switch (this.type) {
-                    case Player.TYPE_1:
+                switch (this.role) {
+                    case Player.ROLE_MAUL:
                         this.image = resources.team1Player1;
                         break;
-                    case Player.TYPE_2:
+                    case Player.ROLE_BLADE:
                         this.image = resources.team1Player2;
                         break;
-                    case Player.TYPE_3:
+                    case Player.ROLE_DART:
                         this.image = resources.team1Player3;
                         break;
                 }
                 break;
             case Team.TEAM_2:
-                switch (this.type) {
-                    case Player.TYPE_1:
+                switch (this.role) {
+                    case Player.ROLE_MAUL:
                         this.image = resources.team2Player1;
                         break;
-                    case Player.TYPE_2:
+                    case Player.ROLE_BLADE:
                         this.image = resources.team2Player2;
                         break;
-                    case Player.TYPE_3:
+                    case Player.ROLE_DART:
                         this.image = resources.team2Player3;
                         break;
                 }
@@ -56,10 +83,12 @@ class Player extends GameObject {
         this.move();
     }
 
-    draw(ctx, cameraMode) {
+    draw(ctx, gp) {
+        const cameraMode = gp.camera.getMode();
+        const cameraPosition = gp.camera.position;
         const scaledSize = GameObject.BASE_SIZE * this.scale;
 
-        const center = Hex.hexToPoint(this.hex, scaledSize);//, cameraMode == Camera.MODE_ISOMETRIC);
+        const center = Hex.hexToPoint(cameraPosition, this.hex);
 
         // calc corner points
         let p0 = new Point(center.x, center.y - scaledSize);                                            // top
@@ -69,12 +98,12 @@ class Player extends GameObject {
         let p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
         let p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
         if (cameraMode == Camera.MODE_ISOMETRIC) {
-            p0 = p0.toIso();
-            p1 = p1.toIso();
-            p2 = p2.toIso();
-            p3 = p3.toIso();
-            p4 = p4.toIso();
-            p5 = p5.toIso();
+            p0 = p0.toIso(gp.camera.position);
+            p1 = p1.toIso(gp.camera.position);
+            p2 = p2.toIso(gp.camera.position);
+            p3 = p3.toIso(gp.camera.position);
+            p4 = p4.toIso(gp.camera.position);
+            p5 = p5.toIso(gp.camera.position);
         }
 
         // define border
@@ -93,23 +122,9 @@ class Player extends GameObject {
                 ctx.fillStyle = this.color;
                 ctx.fill();
             }
-
-            if (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE) {
-                // draw inner circles
-                ctx.beginPath();
-                const lineWidth = Field.BORDER_WIDTH * this.scale;
-                const radius = scaledSize/1.5;
-                ctx.arc(center.x, center.y, lineWidth, 0, 2*Math.PI, false);
-                ctx.strokeStyle = Color.FIELD_HOLE_CIRCLES;
-                const amountOfCircles = 2;
-                for (var i = 0; i < amountOfCircles; i++) {
-                    ctx.lineWidth = radius * (i+1);
-                    ctx.stroke();
-                }
-            }
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
-                const point = Hex.hexToPoint(this.hex, GameObject.BASE_SIZE * this.scale).toIso();
+                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
                 const width = this.image.width * this.scale;
                 const height = this.image.height * this.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
@@ -118,7 +133,7 @@ class Player extends GameObject {
 
         // draw border
         if (this.isHighlighted) {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
+            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
             ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
         } else if (this.isHovered) {
             ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
@@ -128,45 +143,6 @@ class Player extends GameObject {
             ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
         }
         ctx.stroke();
-
-
-
-
-
-
-
-
-
-        // const size = GameObject.BASE_SIZE * this.scale;
-        // const center = Hex.hexToPoint(this.hex, size);
-        //
-        // // draw circle shaped player
-        // ctx.beginPath();
-        // const radius = size * 0.75;
-        // ctx.arc(center.x, center.y, radius, 0, 2*Math.PI, false);
-        // switch (this.team.id) {
-        //     case Team.TEAM_1:
-        //         ctx.fillStyle = Color.PLAYER_TEAM_1;
-        //         break;
-        //     case Team.TEAM_2:
-        //         ctx.fillStyle = Color.PLAYER_TEAM_2;
-        //         break;
-        //     default:
-        //         console.error("invalid team id");
-        // }
-        // ctx.closePath();
-        // ctx.fill();
-        //
-        // // draw border
-        // if (this.isHighlighted) {
-        //     ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
-        //     ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
-        //     ctx.stroke();
-        // } else if (this.isHovered) {
-        //     ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
-        //     ctx.strokeStyle = Color.BORDER_HOVER;
-        //     ctx.stroke();
-        // }
     }
 
     move() {
@@ -186,8 +162,22 @@ class Player extends GameObject {
     getField() {
 
     }
+
+    actionRun() {
+
+    }
+
+    // add this after demo
+    actionSprint() {
+    }
+
+    actionBash() {
+    }
+
+    actionThrow() {
+    }
 }
 
-Player.TYPE_1 = "type-1";
-Player.TYPE_2 = "type-2";
-Player.TYPE_3 = "type-3";
+Player.ROLE_MAUL = "maul";
+Player.ROLE_BLADE = "blade";
+Player.ROLE_DART = "dart";

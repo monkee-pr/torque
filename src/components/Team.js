@@ -9,5 +9,5 @@ class Team {
         this.players.push(player);
     }
 }
-Team.TEAM_1 = "team_1";
-Team.TEAM_2 = "team_2";
+Team.TEAM_1 = 1;
+Team.TEAM_2 = 2;

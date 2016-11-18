@@ -13,12 +13,9 @@ class Point {
         return distance;
     }
 
-    toIso() {
-        const canvas = document.getElementById("canvas");
-        const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
-
-        const relativeX = this.x - originFieldAnchor.x;
-        const relativeY = this.y - originFieldAnchor.y;
+    toIso(anchor) {
+        const relativeX = this.x - anchor.x;
+        const relativeY = this.y - anchor.y;
 
         const radians = -Camera.ROTATE_Z * (Math.PI/180);
         const rotatedX = relativeX * Math.cos(radians) - relativeY * Math.sin(radians);
@@ -27,15 +24,12 @@ class Point {
         const scaledX = rotatedX;
         const scaledY = rotatedY * Camera.SCALE_Y;
 
-        return new Point(scaledX + originFieldAnchor.x, scaledY + originFieldAnchor.y);
+        return new Point(scaledX + anchor.x, scaledY + anchor.y);
     }
 
-    toRegular() {
-        const canvas = document.getElementById("canvas");
-        const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
-
-        const relativeX = this.x - originFieldAnchor.x;
-        const relativeY = this.y - originFieldAnchor.y;
+    toRegular(anchor) {
+        const relativeX = this.x - anchor.x;
+        const relativeY = this.y - anchor.y;
 
         const scaledX = relativeX;
         const scaledY = relativeY / Camera.SCALE_Y;
@@ -44,33 +38,17 @@ class Point {
         const rotatedX = scaledX * Math.cos(radians) - scaledY * Math.sin(radians);
         const rotatedY = scaledX * Math.sin(radians) + scaledY * Math.cos(radians);
 
-        return new Point(rotatedX + originFieldAnchor.x, rotatedY + originFieldAnchor.y);
+        return new Point(rotatedX + anchor.x, rotatedY + anchor.y);
     }
 }
 
-Point.pointToHex = (point, size, iso = false) => {
-    const canvas = document.getElementById("canvas");
-    const originFieldAnchor = new Point(canvas.width / 2, canvas.height / 2);
+Point.pointToHex = (anchor, point) => {
+    const size = GameObject.BASE_SIZE * Camera.scale;
 
     const baseX = point.x;
     const baseY = point.y;
 
-    let relativePoint = null;
-    if (iso) {
-        const scaledX = baseX;
-        const scaledY = baseY * Camera.SCALE_Y;
-
-        const radians = -Camera.ROTATE_Z * (Math.PI/180);
-        const rotatedX = scaledX * Math.cos(radians) - scaledY * Math.sin(radians);
-        const rotatedY = scaledX * Math.sin(radians) + scaledY * Math.cos(radians);
-
-        const x = rotatedX + originFieldAnchor.x;
-        const y = rotatedY + originFieldAnchor.y;
-
-        relativePoint = new Point(x, y);
-    } else {
-        relativePoint = new Point(baseX - originFieldAnchor.x, baseY - originFieldAnchor.y);
-    }
+    const relativePoint = new Point(baseX - anchor.x, baseY - anchor.y);
 
     const r = Math.round(relativePoint.y * 2/3 / size);
     const q = Math.round(relativePoint.x / (size * Math.sqrt(3)) - (r%2 ? 0.5 : 0));
@@ -79,7 +57,7 @@ Point.pointToHex = (point, size, iso = false) => {
 
     // correct hex
     const guessedAndNeighbors = [guessedHex].concat(Hex.getNeighbors(guessedHex));
-    const points = guessedAndNeighbors.map(h => Hex.hexToPoint(h, size));
+    const points = guessedAndNeighbors.map(h => Hex.hexToPoint(anchor, h));
     const distancesToPoints = points.map(p => point.distanceTo(p));
     const highestDistance = distancesToPoints.reduce((a, b) => Math.min(a, b));
     const index = distancesToPoints.indexOf(highestDistance);
