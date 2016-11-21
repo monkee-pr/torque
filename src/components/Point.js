@@ -13,6 +13,15 @@ class Point {
         return distance;
     }
 
+    hits(point, width, height) {
+        return !(
+            this.x < point.x ||
+            this.x > point.x + width ||
+            this.y < point.y ||
+            this.y > point.y + height
+        )
+    }
+
     toIso(anchor) {
         const relativeX = this.x - anchor.x;
         const relativeY = this.y - anchor.y;

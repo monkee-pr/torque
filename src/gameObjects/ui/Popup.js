@@ -1,6 +1,6 @@
 class Popup extends UIElement {
-    constructor(point) {
-        super(point);
+    constructor(point, width, height) {
+        super(point, width, height);
     }
 
     update() {

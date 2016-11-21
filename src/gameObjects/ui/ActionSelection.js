@@ -1,10 +1,13 @@
 class ActionSelection extends Popup {
     constructor(player) {
-        super();
+        super(new Point(760, 410), 400, 260);
 
         this.player = player;
 
-        this.buttonRun = new Button("run", this.run);
+        this.buttonRun = new Button(null, 400, 60, "run", this.run, {player:this.player, startHex:this.player.hex});
+
+        this.height += this.buttonRun.height;
+        this.point.y -= this.buttonRun.height;
     }
 
     update() {
@@ -19,33 +22,46 @@ class ActionSelection extends Popup {
         ctx.globalAlpha = 1;
 
         const tCv = document.createElement("canvas");
-        tCv.width = 400;
-        tCv.height = 260;
-        tCv.height = 160;
+        tCv.width = this.width;
+        tCv.height = this.height;
         const tCtx = tCv.getContext("2d");
 
-        tCtx.fillStyle = "green";
+        tCtx.fillStyle = "#0f0";
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";
-        tCtx.fillText("Name: " + this.player.name,10,50);
-        tCtx.fillText("Role: " + this.player.role,10,100);
-        tCtx.fillText("Rank: " + this.player.rank,10,150);
-        tCtx.fillText("Stats: " + this.player.stats,10,200);
-        tCtx.fillText("Skills: " + this.player.skills,10,250);
+        let textY = this.buttonRun.height;
+        tCtx.fillText("Name: " + this.player.name,10,textY);
+        textY+=50;
+        tCtx.fillText("Role: " + this.player.role,10,textY);
+        textY+=50;
+        tCtx.fillText("Rank: " + this.player.rank,10,textY);
+        textY+=50;
+        tCtx.fillText("Stats: " + this.player.stats,10,textY);
+        textY+=50;
+        tCtx.fillText("Skills: " + this.player.skills,10,textY);
 
         tCtx.strokeStyle = "black";
         tCtx.lineWidth = 5;
         tCtx.rect(0, 0, tCv.width, tCv.height);
         tCtx.stroke();
 
-        const x = (cv.width - tCv.width) / 2;
-        const y = (cv.height - tCv.height) / 2;
-        ctx.drawImage(tCv, x, y, tCv.width, tCv.height);
+        ctx.drawImage(tCv, this.point.x, this.point.y + this.buttonRun.height, tCv.width, tCv.height);
+
+        this.buttonRun.draw(ctx, new Point(this.point.x, this.point.y));   // above the info
     }
 
-    run() {
+    run(gp, params) {
         console.log("make player run");
-        console.log(this.player);
+        console.log(params.player);
+        gp.closeTopPopup();
+        gp.setAction(new Action(Action.TYPE_RUN, params));
+    }
+
+    onClick(gp, point) {
+        const run = this.buttonRun;
+        if (point.hits(run.point, run.width, run.height)) {
+            run.onClick(gp);
+        }
     }
 }

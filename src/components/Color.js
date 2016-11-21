@@ -19,3 +19,5 @@ Color.FIELD_BORDER_REGULAR = "#915900"
 Color.BORDER_HOVER = "black";
 Color.BORDER_HIGHLIGHT = "cyan";
 Color.GAME_BORDER = "black";
+Color.BUTTON = "white";
+Color.BUTTON_HOVER = "#77f"

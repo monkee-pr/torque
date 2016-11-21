@@ -103,7 +103,7 @@ class Field extends GameObject {
     draw(ctx, gp) {
         const cameraMode = gp.camera.getMode();
         const cameraPosition = gp.camera.position;
-        const scaledSize = GameObject.BASE_SIZE * this.scale;
+        const scaledSize = GameObject.BASE_SIZE * Camera.scale;
 
         const center = Hex.hexToPoint(cameraPosition, this.hex);
 
@@ -143,7 +143,7 @@ class Field extends GameObject {
             if (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE) {
                 // draw inner circles
                 ctx.beginPath();
-                const lineWidth = Field.BORDER_WIDTH * this.scale;
+                const lineWidth = Field.BORDER_WIDTH * Camera.scale;
                 const radius = scaledSize/1.5;
                 ctx.arc(center.x, center.y, lineWidth, 0, 2*Math.PI, false);
                 ctx.strokeStyle = Color.FIELD_HOLE_CIRCLES;
@@ -156,27 +156,27 @@ class Field extends GameObject {
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
-                const width = this.image.width * this.scale;
-                const height = this.image.height * this.scale;
+                const width = this.image.width * Camera.scale;
+                const height = this.image.height * Camera.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
             }
         }
 
         // draw border
         if (this.isHighlighted) {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 5;
+            ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
             ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
         } else if (this.isHovered) {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
+            ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
             ctx.strokeStyle = Color.BORDER_HOVER;
         } else {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale;
+            ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
             ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
         }
         ctx.stroke();
 
         // // draw coords
-        // const fontSize = (GameObject.BASE_SIZE / 2 * this.scale);
+        // const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
         // ctx.font = fontSize + "px Georgia";
         // ctx.fillStyle="black"
         // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);

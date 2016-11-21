@@ -59,30 +59,41 @@ Control.drag = (e, gp) => {
 
 Control.click = (e, gp) => {
     if (!Control.dragged) {
-        if (gp.isPopupOpen()) {
-            gp.closeTopPopup();
-            gp.selectPlayer(gp.selectedPlayer);
-        } else {
-            const target = e.target;
-            const x = target.width / target.clientWidth * e.clientX;
-            const y = target.height / target.clientHeight * e.clientY;
-            const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
+        const target = e.target;
+        const x = target.width / target.clientWidth * e.clientX;
+        const y = target.height / target.clientHeight * e.clientY;
+        const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
 
-            const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular(gp.camera.position) : point;
+        const uiElements = gp.layers.getUIElements();
+        let found = false;
+        uiElements.forEach(ui => {
+            if (!found && point.hits(ui.point, ui.width, ui.height)) {
+                ui.onClick(gp, point);
+                found = true;
+            }
+        });
 
-            const anchor = gp.camera.position;
-            const hex = Point.pointToHex(anchor, perspectivePoint);
+        if (!found) {
+            if (gp.isPopupOpen()) {
+                gp.closeTopPopup();
+                gp.selectPlayer(gp.selectedPlayer);
+            } else {
+                const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular(gp.camera.position) : point;
 
-            // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
-            const clickableObjects = gp.layers.getSelectableObjects();
-            const reversedGameObjects = clickableObjects.slice().reverse();
-            let brk = false;
-            reversedGameObjects.forEach(go => {
-                if (!brk && go.hex != null && hex.equals(go.hex)) {
-                    go.onClick(gp);
-                    brk = true;
-                }
-            });
+                const anchor = gp.camera.position;
+                const hex = Point.pointToHex(anchor, perspectivePoint);
+
+                // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
+                const clickableObjects = gp.layers.getSelectableObjects();
+                const reversedGameObjects = clickableObjects.slice().reverse();
+                let brk = false;
+                reversedGameObjects.forEach(go => {
+                    if (!brk && go.hex != null && hex.equals(go.hex)) {
+                        go.onClick(gp);
+                        brk = true;
+                    }
+                });
+            }
         }
     }
     Control.dragged = false;

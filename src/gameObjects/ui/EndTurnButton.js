@@ -1,11 +1,12 @@
-class TurnInfo extends UIElement {
+class EndTurnButton extends Button {
     constructor(gp) {
-        super(new Point(0, 0), 300, 60);
+        const onClick = () => null;
+        super(new Point(0, 0), 300, 60, "End Turn", onClick);
         this.gp = gp;
     }
 
     update() {
-        // super.update();
+        super.update();
     }
 
     draw(ctx) {

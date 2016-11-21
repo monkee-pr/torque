@@ -1,6 +1,6 @@
 class PlayerInfo extends Popup {
     constructor(player) {
-        super();
+        super(new Point(760, 410), 400, 260);
 
         this.player = player;
     }
@@ -17,8 +17,8 @@ class PlayerInfo extends Popup {
         ctx.globalAlpha = 1;
 
         const tCv = document.createElement("canvas");
-        tCv.width = 400;
-        tCv.height = 260;
+        tCv.width = this.width;
+        tCv.height = this.height;
         const tCtx = tCv.getContext("2d");
 
         tCtx.fillStyle = "red";
@@ -36,8 +36,6 @@ class PlayerInfo extends Popup {
         tCtx.rect(0, 0, tCv.width, tCv.height);
         tCtx.stroke();
 
-        const x = (cv.width - tCv.width) / 2;
-        const y = (cv.height - tCv.height) / 2;
-        ctx.drawImage(tCv, x, y, tCv.width, tCv.height);
+        ctx.drawImage(tCv, this.point.x, this.point.y, tCv.width, tCv.height);
     }
 }

@@ -86,7 +86,7 @@ class Player extends GameObject {
     draw(ctx, gp) {
         const cameraMode = gp.camera.getMode();
         const cameraPosition = gp.camera.position;
-        const scaledSize = GameObject.BASE_SIZE * this.scale;
+        const scaledSize = GameObject.BASE_SIZE * Camera.scale;
 
         const center = Hex.hexToPoint(cameraPosition, this.hex);
 
@@ -116,33 +116,37 @@ class Player extends GameObject {
         ctx.lineTo(p5.x, p5.y);
         ctx.closePath();
 
+        const drawBorder = () => {
+            // draw border
+            if (this.isHighlighted) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
+            } else if (this.isHovered) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_HOVER;
+            } else {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
+                ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+            }
+            ctx.stroke();
+        }
+
         if (cameraMode == Camera.MODE_TOP_DOWN) {
             // fill area
             if (this.color) {
                 ctx.fillStyle = this.color;
                 ctx.fill();
             }
+            drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
+            drawBorder();
             if (this.image != null) {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
-                const width = this.image.width * this.scale;
-                const height = this.image.height * this.scale;
+                const width = this.image.width * Camera.scale;
+                const height = this.image.height * Camera.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
             }
         }
-
-        // draw border
-        if (this.isHighlighted) {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
-            ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
-        } else if (this.isHovered) {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale * 2;
-            ctx.strokeStyle = Color.BORDER_HOVER;
-        } else {
-            ctx.lineWidth = Field.BORDER_WIDTH * this.scale;
-            ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
-        }
-        ctx.stroke();
     }
 
     move() {

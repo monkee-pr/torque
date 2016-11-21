@@ -6,6 +6,8 @@ class CanvasLayers {
             [CanvasLayers.LAYER_GAME_OBJECTS] : [],
             [CanvasLayers.LAYER_UI] : [],
         };
+
+        this.hideUI = false;    // not fully implemented yet (e.g. the controls)
     }
 
     add(objects, layer) {
@@ -42,8 +44,23 @@ class CanvasLayers {
     draw(ctx, gp) {
         Object.toArray(this.layers).forEach((objects, layer) => {
             // draw layer's objects
+            if (layer == CanvasLayers.LAYER_UI && this.hideUI) {
+                return;
+            }
             objects.forEach(object => object.draw(ctx, gp));
         });
+    }
+
+    getBoardFields() {
+        const fields = this.layers[CanvasLayers.LAYER_BOARD].map(b => b.fields).reduce((a, b) => a.concat(b));
+
+        return fields;
+    }
+
+    getUIElements() {
+        const uiElements = this.layers[CanvasLayers.LAYER_UI];
+
+        return uiElements;
     }
 
     getSelectableObjects() {
@@ -53,7 +70,7 @@ class CanvasLayers {
     }
 
     getHoverableObjects() {
-        const fields = this.layers[CanvasLayers.LAYER_BOARD].map(b => b.fields).reduce((a, b) => a.concat(b));
+        const fields = this.getBoardFields();
         const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
 
         const hoverableObjects = fields.concat(gameObjects);

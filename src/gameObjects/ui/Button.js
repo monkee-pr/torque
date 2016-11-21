@@ -1,16 +1,18 @@
 class Button extends UIElement {
-    constructor(title, onClick) {
-        super();
+    constructor(anchor, width, height, title, onClick, onClickParams) {
+        super(anchor, width, height);
 
         this.title = title;
-        this.onClick = onClick;
+        this.onClickFunc = onClick;
+        this.onClickParams = onClickParams == null ? {} : typeof onClickParams != "object" ? {onClickParams} : onClickParams;
     }
 
     update() {
         super.update();
     }
 
-    draw(ctx) {
+    draw(ctx, anchor) {
+        this.point = anchor;
         const cv = ctx.canvas;
         ctx.globalAlpha = 0.5;
         ctx.fillStyle="black";
@@ -18,8 +20,8 @@ class Button extends UIElement {
         ctx.globalAlpha = 1;
 
         const tCv = document.createElement("canvas");
-        tCv.width = 400;
-        tCv.height = 60;
+        tCv.width = this.width;
+        tCv.height = this.height;
         const tCtx = tCv.getContext("2d");
 
         tCtx.fillStyle = "white";
@@ -33,12 +35,10 @@ class Button extends UIElement {
         tCtx.rect(0, 0, tCv.width, tCv.height);
         tCtx.stroke();
 
-        const x = (cv.width - tCv.width) / 2;
-        const y = (cv.height - tCv.height) / 2;
-        ctx.drawImage(tCv, x, y, tCv.width, tCv.height);
+        ctx.drawImage(tCv, anchor.x, anchor.y, tCv.width, tCv.height);
     }
 
-    onClick() {
-        this.onClick();
+    onClick(gp) {
+        this.onClickFunc(gp, this.onClickParams);
     }
 }

@@ -42,6 +42,7 @@ class GamePanel {
         this.startNextTurn();
 
         this.selectedPlayer = null;
+        this._action = null;
 
         this.addUIElement(new TurnInfo(this));
     }
@@ -83,6 +84,25 @@ class GamePanel {
         this.layers.remove(ui, CanvasLayers.LAYER_UI);
     }
 
+    setAction(action) {
+        this._action = action;
+        console.log("action");
+        console.log(action);
+        if (action.type == Action.TYPE_RUN) {
+            const player = action.data.player;
+            const playerField = this.layers.getBoardFields().filter(f => f.hex.equals(player.hex))[0];
+            const neighborFields = playerField.getNeighbors();
+            neighborFields.forEach(f => f.isHighlighted = true);
+        }
+    }
+    cancelAction() {
+        const action = this._action;
+        if (action && action.type == Action.TYPE_RUN) {
+            this.layers.getBoardFields().forEach(f => f.isHighlighted = false);
+        }
+        this._action = null;
+    }
+
     update() {
         // this.gameObjects.forEach(go => go.update());
         this.layers.update();
@@ -111,14 +131,14 @@ class GamePanel {
     }
 
     isPopupOpen() {
-        const uiElements = this.layers.layers[CanvasLayers.LAYER_UI];
+        const uiElements = this.layers.getUIElements();
         const popups = uiElements.filter(ui => ui instanceof Popup);
 
         return popups.length > 0;
     }
 
     closeTopPopup() {
-        const uiElements = this.layers.layers[CanvasLayers.LAYER_UI];
+        const uiElements = this.layers.getUIElements();
         const popups = uiElements.filter(ui => ui instanceof Popup);
         const topPopup = popups[popups.length-1];
 
@@ -140,6 +160,7 @@ class GamePanel {
         if (this.selectedPlayer == player) {
             player.isHighlighted = false;
             this.selectedPlayer = null;
+            this.cancelAction();
             // } else if (this.selectedPlayer != player) {
             //     if (this.selectedPlayer != null) {
             //         this.selectedPlayer.isHighlighted = false;
@@ -150,7 +171,8 @@ class GamePanel {
             player.isHighlighted = true;
             this.selectedPlayer = player;
 
-            const uiElement = player.team.id == this.activeTeam.id ? new ActionSelection(this.team1.players[0]) : new PlayerInfo(this.team1.players[0]);
+            const playerOfActiveTeam = player.team.id == this.activeTeam.id;
+            const uiElement = playerOfActiveTeam ? new ActionSelection(player) : new PlayerInfo(player);
             this.addUIElement(uiElement);
 
             // // highlight neighbor fields
@@ -160,8 +182,5 @@ class GamePanel {
         } else {
             // console.log("other player selected");
         }
-
-        console.log("selectedPlayer");
-        console.log(this.selectedPlayer);
     }
 }

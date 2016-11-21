@@ -12,4 +12,9 @@ class UIElement extends GameObject {
 
     draw(ctx) {
     }
+
+    onClick(gp, point) {
+        // console.log("clicked");
+        // console.log(this);
+    }
 }

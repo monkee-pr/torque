@@ -231,20 +231,23 @@ class Board extends GameObject {
         ];
     }
 
-    update() {
+    update(gp) {
         // update background
         this.background.update();
 
-        // reset all fields' selected status
-        this.fields.forEach(f => f.isHighlighted = false);
-
-        // set selected status of selected field's neighbors
-        this.fields.forEach(f => {
-            if (f == this.selectedField) {
-                const neighbors = f.getNeighbors();
-                neighbors.forEach(n => n.isHighlighted = true);
-            }
-        });
+        // // reset all fields' selected status
+        // this.fields.forEach(f => f.isHighlighted = false);
+        //
+        // // set selected status of selected field's neighbors
+        // this.fields.forEach(f => {
+        //     if (
+        //         f == this.selectedField
+        //         // || (gp.action && gp.action.type == Action.TYPE_RUN && gp.action.data.player.hex)
+        //     ) {
+        //         const neighbors = f.getNeighbors();
+        //         neighbors.forEach(n => n.isHighlighted = true);
+        //     }
+        // });
 
         // update fields
         this.fields.forEach(f => f.update());
@@ -257,7 +260,7 @@ class Board extends GameObject {
         ctx.beginPath();
         this.fields.forEach(f => {
 
-            const scaledSize = GameObject.BASE_SIZE * f.scale;
+            const scaledSize = GameObject.BASE_SIZE * Camera.scale;
 
             // calc corner points
             const center = Hex.hexToPoint(cameraPosition, f.hex);
