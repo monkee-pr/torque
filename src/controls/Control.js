@@ -23,9 +23,8 @@ Control.mouseMove = (e, gp) => {
 
         const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular(gp.camera.position) : point;
 
-        const size = GameObject.BASE_SIZE * Camera.scale;
         const anchor = gp.camera.position;
-        const hex = Point.pointToHex(anchor, perspectivePoint, size);
+        const hex = Point.pointToHex(anchor, perspectivePoint);
 
         if (!(Control.hoveredHex && Control.hoveredHex.equals(hex))) {
             Control.hoveredHex = hex;
@@ -71,9 +70,8 @@ Control.click = (e, gp) => {
 
             const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular(gp.camera.position) : point;
 
-            const size = GameObject.BASE_SIZE * Camera.scale;
             const anchor = gp.camera.position;
-            const hex = Point.pointToHex(anchor, perspectivePoint, size);
+            const hex = Point.pointToHex(anchor, perspectivePoint);
 
             // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
             const clickableObjects = gp.layers.getSelectableObjects();

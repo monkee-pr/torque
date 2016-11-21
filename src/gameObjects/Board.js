@@ -287,7 +287,6 @@ class Board extends GameObject {
 
         // draw background as pattern filling selected path
         const backgroundAnchor = Hex.hexToPoint(cameraPosition, this.fields[0].hex);
-        console.log(backgroundAnchor);
         const perspectiveAnchor = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? backgroundAnchor.toRegular(backgroundAnchor) : backgroundAnchor;
         this.background.draw(ctx, perspectiveAnchor);
 

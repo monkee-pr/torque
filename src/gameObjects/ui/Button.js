@@ -1,10 +1,9 @@
-class ActionSelection extends Popup {
-    constructor(player) {
+class Button extends UIElement {
+    constructor(title, onClick) {
         super();
 
-        this.player = player;
-
-        this.buttonRun = new Button("run", this.run);
+        this.title = title;
+        this.onClick = onClick;
     }
 
     update() {
@@ -20,19 +19,14 @@ class ActionSelection extends Popup {
 
         const tCv = document.createElement("canvas");
         tCv.width = 400;
-        tCv.height = 260;
-        tCv.height = 160;
+        tCv.height = 60;
         const tCtx = tCv.getContext("2d");
 
-        tCtx.fillStyle = "green";
+        tCtx.fillStyle = "white";
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";
-        tCtx.fillText("Name: " + this.player.name,10,50);
-        tCtx.fillText("Role: " + this.player.role,10,100);
-        tCtx.fillText("Rank: " + this.player.rank,10,150);
-        tCtx.fillText("Stats: " + this.player.stats,10,200);
-        tCtx.fillText("Skills: " + this.player.skills,10,250);
+        tCtx.fillText(this.title, 10, 50);
 
         tCtx.strokeStyle = "black";
         tCtx.lineWidth = 5;
@@ -44,8 +38,7 @@ class ActionSelection extends Popup {
         ctx.drawImage(tCv, x, y, tCv.width, tCv.height);
     }
 
-    run() {
-        console.log("make player run");
-        console.log(this.player);
+    onClick() {
+        this.onClick();
     }
 }

@@ -16,7 +16,7 @@ class TurnInfo extends UIElement {
         tCv.height = 60;
         const tCtx = tCv.getContext("2d");
 
-        tCtx.fillStyle = "white";
+        tCtx.fillStyle = "yellow";
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";

@@ -149,8 +149,9 @@ class GamePanel {
         } else if (this.selectedPlayer == null) {
             player.isHighlighted = true;
             this.selectedPlayer = player;
-            this.addUIElement(new PlayerInfo(this.team1.players[0]));
-            console.log("ui element added");
+
+            const uiElement = player.team.id == this.activeTeam.id ? new ActionSelection(this.team1.players[0]) : new PlayerInfo(this.team1.players[0]);
+            this.addUIElement(uiElement);
 
             // // highlight neighbor fields
             // const field = this.getBoard().fields.filter(f => f.hex.equals(player.hex))[0];

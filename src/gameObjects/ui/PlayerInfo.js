@@ -21,7 +21,7 @@ class PlayerInfo extends Popup {
         tCv.height = 260;
         const tCtx = tCv.getContext("2d");
 
-        tCtx.fillStyle = "white";
+        tCtx.fillStyle = "red";
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";

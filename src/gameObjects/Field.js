@@ -50,10 +50,43 @@ class Field extends GameObject {
                 break;
             }
             case Field.TYPE_HOT_ZONE:
+            {
+                switch (this.teamSide) {
+                    case Team.TEAM_1:
+                        this.image = resources.tileGoalBlue;
+                        break;
+                    case Team.TEAM_2:
+                        this.image = resources.tileGoalRed;
+                        break;
+                }
+                break;
+            }
                 break;
             case Field.TYPE_SUPER_HOT_ZONE:
+            {
+                switch (this.teamSide) {
+                    case Team.TEAM_1:
+                        this.image = resources.tileGoalBlue;
+                        break;
+                    case Team.TEAM_2:
+                        this.image = resources.tileGoalRed;
+                        break;
+                }
+                break;
+            }
                 break;
             case Field.TYPE_PIT:
+            {
+                switch (this.teamSide) {
+                    case Team.TEAM_1:
+                        this.image = resources.tileGoalBlue;
+                        break;
+                    case Team.TEAM_2:
+                        this.image = resources.tileGoalRed;
+                        break;
+                }
+                break;
+            }
                 break;
             case Field.TYPE_MIDFIELD:
             {
@@ -207,6 +240,7 @@ class Field extends GameObject {
 
     onClick() {
         // this.board.selectField(this);
+        console.log("clicked");
     }
 }
 
