@@ -1,8 +1,9 @@
 class Background extends GameObject {
-    constructor(image) {
+    constructor(image = null, color = null) {
         super();
 
         this.image = image;
+        this.color = color;
     }
     update() {
     }

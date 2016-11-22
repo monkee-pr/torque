@@ -4,7 +4,7 @@ class ActionSelection extends Popup {
 
         this.player = player;
 
-        this.buttonRun = new Button(null, 400, 60, "run", this.run, {player:this.player, startHex:this.player.hex});
+        this.buttonRun = new Button(null, 400, 60, "run", this.run, {player});
 
         this.height += this.buttonRun.height;
         this.point.y -= this.buttonRun.height;
@@ -26,7 +26,7 @@ class ActionSelection extends Popup {
         tCv.height = this.height;
         const tCtx = tCv.getContext("2d");
 
-        tCtx.fillStyle = "#0f0";
+        tCtx.fillStyle = Color.POPUP_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";
@@ -52,10 +52,9 @@ class ActionSelection extends Popup {
     }
 
     run(gp, params) {
-        console.log("make player run");
-        console.log(params.player);
+        const player = params.player;
         gp.closeTopPopup();
-        gp.setAction(new Action(Action.TYPE_RUN, params));
+        gp.setAction(new RunAction(gp, player));
     }
 
     onClick(gp, point) {

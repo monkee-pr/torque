@@ -1,6 +1,6 @@
 class TurnInfo extends UIElement {
     constructor(gp) {
-        super(new Point(0, 0), 300, 60);
+        super(new Point(0, 0), 350, 60);
         this.gp = gp;
     }
 
@@ -20,7 +20,7 @@ class TurnInfo extends UIElement {
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";
-        tCtx.fillText("Active Team: " + this.gp.activeTeam.id,10,50);
+        tCtx.fillText("Active Team: " + (this.gp.activeTeam.id == 1 ? "Blue" : "Red"),10,50);
 
         tCtx.strokeStyle = "black";
         tCtx.lineWidth = 5;

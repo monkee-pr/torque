@@ -115,12 +115,12 @@ class Field extends GameObject {
         let p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
         let p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
         if (cameraMode == Camera.MODE_ISOMETRIC) {
-            p0 = p0.toIso(gp.camera.position);
-            p1 = p1.toIso(gp.camera.position);
-            p2 = p2.toIso(gp.camera.position);
-            p3 = p3.toIso(gp.camera.position);
-            p4 = p4.toIso(gp.camera.position);
-            p5 = p5.toIso(gp.camera.position);
+            p0 = p0.toIso(cameraPosition);
+            p1 = p1.toIso(cameraPosition);
+            p2 = p2.toIso(cameraPosition);
+            p3 = p3.toIso(cameraPosition);
+            p4 = p4.toIso(cameraPosition);
+            p5 = p5.toIso(cameraPosition);
         }
 
         // define border
@@ -153,33 +153,38 @@ class Field extends GameObject {
                     ctx.stroke();
                 }
             }
+
+            // draw coords
+            const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
+            ctx.font = fontSize + "px Georgia";
+            ctx.fillStyle="black"
+            ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
-                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
+                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
                 const width = this.image.width * Camera.scale;
                 const height = this.image.height * Camera.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
             }
         }
 
-        // draw border
-        if (this.isHighlighted) {
-            ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-            ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
-        } else if (this.isHovered) {
-            ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-            ctx.strokeStyle = Color.BORDER_HOVER;
-        } else {
-            ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
-            ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+        if (cameraMode == Camera.MODE_TOP_DOWN || this.image == null || this.image == resources.tileMidfield) {
+            // draw border
+            if (this.isHighlighted && this.isHovered) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
+            } else if (this.isHighlighted) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
+            } else if (this.isHovered) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_HOVER;
+            } else {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
+                ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+            }
+            ctx.stroke();
         }
-        ctx.stroke();
-
-        // // draw coords
-        // const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
-        // ctx.font = fontSize + "px Georgia";
-        // ctx.fillStyle="black"
-        // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
     }
 
     getNeighborAt(direction) {
@@ -238,9 +243,22 @@ class Field extends GameObject {
         return false;
     }
 
-    onClick() {
+    isEmpty(gp) {
+        const gameObjects = gp.layers.getGameObjects();
+        const objectsOnThisHex = gameObjects.filter(go => go.hex.equals(this.hex));
+
+        return objectsOnThisHex.length == 0;
+    }
+
+    onClick(gp) {
         // this.board.selectField(this);
-        console.log("clicked");
+        console.log("field clicked");
+        const action = gp.getAction();
+        if (action instanceof RunAction) {
+            if (action.addHexToPath(this.hex)) {
+                gp.selectedPlayer.hex = this.hex;
+            }
+        }
     }
 }
 

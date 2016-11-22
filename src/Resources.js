@@ -8,12 +8,12 @@ function loadResources(doneFunc) {
         {name: "tileGoalRed", src: "res/tiles/tile_goal_red.png"},
         {name: "tileGoalBlue", src: "res/tiles/tile_goal_blue.png"},
         {name: "tileMidfield", src: "res/tiles/tile_middle.png"},
-        {name: "team1Player1", src: "res/objects/team_1_player_1.png"},
-        {name: "team1Player2", src: "res/objects/team_1_player_2.png"},
-        {name: "team1Player3", src: "res/objects/team_1_player_3.png"},
-        {name: "team2Player1", src: "res/objects/team_2_player_1.png"},
-        {name: "team2Player2", src: "res/objects/team_2_player_2.png"},
-        {name: "team2Player3", src: "res/objects/team_2_player_3.png"},
+        {name: "playerArrowBlue", src: "res/objects/c_b_arrow_01.png"},
+        {name: "playerKnifeBlue", src: "res/objects/c_b_knife_01.png"},
+        {name: "playerMaulBlue", src: "res/objects/c_b_maul_01.png"},
+        {name: "playerArrowRed", src: "res/objects/c_r_arrow_01.png"},
+        {name: "playerKnifeRed", src: "res/objects/c_r_knife_01.png"},
+        {name: "playerMaulRed", src: "res/objects/c_r_maul_01.png"},
         {name: "ball", src: "res/objects/ball.png"},
     ]
 

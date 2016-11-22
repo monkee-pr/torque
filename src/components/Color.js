@@ -12,12 +12,16 @@ Color.FIELD_MIDFIELD_BACKGROUND = "#fe0"
 // objects
 Color.BALL = "black"
 Color.PLAYER_TEAM_1 = "blue";
-Color.PLAYER_TEAM_2 = "red";
+Color.PLAYER_TEAM_2 = "#f00";
 
 // UI
 Color.FIELD_BORDER_REGULAR = "#915900"
-Color.BORDER_HOVER = "black";
-Color.BORDER_HIGHLIGHT = "cyan";
+Color.BORDER_HOVER = "#000";
+Color.BORDER_HIGHLIGHT = "#0ff";
+Color.BORDER_HIGHLIGHT_HOVER = "#077";
 Color.GAME_BORDER = "black";
 Color.BUTTON = "white";
 Color.BUTTON_HOVER = "#77f"
+Color.POPUP_BACKGROUND = "#fff";
+Color.BUTTON_BACKGROUND = "#fff";
+Color.BUTTON_BACKGROUND_HOVER = "#ccc";

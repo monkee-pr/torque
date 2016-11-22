@@ -48,30 +48,31 @@ class Player extends GameObject {
         }
 
         // image for iso perspective
+        this.image = null;  // size of 560x665 px
         switch (this.team.id) {
             case Team.TEAM_1:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.image = resources.team1Player1;
+                        this.image = resources.playerMaulBlue;
                         break;
                     case Player.ROLE_BLADE:
-                        this.image = resources.team1Player2;
+                        this.image = resources.playerKnifeBlue;
                         break;
                     case Player.ROLE_DART:
-                        this.image = resources.team1Player3;
+                        this.image = resources.playerArrowBlue;
                         break;
                 }
                 break;
             case Team.TEAM_2:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.image = resources.team2Player1;
+                        this.image = resources.playerMaulRed;
                         break;
                     case Player.ROLE_BLADE:
-                        this.image = resources.team2Player2;
+                        this.image = resources.playerKnifeRed;
                         break;
                     case Player.ROLE_DART:
-                        this.image = resources.team2Player3;
+                        this.image = resources.playerArrowRed;
                         break;
                 }
                 break;
@@ -118,7 +119,10 @@ class Player extends GameObject {
 
         const drawBorder = () => {
             // draw border
-            if (this.isHighlighted) {
+            if (this.isHighlighted && this.isHovered) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
+            } else if (this.isHighlighted) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
                 ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
             } else if (this.isHovered) {
@@ -144,7 +148,8 @@ class Player extends GameObject {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
                 const width = this.image.width * Camera.scale;
                 const height = this.image.height * Camera.scale;
-                ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
+                const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
+                ctx.drawImage(this.image, anchor.x, anchor.y, width, height);
             }
         }
     }

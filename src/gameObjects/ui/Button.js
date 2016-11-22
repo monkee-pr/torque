@@ -14,17 +14,17 @@ class Button extends UIElement {
     draw(ctx, anchor) {
         this.point = anchor;
         const cv = ctx.canvas;
-        ctx.globalAlpha = 0.5;
-        ctx.fillStyle="black";
-        ctx.fillRect(0, 0, cv.width, cv.height);
-        ctx.globalAlpha = 1;
 
         const tCv = document.createElement("canvas");
         tCv.width = this.width;
         tCv.height = this.height;
         const tCtx = tCv.getContext("2d");
 
-        tCtx.fillStyle = "white";
+        if (this.isHovered) {
+            tCtx.fillStyle = Color.BUTTON_BACKGROUND_HOVER;
+        } else {
+            tCtx.fillStyle = Color.BUTTON_BACKGROUND;
+        }
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";

@@ -47,7 +47,7 @@ class CanvasLayers {
             if (layer == CanvasLayers.LAYER_UI && this.hideUI) {
                 return;
             }
-            objects.forEach(object => object.draw(ctx, gp));
+            objects.sort(CanvasLayers.sortForDrawing).forEach(object => object.draw(ctx, gp));
         });
     }
 
@@ -63,10 +63,22 @@ class CanvasLayers {
         return uiElements;
     }
 
-    getSelectableObjects() {
+    getGameObjects() {
         const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
 
         return gameObjects;
+    }
+
+    getClickableObjects(gp) {
+        let clickableObjects = [];
+        const action = gp.getAction();
+        if (action instanceof RunAction) {
+            clickableObjects = action.getNextPossibleSteps();
+        } else {
+            clickableObjects = this.getGameObjects();
+        }
+
+        return clickableObjects;
     }
 
     getHoverableObjects() {
@@ -86,3 +98,21 @@ CanvasLayers.LAYER_UI = 3;
 // CanvasLayers.LAYER_BOARD = 0;
 // CanvasLayers.LAYER_GAME_OBJECTS = 1;
 // CanvasLayers.LAYER_UI = 2;
+
+CanvasLayers.sortForDrawing = (a, b) => {
+    if (!a.hex) {
+        return -1;
+    } else if (!b.hex) {
+        return -1
+    } else if (a.hex.q < b.hex.q) {
+        return 1;
+    } else if (a.hex.q > b.hex.q) {
+        return -1;
+    } else {
+        if (a.hex.r < b.hex.r) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+}

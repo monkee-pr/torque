@@ -4,7 +4,7 @@ class Board extends GameObject {
 
         this.background = new Background(resources.sand);
         this.selectedField = null;
-        this.fields = [
+        const fields = [
             new Field(this, new Hex(-11, -1)),
             new Field(this, new Hex(-11, 0)),
             new Field(this, new Hex(-11, 1)),
@@ -229,6 +229,7 @@ class Board extends GameObject {
             new Field(this, new Hex(10, 2)),
             new Field(this, new Hex(11, 0)),
         ];
+        this.fields = fields.sort(CanvasLayers.sortForDrawing);
     }
 
     update(gp) {

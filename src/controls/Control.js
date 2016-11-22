@@ -65,15 +65,15 @@ Control.click = (e, gp) => {
         const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
 
         const uiElements = gp.layers.getUIElements();
-        let found = false;
+        let uiElementClicked = false;
         uiElements.forEach(ui => {
-            if (!found && point.hits(ui.point, ui.width, ui.height)) {
+            if (!uiElementClicked && point.hits(ui.point, ui.width, ui.height)) {
                 ui.onClick(gp, point);
-                found = true;
+                uiElementClicked = true;
             }
         });
 
-        if (!found) {
+        if (!uiElementClicked) {
             if (gp.isPopupOpen()) {
                 gp.closeTopPopup();
                 gp.selectPlayer(gp.selectedPlayer);
@@ -84,7 +84,7 @@ Control.click = (e, gp) => {
                 const hex = Point.pointToHex(anchor, perspectivePoint);
 
                 // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
-                const clickableObjects = gp.layers.getSelectableObjects();
+                const clickableObjects = gp.layers.getClickableObjects(gp);
                 const reversedGameObjects = clickableObjects.slice().reverse();
                 let brk = false;
                 reversedGameObjects.forEach(go => {

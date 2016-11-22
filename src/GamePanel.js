@@ -20,7 +20,7 @@ class GamePanel {
 
         this.team1 = new Team(Team.TEAM_1);
         const t1p1 = new Player(this, new Hex(-2, -1), 0, this.team1);
-        const t1p2 = new Player(this, new Hex(-2, 1), 1, this.team1);
+        const t1p2 = new Player(this, new Hex(-1, 0), 1, this.team1);
         this.team1.addPlayer(t1p1);
         this.team1.addPlayer(t1p2);
         this.addGameObject(t1p1);
@@ -88,12 +88,15 @@ class GamePanel {
         this._action = action;
         console.log("action");
         console.log(action);
-        if (action.type == Action.TYPE_RUN) {
-            const player = action.data.player;
-            const playerField = this.layers.getBoardFields().filter(f => f.hex.equals(player.hex))[0];
-            const neighborFields = playerField.getNeighbors();
-            neighborFields.forEach(f => f.isHighlighted = true);
+        if (action instanceof RunAction) {
+            const nextPossibleSteps = action.getNextPossibleSteps();
+            nextPossibleSteps.forEach(f => {
+                f.isHighlighted = true;
+            });
         }
+    }
+    getAction() {
+        return this._action;
     }
     cancelAction() {
         const action = this._action;
