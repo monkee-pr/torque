@@ -10,7 +10,7 @@ class GamePanel {
         // layers for drawable objects
         this.layers = new CanvasLayers();
 
-        // this.setBackground(new Background(resources.tileGoalRed));
+        this.setBackground(new Background(null, Color.WINDOW_BACKGROUND));
 
         const board = new Board();
         this.addGameObject(board);
@@ -20,19 +20,25 @@ class GamePanel {
 
         this.team1 = new Team(Team.TEAM_1);
         const t1p1 = new Player(this, new Hex(-2, -1), 0, this.team1);
-        const t1p2 = new Player(this, new Hex(-1, 0), 1, this.team1);
+        const t1p2 = new Player(this, new Hex(-2, 1), 1, this.team1);
+        const t1p3 = new Player(this, new Hex(-3, 0), 2, this.team1);
         this.team1.addPlayer(t1p1);
         this.team1.addPlayer(t1p2);
+        this.team1.addPlayer(t1p3);
         this.addGameObject(t1p1);
         this.addGameObject(t1p2);
+        this.addGameObject(t1p3);
 
         this.team2 = new Team(Team.TEAM_2);
         const t2p1 = new Player(this, new Hex(1, -1), 0, this.team2);
         const t2p2 = new Player(this, new Hex(1, 1), 1, this.team2);
+        const t2p3 = new Player(this, new Hex(3, 0), 2, this.team2);
         this.team2.addPlayer(t2p1);
         this.team2.addPlayer(t2p2);
+        this.team2.addPlayer(t2p3);
         this.addGameObject(t2p1);
         this.addGameObject(t2p2);
+        this.addGameObject(t2p3);
 
         this.teams = [
             this.team1,
@@ -45,6 +51,7 @@ class GamePanel {
         this._action = null;
 
         this.addUIElement(new TurnInfo(this));
+        this.addUIElement(new SwitchPerspective(this));
     }
 
     setBackground(bg) {
@@ -94,6 +101,7 @@ class GamePanel {
                 f.isHighlighted = true;
             });
         }
+        this.addUIElement(new ActionControl(this));
     }
     getAction() {
         return this._action;
@@ -104,6 +112,11 @@ class GamePanel {
             this.layers.getBoardFields().forEach(f => f.isHighlighted = false);
         }
         this._action = null;
+
+        const actionControl = this.layers.getUIElements().filter(ui => ui instanceof ActionControl)[0];
+        if (actionControl != null) {
+            this.removeUIElement(actionControl);
+        }
     }
 
     update() {

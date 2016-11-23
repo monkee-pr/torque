@@ -53,26 +53,26 @@ class Player extends GameObject {
             case Team.TEAM_1:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.image = resources.playerMaulBlue;
+                        this.image = resources.playerMaulBlueRegular;
                         break;
                     case Player.ROLE_BLADE:
-                        this.image = resources.playerKnifeBlue;
+                        this.image = resources.playerKnifeBlueRegular;
                         break;
                     case Player.ROLE_DART:
-                        this.image = resources.playerArrowBlue;
+                        this.image = resources.playerArrowBlueRegular;
                         break;
                 }
                 break;
             case Team.TEAM_2:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.image = resources.playerMaulRed;
+                        this.image = resources.playerMaulRedRegular;
                         break;
                     case Player.ROLE_BLADE:
-                        this.image = resources.playerKnifeRed;
+                        this.image = resources.playerKnifeRedRegular;
                         break;
                     case Player.ROLE_DART:
-                        this.image = resources.playerArrowRed;
+                        this.image = resources.playerArrowRedRegular;
                         break;
                 }
                 break;

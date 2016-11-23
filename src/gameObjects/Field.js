@@ -77,14 +77,7 @@ class Field extends GameObject {
                 break;
             case Field.TYPE_PIT:
             {
-                switch (this.teamSide) {
-                    case Team.TEAM_1:
-                        this.image = resources.tileGoalBlue;
-                        break;
-                    case Team.TEAM_2:
-                        this.image = resources.tileGoalRed;
-                        break;
-                }
+                this.image = resources.tilePit;
                 break;
             }
                 break;
@@ -154,11 +147,11 @@ class Field extends GameObject {
                 }
             }
 
-            // draw coords
-            const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
-            ctx.font = fontSize + "px Georgia";
-            ctx.fillStyle="black"
-            ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
+            // // draw coords
+            // const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
+            // ctx.font = fontSize + "px Georgia";
+            // ctx.fillStyle="black"
+            // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
@@ -252,7 +245,6 @@ class Field extends GameObject {
 
     onClick(gp) {
         // this.board.selectField(this);
-        console.log("field clicked");
         const action = gp.getAction();
         if (action instanceof RunAction) {
             if (action.addHexToPath(this.hex)) {

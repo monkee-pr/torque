@@ -16,7 +16,6 @@ class RunAction extends Action {
         if (path.length < RunAction.MAX_PATH_LENGTH) {
 
             const index = path.map(h => h.equals(hex)).indexOf(true);
-            console.log(index);
             if (index != -1) {
                 path.splice(index);
             }

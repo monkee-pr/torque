@@ -12,7 +12,7 @@ class Button extends UIElement {
     }
 
     draw(ctx, anchor) {
-        this.point = anchor;
+        if (anchor) this.point = anchor;
         const cv = ctx.canvas;
 
         const tCv = document.createElement("canvas");
@@ -35,7 +35,7 @@ class Button extends UIElement {
         tCtx.rect(0, 0, tCv.width, tCv.height);
         tCtx.stroke();
 
-        ctx.drawImage(tCv, anchor.x, anchor.y, tCv.width, tCv.height);
+        ctx.drawImage(tCv, this.point.x, this.point.y, tCv.width, tCv.height);
     }
 
     onClick(gp) {

@@ -14,12 +14,14 @@ class Camera {
         if (mode == Camera.MODE_ISOMETRIC) {
             Camera.MIN_SCALE = 0.2;
             Camera.MAX_SCALE = 1;
+            Camera.scale = Camera.MAX_SCALE;
         } else if (mode == Camera.MODE_TOP_DOWN) {
             Camera.MIN_SCALE = 0.18;
             Camera.MAX_SCALE = 0.18;
+            Camera.scale = Camera.MAX_SCALE;
         }
 
-        Camera.scale = Math.max(Camera.MIN_SCALE, Math.min(Camera.MAX_SCALE, Camera.scale));
+        // Camera.scale = Math.max(Camera.MIN_SCALE, Math.min(Camera.MAX_SCALE, Camera.scale));
     }
 }
 

@@ -58,7 +58,7 @@ Control.drag = (e, gp) => {
 }
 
 Control.click = (e, gp) => {
-    if (!Control.dragged) {
+    if (true || !Control.dragged) {
         const target = e.target;
         const x = target.width / target.clientWidth * e.clientX;
         const y = target.height / target.clientHeight * e.clientY;
