@@ -21,8 +21,11 @@ class Camera {
             Camera.MAX_SCALE = 0.18;
             Camera.scale = Camera.MAX_SCALE;
         }
-        
+
         this.position = this.startPosition;
+
+        const canvas = document.getElementById("canvas");
+        this.position = new Point(this.position.x + canvas.width/2, this.position.y + canvas.height/2);
 
         // Camera.scale = Math.max(Camera.MIN_SCALE, Math.min(Camera.MAX_SCALE, Camera.scale));
     }

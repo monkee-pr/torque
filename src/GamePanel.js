@@ -3,10 +3,6 @@ class GamePanel {
         this.cv = cv;
         this.ctx = cv.getContext("2d");
 
-        const point = new Point(this.cv.width/2, this.cv.height/2);
-        // this.camera = new Camera(point, Camera.MODE_TOP_DOWN);
-        this.camera = new Camera(point, Camera.MODE_ISOMETRIC);
-
         // layers for drawable objects
         this.layers = new CanvasLayers();
 
@@ -15,6 +11,9 @@ class GamePanel {
         const board = new Board();
         this.addGameObject(board);
         // board.fields.forEach(f => this.addGameObject(f));
+        const originField = this.layers.getBoardFields().filter(f => f.hex.equals(new Hex(0, 0)))[0];
+        this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_ISOMETRIC);
+        // this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_TOP_DOWN);
 
         this.addGameObject(new Torque(new Hex(0, 0)));
 
@@ -83,8 +82,8 @@ class GamePanel {
             console.log("Object not found in panel's list");
             console.log(go);
         } else {
-        }
             this.layers.remove(go, CanvasLayers.LAYER_GAME_OBJECTS);
+        }
     }
 
     addUIElement(ui) {

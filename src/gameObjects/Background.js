@@ -23,9 +23,9 @@ class Background extends GameObject {
 
             // anchor the pattern in the center
             const canvas = ctx.canvas;
-            // ctx.translate(anchor.x/2, anchor.xy/2);
+            ctx.translate(anchor.x, anchor.y);
             ctx.fill();
-            // ctx.translate(-anchor.x/2, -anchor.xy/2);
+            ctx.translate(-anchor.x, -anchor.y);
         } else if (this.color != null) {
             ctx.fillStyle = this.color;
             ctx.fill();

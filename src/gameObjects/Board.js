@@ -290,21 +290,10 @@ class Board extends GameObject {
         ctx.closePath();
 
         // draw background as pattern filling selected path
+        console.log(cameraPosition);
         const backgroundAnchor = Hex.hexToPoint(cameraPosition, this.fields[0].hex);
-        const perspectiveAnchor = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? backgroundAnchor.toRegular(backgroundAnchor) : backgroundAnchor;
-        this.background.draw(ctx, perspectiveAnchor);
+        this.background.draw(ctx, backgroundAnchor);
 
         this.fields.forEach(f => f.draw(ctx, gp));
-    }
-
-    selectField(field) {
-        if (this.selectedField == field) {
-            this.selectedField = null;
-        } else if (this.selectedField == null) {
-            this.selectedField = field;
-        } else if (field.isHighlighted) {
-            console.log("move field");
-            this.selectedField = null;
-        }
     }
 }
