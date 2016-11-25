@@ -25,11 +25,11 @@ class PlayerInfo extends Popup {
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";
-        tCtx.fillText("Name: " + this.player.name,10,50);
-        tCtx.fillText("Role: " + this.player.role,10,100);
-        tCtx.fillText("Rank: " + this.player.rank,10,150);
-        tCtx.fillText("Stats: " + this.player.stats,10,200);
-        tCtx.fillText("Skills: " + this.player.skills,10,250);
+        tCtx.fillText("Name: " + this.player.name, 10, 50);
+        tCtx.fillText("Role: " + this.player.role, 10, 100);
+        tCtx.fillText("Rank: " + this.player.rank, 10, 150);
+        tCtx.fillText("Stats: " + this.player.stats, 10, 200);
+        tCtx.fillText("Skills: " + this.player.skills, 10, 250);
 
         tCtx.strokeStyle = "black";
         tCtx.lineWidth = 5;

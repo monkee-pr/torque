@@ -9,11 +9,10 @@ class GameObject {
     }
 
     draw(ctx, gp) {
-
     }
 
     onClick(gp) {
-        console.log(this);
+        // console.log(this);
     }
 }
 

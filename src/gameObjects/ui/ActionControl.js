@@ -10,8 +10,8 @@ class ActionControl extends UIElement {
 
         const buttonWidth = 150;
         const buttonHeight = 60;
-        this.cancelButton = new Button(new Point(canvasWidth - buttonWidth, canvasHeight - buttonHeight), buttonWidth, buttonHeight, "cancel", this.cancel, this.action);
         this.submitButton = new Button(new Point(canvasWidth - (buttonWidth+10)*2, canvasHeight - buttonHeight), buttonWidth, buttonHeight, "submit", this.submit, this.action);
+        this.cancelButton = new Button(new Point(canvasWidth - buttonWidth, canvasHeight - buttonHeight), buttonWidth, buttonHeight, "cancel", this.cancel, this.action);
 
         this.width += this.cancelButton.width + this.submitButton.width;
         this.point.x -= this.cancelButton.width + this.submitButton.width;
@@ -47,11 +47,37 @@ class ActionControl extends UIElement {
         this.submitButton.draw(ctx);
     }
 
-    cancel() {
-        console.log("control -> cancel");
+    cancel(gp) {
+        const action = gp.getAction();
+        if (action instanceof RunAction) {
+            gp.removeGameObject(action.ghost);
+        }
+        gp.selectPlayer(gp.selectedPlayer);
     }
 
-    submit() {
-        console.log("control -> submit");
+    submit(gp) {
+        const action = gp.getAction();
+        let increaseActionCounter = true;
+        if (action instanceof RunAction) {
+            if (action.ghost != null) {
+                action.player.hex = action.ghost.hex;
+                gp.removeGameObject(action.ghost);
+            } else {
+                increaseActionCounter = false;
+            }
+        }
+        gp.selectPlayer(gp.selectedPlayer);
+
+        if (increaseActionCounter) gp.submitAction();
+    }
+
+    onClick(gp, point) {
+        const sub = this.submitButton;
+        const can = this.cancelButton;
+        if (point.hits(sub.point, sub.width, sub.height)) {
+            sub.onClick(gp);
+        } else if (point.hits(can.point, can.width, can.height)) {
+            can.onClick(gp);
+        }
     }
 }

@@ -1,5 +1,6 @@
 class Camera {
     constructor(position, mode) {
+        this.startPosition = position;
         this.position = position;
         this.setMode(mode);
     }
@@ -20,6 +21,8 @@ class Camera {
             Camera.MAX_SCALE = 0.18;
             Camera.scale = Camera.MAX_SCALE;
         }
+        
+        this.position = this.startPosition;
 
         // Camera.scale = Math.max(Camera.MIN_SCALE, Math.min(Camera.MAX_SCALE, Camera.scale));
     }

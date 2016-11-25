@@ -4,40 +4,62 @@ class RunAction extends Action {
 
         this.gp = gp;
         this.player = player;
-        this.hexPath = [];
-        this.addHexToPath(player.hex);
+        this.path = [];
+        this.ghost = null;
+        this.addFieldToPath(player.getField());
 
         this.getNextPossibleSteps();
 
     }
 
-    addHexToPath(hex) {
-        const path = this.hexPath;
-        if (path.length < RunAction.MAX_PATH_LENGTH) {
+    addFieldToPath(field) {
+        // unhighlight all fields
+        const boardFields = this.gp.layers.getBoardFields();
+        boardFields.forEach(f => f.isHighlighted = false);
 
-            const index = path.map(h => h.equals(hex)).indexOf(true);
+        const path = this.path;
+        if (path.length < RunAction.MAX_PATH_LENGTH) {
+            // add field to path
+            const index = path.map(f => f.hex.equals(field.hex)).indexOf(true);
             if (index != -1) {
                 path.splice(index);
             }
-            path.push(hex);
+            path.push(field);
+
+            if (path.length < RunAction.MAX_PATH_LENGTH) {
+                // highlight next possible steps
+                const nextPossibleSteps = this.getNextPossibleSteps();
+                nextPossibleSteps.forEach(f => f.isHighlighted = true);
+            }
+            // else {
+            //     // highlight next possible steps
+            //     const nextPossibleSteps = this.getNextPossibleSteps().filter(f => path.indexOf(f) != -1);
+            //     nextPossibleSteps.forEach(f => f.isHighlighted = true);
+            // }
+
+            return true
         } else {
             return false;
         }
-
-        if (path.length == RunAction.MAX_PATH_LENGTH) {
-            this.finish(this.gp.cancelAction());
-        }
-
-        return true;
     }
 
     getNextPossibleSteps() {
-        const player = this.player;
-        const playerField = this.gp.layers.getBoardFields().filter(f => f.hex.equals(player.hex))[0];
-        const neighborFields = playerField.getNeighbors();
+        const lastPathField = this.path[this.path.length-1];
+        // const playerField = this.gp.layers.getBoardFields().filter(f => f.hex.equals(player.hex))[0];
+        const neighborFields = lastPathField.getNeighbors();
         const emptyNeighbors = neighborFields.filter(n => n.isEmpty(this.gp));
 
         return emptyNeighbors;
+    }
+
+    moveGhost(hex) {
+        if (this.ghost == null) {
+            const p = this.player;
+            this.ghost = new Ghost(p.gp, p.hex, p.id, p.team);
+            this.gp.addGameObject(this.ghost);
+        }
+
+        this.ghost.hex = hex;
     }
 }
 RunAction.MAX_PATH_LENGTH = 1 + 5;  // including the start hex

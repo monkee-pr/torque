@@ -16,7 +16,7 @@ class GamePanel {
         this.addGameObject(board);
         // board.fields.forEach(f => this.addGameObject(f));
 
-        this.addGameObject(new Ball(new Hex(0, 0)));
+        this.addGameObject(new Torque(new Hex(0, 0)));
 
         this.team1 = new Team(Team.TEAM_1);
         const t1p1 = new Player(this, new Hex(-2, -1), 0, this.team1);
@@ -50,6 +50,8 @@ class GamePanel {
         this.selectedPlayer = null;
         this._action = null;
 
+        this.actionsPerformed = 0;
+
         this.addUIElement(new TurnInfo(this));
         this.addUIElement(new SwitchPerspective(this));
     }
@@ -77,7 +79,12 @@ class GamePanel {
         }
     }
     removeGameObject(go) {
-        this.layers.remove(go, CanvasLayers.LAYER_GAME_OBJECTS);
+        if (go == null) {
+            console.log("Object not found in panel's list");
+            console.log(go);
+        } else {
+        }
+            this.layers.remove(go, CanvasLayers.LAYER_GAME_OBJECTS);
     }
 
     addUIElement(ui) {
@@ -88,19 +95,16 @@ class GamePanel {
         }
     }
     removeUIElement(ui) {
-        this.layers.remove(ui, CanvasLayers.LAYER_UI);
+        if (ui == null) {
+            console.log("Object not found in panel's list");
+            console.log(ui);
+        } else {
+            this.layers.remove(ui, CanvasLayers.LAYER_UI);
+        }
     }
 
     setAction(action) {
         this._action = action;
-        console.log("action");
-        console.log(action);
-        if (action instanceof RunAction) {
-            const nextPossibleSteps = action.getNextPossibleSteps();
-            nextPossibleSteps.forEach(f => {
-                f.isHighlighted = true;
-            });
-        }
         this.addUIElement(new ActionControl(this));
     }
     getAction() {
@@ -118,9 +122,15 @@ class GamePanel {
             this.removeUIElement(actionControl);
         }
     }
+    submitAction() {
+        this.actionsPerformed++;
+
+        if (this.actionsPerformed == GamePanel.ACTIONS_PER_TURN) {
+            this.startNextTurn();
+        }
+    }
 
     update() {
-        // this.gameObjects.forEach(go => go.update());
         this.layers.update();
     }
 
@@ -169,6 +179,7 @@ class GamePanel {
         }
 
         this.activeTeam = this.teams[nextTeamIndex];
+        this.actionsPerformed = 0;
     }
 
     selectPlayer(player) {
@@ -200,3 +211,4 @@ class GamePanel {
         }
     }
 }
+GamePanel.ACTIONS_PER_TURN = 5;

@@ -1,7 +1,7 @@
 class EndTurnButton extends Button {
     constructor(gp) {
-        const onClick = () => null;
-        super(new Point(0, 0), 300, 60, "End Turn", onClick);
+        const onClick = (gp) => gp.startNextTurn();
+        super(new Point(0, 120), 350, 60, "End Turn", onClick);
         this.gp = gp;
     }
 
@@ -17,17 +17,17 @@ class EndTurnButton extends Button {
         tCv.height = this.height;
         const tCtx = tCv.getContext("2d");
 
-        tCtx.fillStyle = "yellow";
+        tCtx.fillStyle = Color.BUTTON_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";
-        tCtx.fillText("Active Team: " + this.gp.activeTeam.id,10,50);
+        tCtx.fillText("End Turn",10,50);
 
         tCtx.strokeStyle = "black";
         tCtx.lineWidth = 5;
-        tCtx.rect(this.point.x, this.point.y, tCv.width, tCv.height);
+        tCtx.rect(0, 0, tCv.width, tCv.height);
         tCtx.stroke();
 
-        ctx.drawImage(tCv, 0, 0);
+        ctx.drawImage(tCv, this.point.x, this.point.y);
     }
 }

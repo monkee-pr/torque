@@ -21,6 +21,7 @@ class Field extends GameObject {
                 this.color = Color.FIELD_HOLE_BACKGROUND;
                 break;
             case Field.TYPE_HOT_ZONE:
+                this.color = Color.FIELD_HOT_ZONE_BACKGROUND;
                 break;
             case Field.TYPE_SUPER_HOT_ZONE:
                 this.color = Color.FIELD_SUPER_HOT_ZONE_BACKGROUND;
@@ -53,10 +54,10 @@ class Field extends GameObject {
             {
                 switch (this.teamSide) {
                     case Team.TEAM_1:
-                        this.image = resources.tileGoalBlue;
+                        this.image = resources.tileAroundBlueDown;
                         break;
                     case Team.TEAM_2:
-                        this.image = resources.tileGoalRed;
+                        this.image = resources.tileAroundRedUp;
                         break;
                 }
                 break;
@@ -66,10 +67,10 @@ class Field extends GameObject {
             {
                 switch (this.teamSide) {
                     case Team.TEAM_1:
-                        this.image = resources.tileGoalBlue;
+                        this.image = resources.tileSpecialBlueDown;
                         break;
                     case Team.TEAM_2:
-                        this.image = resources.tileGoalRed;
+                        this.image = resources.tileSpecialRedUp;
                         break;
                 }
                 break;
@@ -133,20 +134,6 @@ class Field extends GameObject {
                 ctx.fill();
             }
 
-            if (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE) {
-                // draw inner circles
-                ctx.beginPath();
-                const lineWidth = Field.BORDER_WIDTH * Camera.scale;
-                const radius = scaledSize/1.5;
-                ctx.arc(center.x, center.y, lineWidth, 0, 2*Math.PI, false);
-                ctx.strokeStyle = Color.FIELD_HOLE_CIRCLES;
-                const amountOfCircles = 2;
-                for (var i = 0; i < amountOfCircles; i++) {
-                    ctx.lineWidth = radius * (i+1);
-                    ctx.stroke();
-                }
-            }
-
             // // draw coords
             // const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
             // ctx.font = fontSize + "px Georgia";
@@ -161,7 +148,7 @@ class Field extends GameObject {
             }
         }
 
-        if (cameraMode == Camera.MODE_TOP_DOWN || this.image == null || this.image == resources.tileMidfield) {
+        if (cameraMode == Camera.MODE_TOP_DOWN || (this.image != resources.tileGoalRed && this.image != resources.tileGoalBlue)) {
             // draw border
             if (this.isHighlighted && this.isHovered) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
@@ -176,7 +163,22 @@ class Field extends GameObject {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
                 ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
             }
+
             ctx.stroke();
+        }
+
+        if (cameraMode == Camera.MODE_TOP_DOWN && (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE)) {
+            // draw inner circles
+            ctx.beginPath();
+            const lineWidth = Field.BORDER_WIDTH * Camera.scale;
+            const radius = scaledSize/1.5;
+            ctx.arc(center.x, center.y, lineWidth, 0, 2*Math.PI, false);
+            ctx.strokeStyle = Color.FIELD_HOLE_CIRCLES;
+            const amountOfCircles = 2;
+            for (var i = 0; i < amountOfCircles; i++) {
+                ctx.lineWidth = radius * (i+1);
+                ctx.stroke();
+            }
         }
     }
 
@@ -239,16 +241,25 @@ class Field extends GameObject {
     isEmpty(gp) {
         const gameObjects = gp.layers.getGameObjects();
         const objectsOnThisHex = gameObjects.filter(go => go.hex.equals(this.hex));
-
         return objectsOnThisHex.length == 0;
     }
 
+    isAccessible() {
+        switch (this.type) {
+            case Field.TYPE_HOLE:
+            case Field.TYPE_PIT:
+                return false
+            default:
+                return true;
+        }
+    }
+
     onClick(gp) {
-        // this.board.selectField(this);
         const action = gp.getAction();
         if (action instanceof RunAction) {
-            if (action.addHexToPath(this.hex)) {
-                gp.selectedPlayer.hex = this.hex;
+            if (action.addFieldToPath(this)) {
+                action.moveGhost(this.hex);
+                // gp.selectedPlayer.hex = this.hex;
             }
         }
     }

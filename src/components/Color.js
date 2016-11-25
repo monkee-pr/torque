@@ -10,9 +10,9 @@ Color.FIELD_PIT_BACKGROUND = "#444";
 Color.FIELD_MIDFIELD_BACKGROUND = "#fe0"
 
 // objects
-Color.BALL = "#333"
-Color.PLAYER_TEAM_1 = "blue";
-Color.PLAYER_TEAM_2 = "#f00";
+Color.TORQUE = "#333"
+Color.TEAM_1 = "#00f";
+Color.TEAM_2 = "#f00";
 
 // UI
 Color.FIELD_BORDER_REGULAR = "#915900"

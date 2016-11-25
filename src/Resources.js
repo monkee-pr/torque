@@ -8,7 +8,14 @@ function loadResources(doneFunc) {
         {name: "tileGoalRed", src: "res/tiles/tile_goal_red.png"},
         {name: "tileGoalBlue", src: "res/tiles/tile_goal_blue.png"},
         {name: "tilePit", src: "res/tiles/tile_pit.png"},
-        {name: "tileMidfield", src: "res/tiles/tile_middle.png"},
+        {name: "tileAroundBlueDown", src: "res/tiles/tile_around_blue_down.png"},
+        {name: "tileAroundBlueUp", src: "res/tiles/tile_around_blue_up.png"},
+        {name: "tileAroundRedDown", src: "res/tiles/tile_around_red_down.png"},
+        {name: "tileAroundRedUp", src: "res/tiles/tile_around_red_up.png"},
+        {name: "tileSpecialBlueDown", src: "res/tiles/tile_special_blue_down.png"},
+        {name: "tileSpecialBlueUp", src: "res/tiles/tile_special_blue_up.png"},
+        {name: "tileSpecialRedDown", src: "res/tiles/tile_special_red_down.png"},
+        {name: "tileSpecialRedUp", src: "res/tiles/tile_special_red_up.png"},
         {name: "playerArrowBlueRegular", src: "res/objects/c_b_arrow_01.png"},
         {name: "playerKnifeBlueRegular", src: "res/objects/c_b_knife_01.png"},
         {name: "playerMaulBlueRegular", src: "res/objects/c_b_maul_01.png"},
@@ -21,7 +28,7 @@ function loadResources(doneFunc) {
         {name: "playerArrowRedBashed", src: "res/objects/c_r_arrow_02.png"},
         {name: "playerKnifeRedBashed", src: "res/objects/c_r_knife_02.png"},
         {name: "playerMaulRedBashed", src: "res/objects/c_r_maul_02.png"},
-        {name: "ball", src: "res/objects/ball.png"},
+        {name: "torque", src: "res/objects/torque.png"},
     ]
 
     let soundQueue = [

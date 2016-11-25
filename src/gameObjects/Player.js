@@ -33,6 +33,8 @@ class Player extends GameObject {
         this.stats = stats;
         this.skills = skills;
 
+        this.status = Player.STATUS_NORMAL;
+
         this.vq = 0;
         this.vr = 0;
 
@@ -40,10 +42,10 @@ class Player extends GameObject {
         let fill = true;
         switch (this.team.id) {
             case Team.TEAM_1:
-                this.color = Color.PLAYER_TEAM_1;
+                this.color = Color.TEAM_1;
                 break;
             case Team.TEAM_2:
-                this.color = Color.PLAYER_TEAM_2;
+                this.color = Color.TEAM_2;
                 break;
         }
 
@@ -169,7 +171,18 @@ class Player extends GameObject {
     }
 
     getField() {
+        const fields = this.gp.layers.getBoardFields();
+        const thisField = fields.filter(f => f.hex.equals(this.hex))[0];
 
+        return thisField;
+    }
+
+    canHoldTorque() {
+        if (this.role == Player.ROLE_MAUL) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     actionRun() {
@@ -190,3 +203,6 @@ class Player extends GameObject {
 Player.ROLE_MAUL = "maul";
 Player.ROLE_BLADE = "blade";
 Player.ROLE_DART = "dart";
+
+Player.STATUS_NORMAL = "normal";
+Player.STATUS_BASHED = "bashed";

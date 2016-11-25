@@ -1,4 +1,4 @@
-class Ball extends GameObject {
+class Torque extends GameObject {
     constructor(hex) {
         const isMovable = true;
         super(isMovable);
@@ -10,8 +10,8 @@ class Ball extends GameObject {
         this.vq = 0;
         this.vr = 0;
 
-        this.color = Color.BALL;
-        this.image = resources.ball;
+        this.color = Color.TORQUE;
+        this.image = resources.torque;
     }
 
     update() {
@@ -89,9 +89,10 @@ class Ball extends GameObject {
             }
             drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
-            drawBorder();
+            // drawBorder();
             if (this.image != null) {
-                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
+                const point = center.toIso(cameraPosition);
+                // const point = new Point(point1.x-4, point1.y-4);
                 const width = this.image.width * Camera.scale;
                 const height = this.image.height * Camera.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);

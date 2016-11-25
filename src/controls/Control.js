@@ -35,7 +35,6 @@ Control.mouseMove = (e, gp) => {
             reversedGameObjects.forEach(go => {
                 if (!brk && go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
                     go.isHovered = true;
-                    // console.log(go);
                     brk = true;
                 } else {
                     go.isHovered = false;
@@ -46,19 +45,21 @@ Control.mouseMove = (e, gp) => {
 }
 
 Control.drag = (e, gp) => {
-    Control.dragged = true;
+    if (gp.camera.getMode() == Camera.MODE_ISOMETRIC) {
+        Control.dragged = true;
 
-    const target = e.target;
-    const vx = e.movementX / target.clientWidth * target.width;
-    const vy = e.movementY / target.clientHeight * target.height;
+        const target = e.target;
+        const vx = e.movementX / target.clientWidth * target.width;
+        const vy = e.movementY / target.clientHeight * target.height;
 
-    const oldPoint = gp.camera.position;
+        const oldPoint = gp.camera.position;
 
-    gp.camera.position = new Point(oldPoint.x + vx, oldPoint.y + vy);
+        gp.camera.position = new Point(oldPoint.x + vx, oldPoint.y + vy);
+    }
 }
 
 Control.click = (e, gp) => {
-    if (true || !Control.dragged) {
+    if (!Control.dragged) {
         const target = e.target;
         const x = target.width / target.clientWidth * e.clientX;
         const y = target.height / target.clientHeight * e.clientY;
@@ -108,8 +109,4 @@ Control.scroll = (e, gp) => {
     const oldScale = Camera.scale;
     Camera.scale = Math.max(Camera.MIN_SCALE, Math.min(Camera.MAX_SCALE, Camera.scale * (1 - (step))));
     const newScale = Camera.scale;
-
-    if (oldScale != newScale) {
-        // console.log(e);
-    }
 }
