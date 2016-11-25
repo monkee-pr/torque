@@ -1,5 +1,5 @@
 class Player extends GameObject {
-    constructor(gp, hex, id, team) {
+    constructor(gp, hex, id, team, status = Player.STATUS_NORMAL) {
         super();
 
         this.gp = gp;
@@ -7,6 +7,7 @@ class Player extends GameObject {
         this.hex = hex;
         this.id = id;
         this.team = team;
+        this.status = status;
 
         // exclude this in a DB later
         let name, role, rank, stats, skills;
@@ -33,8 +34,6 @@ class Player extends GameObject {
         this.stats = stats;
         this.skills = skills;
 
-        this.status = Player.STATUS_NORMAL;
-
         this.vq = 0;
         this.vr = 0;
 
@@ -50,31 +49,38 @@ class Player extends GameObject {
         }
 
         // image for iso perspective
-        this.image = null;  // size of 560x665 px
+        this.imageRegular = null;  // size of 560x665 px
+        this.imageBashed = null;  // size of 560x665 px
         switch (this.team.id) {
             case Team.TEAM_1:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.image = resources.playerMaulBlueRegular;
+                        this.imageRegular = resources.playerMaulBlueRegular;
+                        this.imageBashed = resources.playerMaulBlueBashed;
                         break;
                     case Player.ROLE_BLADE:
-                        this.image = resources.playerKnifeBlueRegular;
+                        this.imageRegular = resources.playerBladeBlueRegular;
+                        this.imageBashed = resources.playerBladeBlueBashed;
                         break;
                     case Player.ROLE_DART:
-                        this.image = resources.playerArrowBlueRegular;
+                        this.imageRegular = resources.playerDartBlueRegular;
+                        this.imageBashed = resources.playerDartBlueBashed;
                         break;
                 }
                 break;
             case Team.TEAM_2:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.image = resources.playerMaulRedRegular;
+                        this.imageRegular = resources.playerMaulRedRegular;
+                        this.imageBashed = resources.playerMaulRedBashed;
                         break;
                     case Player.ROLE_BLADE:
-                        this.image = resources.playerKnifeRedRegular;
+                        this.imageRegular = resources.playerBladeRedRegular;
+                        this.imageBashed = resources.playerBladeRedBashed;
                         break;
                     case Player.ROLE_DART:
-                        this.image = resources.playerArrowRedRegular;
+                        this.imageRegular = resources.playerDartRedRegular;
+                        this.imageBashed = resources.playerDartRedBashed;
                         break;
                 }
                 break;
@@ -146,12 +152,24 @@ class Player extends GameObject {
             drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             drawBorder();
-            if (this.image != null) {
+            let image = null;
+            switch (this.status) {
+                case Player.STATUS_BASHED:
+                case Player.STATUS_HOLD_TORQUE:
+                    image = this.imageBashed;
+                    break;
+                default:
+                    image = this.imageRegular;
+            }
+            // if (this instanceof Ghost) {
+            //     console.log(this.status == Player.STATUS_HOLD_TORQUE);
+            // }
+            if (image != null) {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
-                const width = this.image.width * Camera.scale;
-                const height = this.image.height * Camera.scale;
+                const width = image.width * Camera.scale;
+                const height = image.height * Camera.scale;
                 const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
-                ctx.drawImage(this.image, anchor.x, anchor.y, width, height);
+                ctx.drawImage(image, anchor.x, anchor.y, width, height);
             }
         }
     }
@@ -185,6 +203,38 @@ class Player extends GameObject {
         }
     }
 
+    holdsTorque() {
+        switch (this.status) {
+            case Player.STATUS_HOLD_TORQUE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    pickUpTorque(gp) {
+        const boardFields = gp.layers.getBoardFields();
+        const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty(gp));
+        const gameObjectsOfFields = notEmptyBoardFields.map(f => f.getGameObject(gp));
+        const torque = gameObjectsOfFields.filter(go => go instanceof Torque)[0];
+        if (this.canHoldTorque()) {
+            console.log("pickup!");
+            console.log(this);
+            this.status = Player.STATUS_HOLD_TORQUE;
+
+            gp.removeGameObject(torque);
+        } else {
+            torque.scatter();
+        }
+    }
+
+    dropTorque(gp) {
+        this.status = Player.NORMAL;
+        const torque = new Torque(this.hex);
+        gp.addGameObject(torque);
+        torque.scatter();
+    }
+
     actionRun() {
 
     }
@@ -206,3 +256,4 @@ Player.ROLE_DART = "dart";
 
 Player.STATUS_NORMAL = "normal";
 Player.STATUS_BASHED = "bashed";
+Player.STATUS_HOLD_TORQUE = "hold-torque";

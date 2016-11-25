@@ -1,6 +1,6 @@
 class ActionControl extends UIElement {
     constructor(gp) {
-        const width = 250;
+        const width = 300;
         const height = 60;
         const canvasWidth = 1920;
         const canvasHeight = 1080;
@@ -33,7 +33,14 @@ class ActionControl extends UIElement {
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Georgia";
-        const actionName = this.action instanceof RunAction ? "Run" : "undefined";
+        let actionName
+        if (this.action instanceof RunAction) {
+            actionName = "Run";
+        } else if(this.action instanceof ThrowAction) {
+            actionName = "Throw";
+        } else {
+            actionName = "undefined";
+        }
         tCtx.fillText("Action: " + actionName, 10, 50);
 
         tCtx.strokeStyle = "black";
@@ -60,12 +67,18 @@ class ActionControl extends UIElement {
         let increaseActionCounter = true;
         if (action instanceof RunAction) {
             if (action.ghost != null) {
+                // copy all properties changed during the action from ghost to player
                 action.player.hex = action.ghost.hex;
+                action.player.status = action.ghost.status;
+
+                // remove ghost
                 gp.removeGameObject(action.ghost);
             } else {
                 increaseActionCounter = false;
             }
         }
+
+        // unselect player
         gp.selectPlayer(gp.selectedPlayer);
 
         if (increaseActionCounter) gp.submitAction();

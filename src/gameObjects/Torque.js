@@ -1,9 +1,6 @@
 class Torque extends GameObject {
     constructor(hex) {
-        const isMovable = true;
-        super(isMovable);
-
-        this.edgeLength = GameObject;
+        super();
 
         this.hex = hex;
 
@@ -108,5 +105,9 @@ class Torque extends GameObject {
         // reset movement
         this.vq = 0;
         this.vr = 0;
+    }
+
+    scatter() {
+        console.log(scatter);
     }
 }

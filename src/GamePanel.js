@@ -171,14 +171,18 @@ class GamePanel {
     }
 
     startNextTurn() {
-        const index = this.teams.indexOf(this.activeTeam);
-        let nextTeamIndex = index+1;
-        if (nextTeamIndex >= this.teams.length) {
-            nextTeamIndex = 0;
-        }
+        if (this.getAction() == null) {
+            const index = this.teams.indexOf(this.activeTeam);
+            let nextTeamIndex = index+1;
+            if (nextTeamIndex >= this.teams.length) {
+                nextTeamIndex = 0;
+            }
 
-        this.activeTeam = this.teams[nextTeamIndex];
-        this.actionsPerformed = 0;
+            this.activeTeam = this.teams[nextTeamIndex];
+            this.actionsPerformed = 0;
+        } else {
+            console.error("Can't end a turn with an active action");
+        }
     }
 
     selectPlayer(player) {

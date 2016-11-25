@@ -7,6 +7,10 @@ class Hex {
     equals(hex) {
         return this.q == hex.q && this.r == hex.r;
     }
+
+    rangeTo(hex) {
+        return 0;
+    }
 }
 
 Hex.add = (hex1, hex2) => {

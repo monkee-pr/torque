@@ -1,10 +1,11 @@
 class Field extends GameObject {
-    constructor(board, hex, type = Field.TYPE_REGULAR) {
+    constructor(board, hex, type = Field.TYPE_REGULAR, strikeArea) {
         super();
 
         this.board = board;
         this.hex = hex;
         this.type = type;
+        this.strikeArea = strikeArea;
 
         if (hex.q < 0) {
             this.teamSide = Team.TEAM_1;
@@ -134,11 +135,11 @@ class Field extends GameObject {
                 ctx.fill();
             }
 
-            // // draw coords
-            // const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
-            // ctx.font = fontSize + "px Georgia";
-            // ctx.fillStyle="black"
-            // ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
+            // draw coords
+            const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
+            ctx.font = fontSize + "px Georgia";
+            ctx.fillStyle="black"
+            ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
@@ -239,9 +240,16 @@ class Field extends GameObject {
     }
 
     isEmpty(gp) {
+        const empty = this.getGameObject(gp) == null;
+
+        return empty;
+    }
+
+    getGameObject(gp) {
         const gameObjects = gp.layers.getGameObjects();
-        const objectsOnThisHex = gameObjects.filter(go => go.hex.equals(this.hex));
-        return objectsOnThisHex.length == 0;
+        const objectOnThisHex = gameObjects.filter(go => go.hex.equals(this.hex))[0];
+
+        return objectOnThisHex;
     }
 
     isAccessible() {
@@ -258,8 +266,12 @@ class Field extends GameObject {
         const action = gp.getAction();
         if (action instanceof RunAction) {
             if (action.addFieldToPath(this)) {
+                const hasTorque = this.getGameObject(gp) instanceof Torque;
+                if (hasTorque) {
+                    action.ghost.pickUpTorque(gp);
+                }
+
                 action.moveGhost(this.hex);
-                // gp.selectedPlayer.hex = this.hex;
             }
         }
     }

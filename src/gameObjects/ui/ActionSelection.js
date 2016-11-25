@@ -5,9 +5,10 @@ class ActionSelection extends Popup {
         this.player = player;
 
         this.buttonRun = new Button(null, 400, 60, "run", this.run, {player});
+        this.buttonThrow = new Button(null, 400, 60, "throw", this.throwTorque, {player});
 
-        this.height += this.buttonRun.height;
-        this.point.y -= this.buttonRun.height;
+        this.height += this.buttonRun.height + this.buttonThrow.height;
+        this.point.y -= this.buttonRun.height + this.buttonThrow.height;
     }
 
     update() {
@@ -46,9 +47,10 @@ class ActionSelection extends Popup {
         tCtx.rect(0, 0, tCv.width, tCv.height);
         tCtx.stroke();
 
-        ctx.drawImage(tCv, this.point.x, this.point.y + this.buttonRun.height, tCv.width, tCv.height);
+        ctx.drawImage(tCv, this.point.x, this.point.y + this.buttonRun.height + this.buttonThrow.height, tCv.width, tCv.height);
 
         this.buttonRun.draw(ctx, new Point(this.point.x, this.point.y));   // above the info
+        this.buttonThrow.draw(ctx, new Point(this.point.x, this.point.y + 60));   // above the info
     }
 
     run(gp, params) {
@@ -57,10 +59,19 @@ class ActionSelection extends Popup {
         gp.setAction(new RunAction(gp, player));
     }
 
+    throwTorque(gp, params) {
+        const player = params.player;
+        gp.closeTopPopup();
+        gp.setAction(new ThrowAction(gp, player));
+    }
+
     onClick(gp, point) {
-        const run = this.buttonRun;
-        if (point.hits(run.point, run.width, run.height)) {
-            run.onClick(gp);
+        const r = this.buttonRun;
+        const t = this.buttonThrow;
+        if (point.hits(r.point, r.width, r.height)) {
+            r.onClick(gp);
+        } else if(point.hits(t.point, t.width, t.height)) {
+            t.onClick(gp);
         }
     }
 }

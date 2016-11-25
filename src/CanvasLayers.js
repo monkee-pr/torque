@@ -75,6 +75,8 @@ class CanvasLayers {
         if (action instanceof RunAction) {
             const fields = action.getNextPossibleSteps();
             clickableObjects = fields.filter(f => f.isAccessible());
+        } else if (action instanceof ThrowAction) {
+            clickableObjects = action.getPossibleTargets();
         } else {
             clickableObjects = this.getGameObjects();
         }
@@ -87,7 +89,7 @@ class CanvasLayers {
         const hoverableFields = fields.filter(f => f.isAccessible());
         const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
 
-        const hoverableObjects = fields.concat(gameObjects);
+        const hoverableObjects = hoverableFields.concat(gameObjects);
 
         return hoverableObjects;
     }

@@ -45,9 +45,8 @@ class RunAction extends Action {
 
     getNextPossibleSteps() {
         const lastPathField = this.path[this.path.length-1];
-        // const playerField = this.gp.layers.getBoardFields().filter(f => f.hex.equals(player.hex))[0];
         const neighborFields = lastPathField.getNeighbors();
-        const emptyNeighbors = neighborFields.filter(n => n.isEmpty(this.gp));
+        const emptyNeighbors = neighborFields.filter(n => (n.isEmpty(this.gp) || n.getGameObject(this.gp) instanceof Torque) && n.isAccessible());
 
         return emptyNeighbors;
     }
@@ -55,7 +54,7 @@ class RunAction extends Action {
     moveGhost(hex) {
         if (this.ghost == null) {
             const p = this.player;
-            this.ghost = new Ghost(p.gp, p.hex, p.id, p.team);
+            this.ghost = new Ghost(p.gp, p.hex, p.id, p.team, p.status);
             this.gp.addGameObject(this.ghost);
         }
 
