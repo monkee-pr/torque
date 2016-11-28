@@ -1,7 +1,8 @@
 class Torque extends GameObject {
-    constructor(hex) {
+    constructor(gp, hex) {
         super();
 
+        this.gp = gp;
         this.hex = hex;
 
         this.vq = 0;
@@ -16,7 +17,8 @@ class Torque extends GameObject {
         this.move();
     }
 
-    draw(ctx, gp) {
+    draw(ctx) {
+        const gp = this.gp;
         const cameraMode = gp.camera.getMode();
         const cameraPosition = gp.camera.position;
         const scaledSize = GameObject.BASE_SIZE * Camera.scale;
@@ -97,6 +99,10 @@ class Torque extends GameObject {
         }
     }
 
+    onClick() {
+        this.scatter();
+    }
+
     move() {
         // set new position
         const vector = new Hex(this.vq, this.vr);
@@ -107,7 +113,17 @@ class Torque extends GameObject {
         this.vr = 0;
     }
 
+    getField() {
+        const fields = this.gp.layers.getBoardFields();
+        const thisField = fields.filter(f => f.hex.equals(this.hex))[0];
+
+        return thisField;
+    }
+
     scatter() {
-        console.log(scatter);
+        const field = this.getField();
+        const neighborFields = field.getNeighbors();
+        const randomizedNeighbor = Array.getRandomElement(neighborFields);
+        this.hex = new Hex(randomizedNeighbor.hex.q, randomizedNeighbor.hex.r);
     }
 }

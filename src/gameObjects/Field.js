@@ -1,11 +1,12 @@
 class Field extends GameObject {
-    constructor(board, hex, type = Field.TYPE_REGULAR, strikeArea) {
+    constructor(gp, hex, type = Field.TYPE_REGULAR, strikeArea) {
         super();
 
-        this.board = board;
+        this.gp = gp;
         this.hex = hex;
         this.type = type;
         this.strikeArea = strikeArea;
+        this.isOpen = type == Field.TYPE_HOLE ? false : null;
 
         if (hex.q < 0) {
             this.teamSide = Team.TEAM_1;
@@ -19,7 +20,7 @@ class Field extends GameObject {
             case Field.TYPE_REGULAR:
                 break;
             case Field.TYPE_HOLE:
-                this.color = Color.FIELD_HOLE_BACKGROUND;
+                this.color = Color.FIELD_HOLE_CLOSED_BACKGROUND;
                 break;
             case Field.TYPE_HOT_ZONE:
                 this.color = Color.FIELD_HOT_ZONE_BACKGROUND;
@@ -43,10 +44,10 @@ class Field extends GameObject {
             {
                 switch (this.teamSide) {
                     case Team.TEAM_1:
-                        this.image = resources.tileGoalBlue;
+                        this.image = resources.tileHoleClosedBlue;
                         break;
                     case Team.TEAM_2:
-                        this.image = resources.tileGoalRed;
+                        this.image = resources.tileHoleClosedRed;
                         break;
                 }
                 break;
@@ -63,7 +64,6 @@ class Field extends GameObject {
                 }
                 break;
             }
-                break;
             case Field.TYPE_SUPER_HOT_ZONE:
             {
                 switch (this.teamSide) {
@@ -76,13 +76,11 @@ class Field extends GameObject {
                 }
                 break;
             }
-                break;
             case Field.TYPE_PIT:
             {
                 this.image = resources.tilePit;
                 break;
             }
-                break;
             case Field.TYPE_MIDFIELD:
             {
                 this.image = resources.tileMidfield;
@@ -93,9 +91,36 @@ class Field extends GameObject {
 
     update() {
         super.update();
+
+        if (this.type == Field.TYPE_HOLE) {
+            const thisObj = this;
+            const boardFields = this.gp.layers.getBoardFields();
+            const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == thisObj.strikeArea && f.teamSide == thisObj.teamSide);
+            const fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque = fieldsOfStrikeArea.filter(f => {
+                const go = f.getGameObject(123);
+                if (go instanceof Player && !(go instanceof Ghost)) {
+                    const player = go;
+                    if (player.team.id != thisObj.teamSide) {
+                        const opposingPlayer = player;
+                        if (opposingPlayer.holdsTorque()) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            });
+
+            if (fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque.length > 0) {
+                this.openHole();
+            } else {
+                this.closeHole();
+            }
+        }
     }
 
-    draw(ctx, gp) {
+    draw(ctx) {
+        const gp = this.gp;
         const cameraMode = gp.camera.getMode();
         const cameraPosition = gp.camera.position;
         const scaledSize = GameObject.BASE_SIZE * Camera.scale;
@@ -149,8 +174,14 @@ class Field extends GameObject {
             }
         }
 
-        if (cameraMode == Camera.MODE_TOP_DOWN || (this.image != resources.tileGoalRed && this.image != resources.tileGoalBlue)) {
+        if (true) {//cameraMode == Camera.MODE_TOP_DOWN || this.type != Field.TYPE_HOLE) {
             // draw border
+            if (this.type != Field.TYPE_HOLE) {
+                // regular border
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
+                ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+            }
+
             if (this.isHighlighted && this.isHovered) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
                 ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
@@ -160,9 +191,6 @@ class Field extends GameObject {
             } else if (this.isHovered) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
                 ctx.strokeStyle = Color.BORDER_HOVER;
-            } else {
-                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
-                ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
             }
 
             ctx.stroke();
@@ -189,7 +217,8 @@ class Field extends GameObject {
         const neighborHex = Hex.getNeighborAt(hex, direction);
 
         let neighbor = null;
-        this.board.fields.forEach(f => {
+        const boardFields = this.gp.layers.getBoardFields();
+        boardFields.forEach(f => {
             if (neighbor == null) {
                 if (f.hex.equals(neighborHex)) {
                     neighbor = f;
@@ -245,9 +274,12 @@ class Field extends GameObject {
         return empty;
     }
 
-    getGameObject(gp) {
-        const gameObjects = gp.layers.getGameObjects();
-        const objectOnThisHex = gameObjects.filter(go => go.hex.equals(this.hex))[0];
+    getGameObject(a) {
+        const gameObjects = this.gp.layers.getGameObjects();
+        const objectOnThisHex = gameObjects.filter(go => {
+            // if (a=123) console.log(go);
+            return go.hex.equals(this.hex)
+        })[0];
 
         return objectOnThisHex;
     }
@@ -255,6 +287,7 @@ class Field extends GameObject {
     isAccessible() {
         switch (this.type) {
             case Field.TYPE_HOLE:
+                return this.isOpen;
             case Field.TYPE_PIT:
                 return false
             default:
@@ -266,13 +299,50 @@ class Field extends GameObject {
         const action = gp.getAction();
         if (action instanceof RunAction) {
             if (action.addFieldToPath(this)) {
-                const hasTorque = this.getGameObject(gp) instanceof Torque;
+
+                action.moveGhost(this.hex);
+
+                const hasTorque = this.getGameObject() instanceof Torque;
                 if (hasTorque) {
                     action.ghost.pickUpTorque(gp);
                 }
-
-                action.moveGhost(this.hex);
             }
+        } else if (action instanceof ThrowAction) {
+            action.target(this);
+        }
+    }
+
+    openHole() {
+        if (this.type == Field.TYPE_HOLE && this.isOpen == false) {
+            this.isOpen = true;
+
+            // switch sprite
+            switch (this.teamSide) {
+                case Team.TEAM_1:
+                    this.image = resources.tileHoleOpenedBlue;
+                    break;
+                case Team.TEAM_2:
+                    this.image = resources.tileHoleOpenedRed;
+                    break;
+            }
+            this.color = Color.FIELD_HOLE_OPENED_BACKGROUND;
+        }
+    }
+
+    closeHole() {
+        if (this.type == Field.TYPE_HOLE && this.isOpen == true) {
+            this.isOpen = false;
+
+            // switch sprite
+            switch (this.teamSide) {
+                case Team.TEAM_1:
+                    this.image = resources.tileHoleClosedBlue;
+                    break;
+                case Team.TEAM_2:
+                    this.image = resources.tileHoleClosedRed;
+                    break;
+            }
+            this.color = Color.FIELD_HOLE_CLOSED_BACKGROUND;
         }
     }
 }
@@ -283,5 +353,9 @@ Field.TYPE_HOT_ZONE = "hot_zone";
 Field.TYPE_SUPER_HOT_ZONE = "super_hot_zone";
 Field.TYPE_PIT = "pit";
 Field.TYPE_MIDFIELD = "midfield";
+
+Field.STRIKE_AREA_BACK = "back";
+Field.STRIKE_AREA_LEFT = "left";
+Field.STRIKE_AREA_RIGHT = "right";
 
 Field.BORDER_WIDTH = GameObject.BASE_SIZE / 50;

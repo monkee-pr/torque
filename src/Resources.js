@@ -5,8 +5,10 @@ function loadResources(doneFunc) {
 
     let imageQueue = [
         {name: "sand", src: "res/textures/sand.png"},
-        {name: "tileGoalRed", src: "res/tiles/tile_goal_red.png"},
-        {name: "tileGoalBlue", src: "res/tiles/tile_goal_blue.png"},
+        {name: "tileHoleOpenedRed", src: "res/tiles/tile_special_red_up.png"},
+        {name: "tileHoleOpenedBlue", src: "res/tiles/tile_special_blue_down.png"},
+        {name: "tileHoleClosedRed", src: "res/tiles/tile_goal_red.png"},
+        {name: "tileHoleClosedBlue", src: "res/tiles/tile_goal_blue.png"},
         {name: "tilePit", src: "res/tiles/tile_pit.png"},
         {name: "tileMidfield", src: "res/tiles/tile_middle.png"},
         {name: "tileAroundBlueDown", src: "res/tiles/tile_around_blue_down.png"},

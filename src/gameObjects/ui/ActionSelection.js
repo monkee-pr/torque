@@ -61,8 +61,12 @@ class ActionSelection extends Popup {
 
     throwTorque(gp, params) {
         const player = params.player;
-        gp.closeTopPopup();
-        gp.setAction(new ThrowAction(gp, player));
+        if (player.holdsTorque()) {
+            gp.closeTopPopup();
+            gp.setAction(new ThrowAction(gp, player));
+        } else {
+            console.log("Can't throw without holding the torque");
+        }
     }
 
     onClick(gp, point) {

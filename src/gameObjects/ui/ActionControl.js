@@ -76,6 +76,12 @@ class ActionControl extends UIElement {
             } else {
                 increaseActionCounter = false;
             }
+        } else if (action instanceof ThrowAction) {
+            if (action.targetField != null) {
+                action.throwTorque();
+            } else {
+                increaseActionCounter = false;
+            }
         }
 
         // unselect player

@@ -212,14 +212,13 @@ class Player extends GameObject {
         }
     }
 
-    pickUpTorque(gp) {
+    pickUpTorque() {
+        const gp = this.gp;
         const boardFields = gp.layers.getBoardFields();
         const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty(gp));
         const gameObjectsOfFields = notEmptyBoardFields.map(f => f.getGameObject(gp));
         const torque = gameObjectsOfFields.filter(go => go instanceof Torque)[0];
         if (this.canHoldTorque()) {
-            console.log("pickup!");
-            console.log(this);
             this.status = Player.STATUS_HOLD_TORQUE;
 
             gp.removeGameObject(torque);
@@ -228,11 +227,21 @@ class Player extends GameObject {
         }
     }
 
-    dropTorque(gp) {
+    throwTorque() {
+        if (this.holdsTorque()) {
+            this.status = Player.NORMAL;
+        }
+    }
+
+    dropTorque() {
         this.status = Player.NORMAL;
-        const torque = new Torque(this.hex);
-        gp.addGameObject(torque);
+        const torque = new Torque(this.gp, new Hex(this.hex.q, this.hex.r));
+        this.gp.addGameObject(torque);
         torque.scatter();
+    }
+
+    isTeamMateOf(player) {
+        return player != null && this.team.id == player.team.id;
     }
 
     actionRun() {

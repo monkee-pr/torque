@@ -29,7 +29,7 @@ Control.mouseMove = (e, gp) => {
         if (!(Control.hoveredHex && Control.hoveredHex.equals(hex))) {
             Control.hoveredHex = hex;
 
-            const hoverableObjects = gp.layers.getHoverableObjects();
+            const hoverableObjects = gp.layers.getHoverableObjects(gp);
             const reversedGameObjects = hoverableObjects.slice().reverse();
             let brk = false;
             reversedGameObjects.forEach(go => {
@@ -91,6 +91,8 @@ Control.click = (e, gp) => {
                 reversedGameObjects.forEach(go => {
                     if (!brk && go.hex != null && hex.equals(go.hex)) {
                         go.onClick(gp);
+                        console.log("click");
+                        console.log(go);
                         brk = true;
                     }
                 });

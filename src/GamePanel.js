@@ -8,18 +8,18 @@ class GamePanel {
 
         this.setBackground(new Background(null, Color.WINDOW_BACKGROUND));
 
-        const board = new Board();
+        const board = new Board(this);
         this.addGameObject(board);
         // board.fields.forEach(f => this.addGameObject(f));
         const originField = this.layers.getBoardFields().filter(f => f.hex.equals(new Hex(0, 0)))[0];
         this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_ISOMETRIC);
         // this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_TOP_DOWN);
 
-        this.addGameObject(new Torque(new Hex(0, 0)));
+        this.addGameObject(new Torque(this, new Hex(0, 0)));
 
         this.team1 = new Team(Team.TEAM_1);
         const t1p1 = new Player(this, new Hex(-2, -1), 0, this.team1);
-        const t1p2 = new Player(this, new Hex(-2, 1), 1, this.team1);
+        const t1p2 = new Player(this, new Hex(-1, 0), 1, this.team1);
         const t1p3 = new Player(this, new Hex(-3, 0), 2, this.team1);
         this.team1.addPlayer(t1p1);
         this.team1.addPlayer(t1p2);
