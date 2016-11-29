@@ -121,9 +121,13 @@ class Torque extends GameObject {
     }
 
     scatter() {
-        const field = this.getField();
-        const neighborFields = field.getNeighbors();
-        const randomizedNeighbor = Array.getRandomElement(neighborFields);
-        this.hex = new Hex(randomizedNeighbor.hex.q, randomizedNeighbor.hex.r);
+        const amountOfFieldsScattering = 3;
+        for (var i = 0; i < amountOfFieldsScattering; i++) {
+            const field = this.getField();
+            const neighborFields = field.getNeighbors();
+            const validNeightbors = neighborFields.filter(f => f.isEmpty() && f.isAccessible());
+            const randomizedNeighbor = Array.getRandomElement(validNeightbors);
+            this.hex = new Hex(randomizedNeighbor.hex.q, randomizedNeighbor.hex.r);
+        }
     }
 }

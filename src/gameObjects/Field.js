@@ -93,6 +93,14 @@ class Field extends GameObject {
         super.update();
 
         if (this.type == Field.TYPE_HOLE) {
+            if (this.getGameObject() instanceof Torque) {
+                // HOOOLE!!!
+                console.log("HOOOLE!!!");
+                const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
+                this.gp.scoreForTeam(scoringTeam);
+                this.gp.respawnTorque();
+            }
+
             const thisObj = this;
             const boardFields = this.gp.layers.getBoardFields();
             const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == thisObj.strikeArea && f.teamSide == thisObj.teamSide);
@@ -304,7 +312,7 @@ class Field extends GameObject {
 
                 const hasTorque = this.getGameObject() instanceof Torque;
                 if (hasTorque) {
-                    action.ghost.pickUpTorque(gp);
+                    action.ghost.pickUpTorque();
                 }
             }
         } else if (action instanceof ThrowAction) {

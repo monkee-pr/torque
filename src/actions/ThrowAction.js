@@ -39,9 +39,21 @@ class ThrowAction extends Action {
     throwTorque() {
         // spawn torque in target field
         if (this.targetField != null) {
+            const field = this.targetField;
             const hex = this.targetField.hex;
             const torque = new Torque(this.gp, new Hex(hex.q, hex.r));
             this.gp.addGameObject(torque);
+
+            const go = field.getGameObject();
+            if (go instanceof Player) {
+                const targetPlayer = go;
+                if (true || targetPlayer.isTeamMateOf(this.player)) {
+                    // pass torque
+                    targetPlayer.pickUpTorque();
+                } else {
+                    // hit opposing player
+                }
+            }
 
             // reset action's target field
             this.targetField = null;

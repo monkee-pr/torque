@@ -44,6 +44,8 @@ class GamePanel {
             this.team2,
         ];
 
+        this.score = 0; // reaches from -7 to 7
+
         this.startNextTurn();
 
         this.selectedPlayer = null;
@@ -53,6 +55,7 @@ class GamePanel {
 
         this.addUIElement(new TurnInfo(this));
         this.addUIElement(new SwitchPerspective(this));
+        this.addUIElement(new ScoreInfo(this));
     }
 
     setBackground(bg) {
@@ -111,7 +114,7 @@ class GamePanel {
     }
     cancelAction() {
         const action = this._action;
-        if (action && action.type == Action.TYPE_RUN) {
+        if (action instanceof RunAction) {
             this.layers.getBoardFields().forEach(f => f.isHighlighted = false);
         }
         this._action = null;
@@ -168,6 +171,25 @@ class GamePanel {
         const topPopup = popups[popups.length-1];
 
         this.removeUIElement(topPopup);
+    }
+
+    scoreForTeam(team) {
+        if (team == this.team1) {
+            this.score--;
+        } else {
+            this.score++;
+        }
+        console.log("score");
+        console.log(this.score);
+    }
+
+    respawnTorque() {
+        const gameObjects = this.layers.getGameObjects();
+        const torque = gameObjects.filter(go => go instanceof Torque)[0];
+
+        if (torque != null) {
+            torque.hex = new Hex(0, 0);
+        }
     }
 
     startNextTurn() {

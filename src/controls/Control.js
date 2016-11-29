@@ -2,6 +2,7 @@ const Control = {};
 
 Control.dragAnchor = null;
 Control.dragged = false;
+Control.dragTolerance = 5;
 Control.hoveredHex = null;
 
 Control.mouseDown = (e, gp) => {
@@ -9,7 +10,6 @@ Control.mouseDown = (e, gp) => {
 }
 
 Control.mouseUp = (e, gp) => {
-    Control.dragAnchor = null;
 }
 
 Control.mouseMove = (e, gp) => {
@@ -59,7 +59,13 @@ Control.drag = (e, gp) => {
 }
 
 Control.click = (e, gp) => {
-    if (!Control.dragged) {
+    const draggedWidth = Math.abs(e.x - Control.dragAnchor.x);
+    const draggedHeight = Math.abs(e.y - Control.dragAnchor.y);
+    const draggedDistance = Math.sqrt(Math.pow(draggedWidth, 2) + Math.pow(draggedHeight, 2));
+    const dragged = draggedDistance > Control.dragTolerance;
+    Control.dragAnchor = null;
+
+    if (!dragged) {
         const target = e.target;
         const x = target.width / target.clientWidth * e.clientX;
         const y = target.height / target.clientHeight * e.clientY;

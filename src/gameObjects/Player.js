@@ -212,18 +212,21 @@ class Player extends GameObject {
         }
     }
 
+    // requires a Torque object in the GamePanel's GameObject list
     pickUpTorque() {
         const gp = this.gp;
         const boardFields = gp.layers.getBoardFields();
         const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty(gp));
         const gameObjectsOfFields = notEmptyBoardFields.map(f => f.getGameObject(gp));
         const torque = gameObjectsOfFields.filter(go => go instanceof Torque)[0];
-        if (this.canHoldTorque()) {
-            this.status = Player.STATUS_HOLD_TORQUE;
+        if (torque != null) {
+            if (this.canHoldTorque()) {
+                this.status = Player.STATUS_HOLD_TORQUE;
 
-            gp.removeGameObject(torque);
-        } else {
-            torque.scatter();
+                gp.removeGameObject(torque);
+            } else {
+                torque.scatter();
+            }
         }
     }
 
