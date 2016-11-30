@@ -17,3 +17,14 @@ Array.getRandomElement = (arr) => {
     const i = Math.randomInt(0, arr.length-1);
     return arr[i];
 }
+Array.flatten = (arr) => {
+    var ret = [];
+    for(var i = 0; i < arr.length; i++) {
+        if(Array.isArray(arr[i])) {
+            ret = ret.concat(Array.flatten(arr[i]));
+        } else {
+            ret.push(arr[i]);
+        }
+    }
+    return ret;
+}

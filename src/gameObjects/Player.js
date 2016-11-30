@@ -216,8 +216,8 @@ class Player extends GameObject {
     pickUpTorque() {
         const gp = this.gp;
         const boardFields = gp.layers.getBoardFields();
-        const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty(gp));
-        const gameObjectsOfFields = notEmptyBoardFields.map(f => f.getGameObject(gp));
+        const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty());
+        const gameObjectsOfFields = Array.flatten(notEmptyBoardFields.map(f => f.getGameObjects()));
         const torque = gameObjectsOfFields.filter(go => go instanceof Torque)[0];
         if (torque != null) {
             if (this.canHoldTorque()) {

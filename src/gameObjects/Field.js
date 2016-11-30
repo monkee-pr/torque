@@ -93,7 +93,7 @@ class Field extends GameObject {
         super.update();
 
         if (this.type == Field.TYPE_HOLE) {
-            if (this.getGameObject() instanceof Torque) {
+            if (this.getGameObjects().filter(go => go instanceof Torque).length > 0) {
                 // HOOOLE!!!
                 console.log("HOOOLE!!!");
                 const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
@@ -105,7 +105,7 @@ class Field extends GameObject {
             const boardFields = this.gp.layers.getBoardFields();
             const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == thisObj.strikeArea && f.teamSide == thisObj.teamSide);
             const fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque = fieldsOfStrikeArea.filter(f => {
-                const go = f.getGameObject(123);
+                const go = f.getGameObjects()[0];
                 if (go instanceof Player && !(go instanceof Ghost)) {
                     const player = go;
                     if (player.team.id != thisObj.teamSide) {
@@ -276,20 +276,19 @@ class Field extends GameObject {
         return false;
     }
 
-    isEmpty(gp) {
-        const empty = this.getGameObject(gp) == null;
+    isEmpty() {
+        const empty = this.getGameObjects().length == 0;
 
         return empty;
     }
 
-    getGameObject(a) {
+    getGameObjects() {
         const gameObjects = this.gp.layers.getGameObjects();
-        const objectOnThisHex = gameObjects.filter(go => {
-            // if (a=123) console.log(go);
+        const objectsOnThisHex = gameObjects.filter(go => {
             return go.hex.equals(this.hex)
-        })[0];
+        });
 
-        return objectOnThisHex;
+        return objectsOnThisHex;
     }
 
     isAccessible() {
@@ -310,7 +309,7 @@ class Field extends GameObject {
 
                 action.moveGhost(this.hex);
 
-                const hasTorque = this.getGameObject() instanceof Torque;
+                const hasTorque = this.getGameObjects().filter(go => go instanceof Torque).length > 0;
                 if (hasTorque) {
                     action.ghost.pickUpTorque();
                 }

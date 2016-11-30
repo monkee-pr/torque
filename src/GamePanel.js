@@ -134,6 +134,8 @@ class GamePanel {
 
     update() {
         this.layers.update();
+        // const torques = this.layers.getGameObjects().filter(go => go instanceof Torque);
+        // console.log(torques.length);
     }
 
     draw() {

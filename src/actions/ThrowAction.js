@@ -13,7 +13,7 @@ class ThrowAction extends Action {
         const playerField = this.player.getField();
         const boardFields = this.gp.layers.getBoardFields();
         const possibleTargetFields = boardFields.filter(f => {
-            const go = f.getGameObject();
+            const go = f.getGameObjects()[0];
             if (go instanceof Player && go != this.player) {
                 // team mate or opposing player
                 return true;
@@ -44,16 +44,19 @@ class ThrowAction extends Action {
             const torque = new Torque(this.gp, new Hex(hex.q, hex.r));
             this.gp.addGameObject(torque);
 
-            const go = field.getGameObject();
-            if (go instanceof Player) {
-                const targetPlayer = go;
-                if (true || targetPlayer.isTeamMateOf(this.player)) {
-                    // pass torque
-                    targetPlayer.pickUpTorque();
-                } else {
-                    // hit opposing player
+            field.getGameObjects().forEach(go => {
+                if (go instanceof Player) {
+                    const targetPlayer = go;
+                    if (true || targetPlayer.isTeamMateOf(this.player)) {
+                        // pass torque
+                        targetPlayer.pickUpTorque();
+                    } else {
+                        // hit opposing player
+                        // targetPlayer.bash();
+                        torque.scatter();
+                    }
                 }
-            }
+            });
 
             // reset action's target field
             this.targetField = null;

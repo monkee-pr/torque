@@ -46,7 +46,7 @@ class RunAction extends Action {
     getNextPossibleSteps() {
         const lastPathField = this.path[this.path.length-1];
         const neighborFields = lastPathField.getNeighbors();
-        const emptyNeighbors = neighborFields.filter(n => (n.isEmpty(this.gp) || n.getGameObject(this.gp) instanceof Torque) && n.isAccessible());
+        const emptyNeighbors = neighborFields.filter(n => (n.isEmpty() || n.getGameObjects().filter(go => go instanceof Torque).length > 0) && n.isAccessible());
 
         return emptyNeighbors;
     }
