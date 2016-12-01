@@ -186,11 +186,44 @@ class GamePanel {
     }
 
     respawnTorque() {
+        if (this.actionsPerformed < GamePanel.ACTIONS_PER_TURN) {
+            this.startNextTurn();
+        }
+
         const gameObjects = this.layers.getGameObjects();
         const torque = gameObjects.filter(go => go instanceof Torque)[0];
 
         if (torque != null) {
-            torque.hex = new Hex(0, 0);
+            const boardFields = this.layers.getBoardFields();
+            const spawnFields = boardFields.filter(f => f.isSpawnPoint);
+
+            const spawnFieldIndex = Math.randomInt(0, spawnFields.length-1+1);
+
+            let passingFields = null;
+            if (this.activeTeam == this.team1) {
+                passingFields = spawnFields.slice(0, spawnFieldIndex+1);
+            } else {
+                passingFields = spawnFields.slice(spawnFieldIndex, spawnFields.length-1+1).reverse();
+            }
+
+            const playersPassing = Array.flatten(passingFields.map(f => f.getGameObjects())).filter(go => go instanceof Player);
+            const playerCollidingWith = playersPassing[0];
+
+            if (playerCollidingWith != null) {
+                // torque collides with player
+                const landingField = passingFields.filter(f => f.getGameObjects().indexOf(playerCollidingWith) != -1)[0];
+                torque.hex = new Hex(landingField.hex.q, landingField.hex.r);
+                if (false) { // player faces the torque
+                    playerCollidingWith.pickUpTorque();
+                } else {
+                    // bash player
+                    torque.scatter();
+                }
+            } else {
+                // torque reaches landing field without any collisions
+                const landingField = passingFields[passingFields.length-1];
+                torque.hex = new Hex(landingField.hex.q, landingField.hex.r);
+            }
         }
     }
 

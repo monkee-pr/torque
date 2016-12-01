@@ -6,7 +6,8 @@ class Field extends GameObject {
         this.hex = hex;
         this.type = type;
         this.strikeArea = strikeArea;
-        this.isOpen = type == Field.TYPE_HOLE ? false : null;
+        this.isOpen = type == Field.TYPE_HOLE ? false : null;   // only for field of the type "hole"
+        this.isSpawnPoint = type == Field.TYPE_MIDFIELD && hex.q == 0 && Number.isEven(hex.r) ? true : false;
 
         if (hex.q < 0) {
             this.teamSide = Team.TEAM_1;
@@ -175,10 +176,18 @@ class Field extends GameObject {
             ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
-                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
-                const width = this.image.width * Camera.scale;
-                const height = this.image.height * Camera.scale;
-                ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
+                if (this.isOpen == true) {
+                    const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
+                    const width = this.image.width * Camera.scale;
+                    const height = this.image.height * Camera.scale;
+                    const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
+                    ctx.drawImage(this.image, anchor.x, anchor.y, width, height);
+                } else {
+                    const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
+                    const width = this.image.width * Camera.scale;
+                    const height = this.image.height * Camera.scale;
+                    ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
+                }
             }
         }
 

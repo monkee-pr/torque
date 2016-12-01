@@ -13,17 +13,17 @@ class Player extends GameObject {
         let name, role, rank, stats, skills;
         switch (this.id) {
             case 0:
-                name = "player1Team" + this.team.id;
+                name = "Sir Maulton";
                 role = Player.ROLE_MAUL;
                 rank = 1;
                 break;
             case 1:
-                name = "player2Team" + this.team.id;
+                name = "Ms. Bladeness";
                 role = Player.ROLE_BLADE;
                 rank = 1;
                 break;
             case 2:
-                name = "player3Team" + this.team.id;
+                name = "M. von Dart";
                 role = Player.ROLE_DART;
                 rank = 1;
                 break;
@@ -221,6 +221,7 @@ class Player extends GameObject {
         const torque = gameObjectsOfFields.filter(go => go instanceof Torque)[0];
         if (torque != null) {
             if (this.canHoldTorque()) {
+                // recognize direction and pickup chance here and remove it from GamePanel's respawnTorque() tileHoleOpenedRed
                 this.status = Player.STATUS_HOLD_TORQUE;
 
                 gp.removeGameObject(torque);

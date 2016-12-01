@@ -5,7 +5,48 @@ Math.getTrianglesHeight = (length) => {
 Math.randomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min;
+    return Math.floor(Math.random() * (max+1 - min) + min);
+}
+Math.chance = (chance) => {
+    const randomValue = Math.random() * 100;    // 0 - 99.99999999
+
+    return randomValue < chance;
+}
+Math.rollDice = (amountOfDice) => {
+    const amountOfDice1 = amountOfDice || 1;
+
+    let values = [];
+    for (var i = 0; i < amountOfDice1; i++) {
+        const value = Math.randomInt(1, 6);
+        values.push(value);
+    }
+
+    return values;
+}
+Math.diceHigherX = (amountOfDice, minValue) => {
+    const values = Math.rollDice(amountOfDice);
+
+    return values.filter(v => v >= minValue);
+}
+Math.diceValueNeeded = (amountOfDice, minValue, neededAmount) => {
+    return diceHigherX(amountOfDice, minValue).length >= neededAmount;
+}
+
+Number.isEven = (num) => {
+    if (!Number.isInteger(num)) {
+        console.error(num + " is not an integer");
+        return null;
+    } else {
+        return num % 2 == 0;
+    }
+}
+Number.isOdd = (num) => {
+    if (!Number.isInteger(num)) {
+        console.error(num + " is not an integer");
+        return null;
+    } else {
+        return num % 2 != 0;
+    }
 }
 
 // object extensions
