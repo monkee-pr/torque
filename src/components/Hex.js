@@ -19,7 +19,7 @@ Hex.add = (hex1, hex2) => {
 
 Hex.hexToPoint = (anchor, hex) => {
     const size = GameObject.BASE_SIZE * Camera.scale;
-    const baseX = size * Math.sqrt(3) * (hex.q + 0.5 * (hex.r&1));
+    const baseX = size * Math.sqrt(3) * (hex.r/2 + hex.q);
     const baseY = size * 3/2 * hex.r;
 
     const x = baseX + anchor.x;
@@ -35,22 +35,22 @@ Hex.getNeighborAt = (hex, direction) => {
     let neighborHex = null;
     switch (direction) {
         case Hex.DIRECTION_TOP_RIGHT:
-            neighborHex = new Hex(hex.q + (hex.r&1), hex.r - 1);
+            neighborHex = new Hex(hex.q + 1, hex.r - 1);
             break;
         case Hex.DIRECTION_RIGHT:
             neighborHex = new Hex(hex.q + 1, hex.r);
             break;
         case Hex.DIRECTION_BOTTOM_RIGHT:
-            neighborHex = new Hex(hex.q + (hex.r&1), hex.r + 1);
+            neighborHex = new Hex(hex.q, hex.r + 1);
             break;
         case Hex.DIRECTION_BOTTOM_LEFT:
-            neighborHex = new Hex(hex.q - (!(hex.r&1)), hex.r + 1);
+            neighborHex = new Hex(hex.q - 1, hex.r + 1);
             break;
         case Hex.DIRECTION_LEFT:
             neighborHex = new Hex(hex.q - 1, hex.r);
             break;
         case Hex.DIRECTION_TOP_LEFT:
-            neighborHex = new Hex(hex.q - (!(hex.r&1)), hex.r - 1);
+            neighborHex = new Hex(hex.q, hex.r - 1);
             break;
         default:
             console.error("Invalid direction");

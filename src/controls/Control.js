@@ -97,8 +97,8 @@ Control.click = (e, gp) => {
                 reversedGameObjects.forEach(go => {
                     if (!brk && go.hex != null && hex.equals(go.hex)) {
                         go.onClick(gp);
-                        console.log("click");
-                        console.log(go);
+                        // console.log("click");
+                        // console.log(go);
                         brk = true;
                     }
                 });

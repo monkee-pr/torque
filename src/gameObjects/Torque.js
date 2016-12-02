@@ -88,7 +88,6 @@ class Torque extends GameObject {
             }
             drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
-            // drawBorder();
             if (this.image != null) {
                 const point = center.toIso(cameraPosition);
                 // const point = new Point(point1.x-4, point1.y-4);
@@ -96,6 +95,7 @@ class Torque extends GameObject {
                 const height = this.image.height * Camera.scale;
                 ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
             }
+            // drawBorder();
         }
     }
 

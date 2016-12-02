@@ -9,7 +9,9 @@ class Field extends GameObject {
         this.isOpen = type == Field.TYPE_HOLE ? false : null;   // only for field of the type "hole"
         this.isSpawnPoint = type == Field.TYPE_MIDFIELD && hex.q == 0 && Number.isEven(hex.r) ? true : false;
 
-        if (hex.q < 0) {
+        if (type == Field.TYPE_MIDFIELD) {
+            this.teamSide = null;
+        } else if (hex.q*2 + hex.r < 0) {
             this.teamSide = Team.TEAM_1;
         } else {
             this.teamSide = Team.TEAM_2;
@@ -180,37 +182,42 @@ class Field extends GameObject {
                     const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
                     const width = this.image.width * Camera.scale;
                     const height = this.image.height * Camera.scale;
-                    const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
+                    const anchor = new Point(point.x - width/2, point.y-2 - (height - 150*Camera.scale));
                     ctx.drawImage(this.image, anchor.x, anchor.y, width, height);
                 } else {
                     const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
                     const width = this.image.width * Camera.scale;
                     const height = this.image.height * Camera.scale;
-                    ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
+                    ctx.drawImage(this.image, point.x - width/2, point.y-2 - height/2, width, height);
                 }
             }
         }
 
         if (true) {//cameraMode == Camera.MODE_TOP_DOWN || this.type != Field.TYPE_HOLE) {
             // draw border
+            let drawBorder = false;
             if (this.type != Field.TYPE_HOLE) {
                 // regular border
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
                 ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+                drawBorder = true;
             }
 
             if (this.isHighlighted && this.isHovered) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
                 ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
+                drawBorder = true;
             } else if (this.isHighlighted) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
                 ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
+                drawBorder = true;
             } else if (this.isHovered) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
                 ctx.strokeStyle = Color.BORDER_HOVER;
+                drawBorder = true;
             }
 
-            ctx.stroke();
+            if (drawBorder) ctx.stroke();
         }
 
         if (cameraMode == Camera.MODE_TOP_DOWN && (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE)) {

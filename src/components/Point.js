@@ -60,7 +60,7 @@ Point.pointToHex = (anchor, point) => {
     const relativePoint = new Point(baseX - anchor.x, baseY - anchor.y);
 
     const r = Math.round(relativePoint.y * 2/3 / size);
-    const q = Math.round(relativePoint.x / (size * Math.sqrt(3)) - (r%2 ? 0.5 : 0));
+    const q = Math.round(relativePoint.x / (size * Math.sqrt(3)) - r/2);
 
     const guessedHex = new Hex(q, r);
 
