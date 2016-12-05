@@ -74,9 +74,9 @@ class ActionSelection extends Popup {
     onClick(gp, point) {
         const r = this.buttonRun;
         const t = this.buttonThrow;
-        if (point.hits(r.point, r.width, r.height)) {
+        if (point.hits(r && r.point, r.width, r.height)) {
             r.onClick(gp);
-        } else if(point.hits(t.point, t.width, t.height)) {
+        } else if(t && point.hits(t.point, t.width, t.height)) {
             t.onClick(gp);
         }
     }

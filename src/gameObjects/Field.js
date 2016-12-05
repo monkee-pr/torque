@@ -101,6 +101,8 @@ class Field extends GameObject {
                 console.log("HOOOLE!!!");
                 const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
                 this.gp.scoreForTeam(scoringTeam);
+                this.gp.actionsPerformed = GamePanel.ACTIONS_PER_TURN-1;
+                // this.gp.startNextTurn();
                 this.gp.respawnTorque();
             }
 
@@ -358,6 +360,7 @@ class Field extends GameObject {
             }
         } else if (action instanceof ThrowAction) {
             action.target(this);
+            actionControl.submit(this.gp);
         }
     }
 

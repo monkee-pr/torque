@@ -140,6 +140,11 @@ class GamePanel {
         this.layers.update();
         // const torques = this.layers.getGameObjects().filter(go => go instanceof Torque);
         // console.log(torques.length);
+
+        const boardFields = this.layers.getBoardFields();
+        const clickableObjects = this.layers.getClickableObjects(this);
+        boardFields.forEach(f => f.isHighlighted = clickableObjects.indexOf(f) != -1);
+        clickableObjects.forEach(go => go.isHighlighted = true);
     }
 
     draw() {

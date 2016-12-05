@@ -3,8 +3,8 @@ class CanvasLayers {
         this.layers = {
             [CanvasLayers.LAYER_BACKGROUND] : [],
             [CanvasLayers.LAYER_BOARD] : [],
-            [CanvasLayers.LAYER_GAME_OBJECTS] : [],
             [CanvasLayers.LAYER_HIGHLIGHTS] : [],
+            [CanvasLayers.LAYER_GAME_OBJECTS] : [],
             [CanvasLayers.LAYER_UI] : [],
         };
 
@@ -48,8 +48,32 @@ class CanvasLayers {
             if (layer == CanvasLayers.LAYER_UI && this.hideUI) {
                 return;
             }
-            objects.sort(CanvasLayers.sortForDrawing).forEach(object => object.draw(ctx, gp));
+
+            const objects1 = layer == CanvasLayers.LAYER_HIGHLIGHTS ? objects : objects.sort(CanvasLayers.sortForDrawing);
+            objects1.forEach(object => {
+                if (
+                    layer < CanvasLayers.LAYER_HIGHLIGHTS &&
+                    (
+                        object.isHovered ||
+                        object.isHighlighted ||
+                        object.isSelected ||
+                        object.fields
+                    )
+                ) {
+                    if (object.fields) {
+                        const specialFields = object.fields.filter(f => f.isHovered || f.isHighlighted || f.isSelected);
+                        const orderedFields = [].concat(specialFields.filter(f => f.isHighlighted && !f.isHovered)).concat(specialFields.filter(f => f.isSelected && !f.isHovered)).concat(specialFields.filter(f => f.isHovered));
+                        this.add(orderedFields, CanvasLayers.LAYER_HIGHLIGHTS);
+                    } else {
+                        this.add(object, CanvasLayers.LAYER_HIGHLIGHTS);
+                    }
+                }
+
+                object.draw(ctx, gp);
+            });
         });
+        
+        this.layers[CanvasLayers.LAYER_HIGHLIGHTS] = [];
     }
 
     getBoardFields() {
@@ -101,13 +125,9 @@ class CanvasLayers {
 }
 CanvasLayers.LAYER_BACKGROUND = 0;
 CanvasLayers.LAYER_BOARD = 1;
-CanvasLayers.LAYER_GAME_OBJECTS = 2;
-CanvasLayers.LAYER_HIGHLIGHTS = 3;
+CanvasLayers.LAYER_HIGHLIGHTS = 2;
+CanvasLayers.LAYER_GAME_OBJECTS = 3;
 CanvasLayers.LAYER_UI = 4;
-
-// CanvasLayers.LAYER_BOARD = 0;
-// CanvasLayers.LAYER_GAME_OBJECTS = 1;
-// CanvasLayers.LAYER_UI = 2;
 
 CanvasLayers.sortForDrawing = (a, b) => {
     if (!a.hex) {

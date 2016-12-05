@@ -89,7 +89,13 @@ class Player extends GameObject {
 
     update() {
         super.update();
+
         this.move();
+
+        const field = this.getField();
+        field.isSelected = this.isSelected;
+        field.isHighlighted = this.isHighlighted;
+        field.isHovered = this.isHovered;
     }
 
     draw(ctx, gp) {
@@ -125,23 +131,23 @@ class Player extends GameObject {
         ctx.lineTo(p5.x, p5.y);
         ctx.closePath();
 
-        const drawBorder = () => {
-            // draw border
-            if (this.isHighlighted && this.isHovered) {
-                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-                ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
-            } else if (this.isHighlighted) {
-                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-                ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
-            } else if (this.isHovered) {
-                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-                ctx.strokeStyle = Color.BORDER_HOVER;
-            } else {
-                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
-                ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
-            }
-            ctx.stroke();
-        }
+        // const drawBorder = () => {
+        //     // draw border
+        //     if (this.isHighlighted && this.isHovered) {
+        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+        //         ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
+        //     } else if (this.isHighlighted) {
+        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+        //         ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
+        //     } else if (this.isHovered) {
+        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+        //         ctx.strokeStyle = Color.BORDER_HOVER;
+        //     } else {
+        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
+        //         ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
+        //     }
+        //     ctx.stroke();
+        // }
 
         if (cameraMode == Camera.MODE_TOP_DOWN) {
             // fill area
@@ -149,9 +155,9 @@ class Player extends GameObject {
                 ctx.fillStyle = this.color;
                 ctx.fill();
             }
-            drawBorder();
+            // drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
-            drawBorder();
+            // drawBorder();
             let image = null;
             switch (this.status) {
                 case Player.STATUS_BASHED:
@@ -161,7 +167,7 @@ class Player extends GameObject {
                 default:
                     image = this.imageRegular;
             }
-            
+
             if (image != null) {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
                 const width = image.width * Camera.scale;

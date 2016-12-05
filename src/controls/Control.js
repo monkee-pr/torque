@@ -31,11 +31,11 @@ Control.mouseMove = (e, gp) => {
 
             const hoverableObjects = gp.layers.getHoverableObjects(gp);
             const reversedGameObjects = hoverableObjects.slice().reverse();
-            let brk = false;
+            // let brk = false;
             reversedGameObjects.forEach(go => {
-                if (!brk && go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
+                if (go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
                     go.isHovered = true;
-                    brk = true;
+                    // brk = true;
                 } else {
                     go.isHovered = false;
                 }
