@@ -24,7 +24,7 @@ class PlayerInfo extends Popup {
         tCtx.fillStyle = Color.UI_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
-        tCtx.font="40px Georgia";
+        tCtx.font="40px Arial";
         tCtx.fillText("Name: " + this.player.name, 10, 50);
         tCtx.fillText("Role: " + this.player.role, 10, 100);
         tCtx.fillText("Rank: " + this.player.rank, 10, 150);

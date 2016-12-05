@@ -20,7 +20,7 @@ class EndTurnButton extends Button {
         tCtx.fillStyle = Color.BUTTON_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
-        tCtx.font="40px Georgia";
+        tCtx.font="40px Arial";
         tCtx.fillText("End Turn",10,50);
 
         tCtx.strokeStyle = "black";

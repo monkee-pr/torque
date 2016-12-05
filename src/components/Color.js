@@ -18,10 +18,10 @@ Color.TEAM_2 = "#f00";
 // UI
 Color.FIELD_BORDER_REGULAR = "#915900"
 Color.BORDER_HOVER = "#000";
-Color.BORDER_SELECT = "#0ff";
-Color.BORDER_SELECT_HOVER = "#077";
-Color.BORDER_HIGHLIGHT = "#fff";
-Color.BORDER_HIGHLIGHT_HOVER = "#777";
+Color.BORDER_SELECT = "#fff";
+Color.BORDER_SELECT_HOVER = "#f77";
+Color.BORDER_HIGHLIGHT = "#0ff";
+Color.BORDER_HIGHLIGHT_HOVER = "#077";
 Color.GAME_BORDER = "black";
 Color.BUTTON = "white";
 Color.BUTTON_HOVER = "#77f"

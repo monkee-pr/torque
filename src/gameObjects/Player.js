@@ -161,9 +161,7 @@ class Player extends GameObject {
                 default:
                     image = this.imageRegular;
             }
-            // if (this instanceof Ghost) {
-            //     console.log(this.status == Player.STATUS_HOLD_TORQUE);
-            // }
+            
             if (image != null) {
                 const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
                 const width = image.width * Camera.scale;

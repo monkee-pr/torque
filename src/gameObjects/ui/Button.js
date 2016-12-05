@@ -27,7 +27,7 @@ class Button extends UIElement {
         }
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
-        tCtx.font="40px Georgia";
+        tCtx.font="40px Arial";
         tCtx.fillText(this.title, 10, 50);
 
         tCtx.strokeStyle = "black";

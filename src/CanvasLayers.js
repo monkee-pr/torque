@@ -4,6 +4,7 @@ class CanvasLayers {
             [CanvasLayers.LAYER_BACKGROUND] : [],
             [CanvasLayers.LAYER_BOARD] : [],
             [CanvasLayers.LAYER_GAME_OBJECTS] : [],
+            [CanvasLayers.LAYER_HIGHLIGHTS] : [],
             [CanvasLayers.LAYER_UI] : [],
         };
 
@@ -101,7 +102,8 @@ class CanvasLayers {
 CanvasLayers.LAYER_BACKGROUND = 0;
 CanvasLayers.LAYER_BOARD = 1;
 CanvasLayers.LAYER_GAME_OBJECTS = 2;
-CanvasLayers.LAYER_UI = 3;
+CanvasLayers.LAYER_HIGHLIGHTS = 3;
+CanvasLayers.LAYER_UI = 4;
 
 // CanvasLayers.LAYER_BOARD = 0;
 // CanvasLayers.LAYER_GAME_OBJECTS = 1;

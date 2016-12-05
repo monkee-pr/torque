@@ -16,7 +16,13 @@ class ThrowAction extends Action {
             const go = f.getGameObjects()[0];
             if (go instanceof Player && go != this.player) {
                 // team mate or opposing player
-                return true;
+                if (go.isTeamMateOf(this.player) && !go.canHoldTorque()) {
+                    // friendly player that can't hold the torque
+                    return false;
+                } else {
+                    // friendly player that can hold the torque, or opposing player
+                    return true;
+                }
             } else if (f.type == Field.TYPE_HOLE && f.strikeArea == playerField.strikeArea && f.teamSide == playerField.teamSide && f.isOpen == true) {
                 // opposing open hole
                 return true;
@@ -31,7 +37,6 @@ class ThrowAction extends Action {
 
     target(field) {
         if (field != null && this.possibleTargetFields.indexOf(field) != -1) {
-            console.log("targeted");
             this.targetField = field;
         }
     }

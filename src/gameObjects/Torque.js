@@ -100,7 +100,6 @@ class Torque extends GameObject {
     }
 
     onClick() {
-        this.scatter();
     }
 
     move() {

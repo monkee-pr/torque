@@ -5,10 +5,10 @@ class ActionSelection extends Popup {
         this.player = player;
 
         this.buttonRun = new Button(null, 400, 60, "run", this.run, {player});
-        this.buttonThrow = new Button(null, 400, 60, "throw", this.throwTorque, {player});
+        this.buttonThrow = player.holdsTorque() ? new Button(null, 400, 60, "throw", this.throwTorque, {player}) : null;
 
-        this.height += this.buttonRun.height + this.buttonThrow.height;
-        this.point.y -= this.buttonRun.height + this.buttonThrow.height;
+        this.height += this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0);
+        this.point.y -= this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0);
     }
 
     update() {
@@ -30,7 +30,7 @@ class ActionSelection extends Popup {
         tCtx.fillStyle = Color.UI_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
-        tCtx.font="40px Georgia";
+        tCtx.font="40px Arial";
         let textY = this.buttonRun.height;
         tCtx.fillText("Name: " + this.player.name,10,textY);
         textY+=50;
@@ -47,10 +47,12 @@ class ActionSelection extends Popup {
         tCtx.rect(0, 0, tCv.width, tCv.height);
         tCtx.stroke();
 
-        ctx.drawImage(tCv, this.point.x, this.point.y + this.buttonRun.height + this.buttonThrow.height, tCv.width, tCv.height);
+        ctx.drawImage(tCv, this.point.x, this.point.y + this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0), tCv.width, tCv.height);
 
         this.buttonRun.draw(ctx, new Point(this.point.x, this.point.y));   // above the info
-        this.buttonThrow.draw(ctx, new Point(this.point.x, this.point.y + 60));   // above the info
+        if (this.buttonThrow) {
+            this.buttonThrow.draw(ctx, new Point(this.point.x, this.point.y + 60));   // above the info
+        }
     }
 
     run(gp, params) {

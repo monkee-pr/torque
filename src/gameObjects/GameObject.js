@@ -2,6 +2,7 @@ class GameObject {
     constructor() {
         this.isHovered = false;
         this.isHighlighted = false;
+        this.isSelected = false;
     }
 
     update() {

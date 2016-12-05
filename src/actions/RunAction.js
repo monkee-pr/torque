@@ -5,7 +5,6 @@ class RunAction extends Action {
         this.gp = gp;
         this.player = player;
         this.path = [];
-        this.ghost = null;
         this.addFieldToPath(player.getField());
 
         this.getNextPossibleSteps();
@@ -51,14 +50,8 @@ class RunAction extends Action {
         return emptyNeighbors;
     }
 
-    moveGhost(hex) {
-        if (this.ghost == null) {
-            const p = this.player;
-            this.ghost = new Ghost(p.gp, p.hex, p.id, p.team, p.status);
-            this.gp.addGameObject(this.ghost);
-        }
-
-        this.ghost.hex = hex;
+    movePlayer(hex) {
+        this.player.hex = hex;
     }
 }
 RunAction.MAX_PATH_LENGTH = 1 + 5;  // including the start hex

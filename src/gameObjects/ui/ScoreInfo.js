@@ -23,7 +23,7 @@ class ScoreInfo extends UIElement {
         tCtx.fillStyle = Color.UI_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = this.gp.score < 0 ? Color.TEAM_1 : this.gp.score > 0 ? Color.TEAM_2 : "black";
-        tCtx.font="60px Georgia";
+        tCtx.font="60px Arial";
         tCtx.fillText("Score: " + Math.abs(this.gp.score), 10, 50);
 
         tCtx.strokeStyle = "black";

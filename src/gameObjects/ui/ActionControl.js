@@ -1,20 +1,20 @@
 class ActionControl extends UIElement {
-    constructor(gp) {
+    constructor(gp, action) {
         const width = 300;
         const height = 60;
         const canvasWidth = 1920;
         const canvasHeight = 1080;
         super(new Point(canvasWidth - width, canvasHeight - height), width, height);
         this.gp = gp;
-        this.action = gp.getAction();
+        this.action = action;
 
         const buttonWidth = 150;
         const buttonHeight = 60;
-        this.submitButton = new Button(new Point(canvasWidth - (buttonWidth+10)*2, canvasHeight - buttonHeight), buttonWidth, buttonHeight, "submit", this.submit, this.action);
-        this.cancelButton = new Button(new Point(canvasWidth - buttonWidth, canvasHeight - buttonHeight), buttonWidth, buttonHeight, "cancel", this.cancel, this.action);
+        this.submitButton = new Button(new Point(canvasWidth - (buttonWidth+10), canvasHeight - buttonHeight), buttonWidth, buttonHeight, "submit", this.submit, this.action);
+        // this.cancelButton = new Button(new Point(canvasWidth - buttonWidth, canvasHeight - buttonHeight), buttonWidth, buttonHeight, "cancel", this.cancel, this.action);
 
-        this.width += this.cancelButton.width + this.submitButton.width;
-        this.point.x -= this.cancelButton.width + this.submitButton.width;
+        this.width += this.submitButton.width;
+        this.point.x -= this.submitButton.width;
     }
 
     update() {
@@ -32,7 +32,7 @@ class ActionControl extends UIElement {
         tCtx.fillStyle = Color.UI_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
-        tCtx.font="40px Georgia";
+        tCtx.font="40px Arial";
         let actionName
         if (this.action instanceof RunAction) {
             actionName = "Run";
@@ -50,30 +50,18 @@ class ActionControl extends UIElement {
 
         ctx.drawImage(tCv, this.point.x, this.point.y);
 
-        this.cancelButton.draw(ctx);
+        // this.cancelButton.draw(ctx);
         this.submitButton.draw(ctx);
-    }
-
-    cancel(gp) {
-        const action = gp.getAction();
-        if (action instanceof RunAction) {
-            gp.removeGameObject(action.ghost);
-        }
-        gp.selectPlayer(gp.selectedPlayer);
     }
 
     submit(gp) {
         const action = gp.getAction();
         let increaseActionCounter = true;
         if (action instanceof RunAction) {
-            if (action.ghost != null) {
-                // copy all properties changed during the action from ghost to player
-                action.player.hex = action.ghost.hex;
-                action.player.status = action.ghost.status;
-
-                // remove ghost
-                gp.removeGameObject(action.ghost);
-            } else {
+            const player = action.player;
+            const startHex = action.path[0].hex;
+            if (player.hex.equals(startHex)) {
+                // player didn't move in this action
                 increaseActionCounter = false;
             }
         } else if (action instanceof ThrowAction) {
@@ -92,11 +80,11 @@ class ActionControl extends UIElement {
 
     onClick(gp, point) {
         const sub = this.submitButton;
-        const can = this.cancelButton;
+        // const can = this.cancelButton;
         if (point.hits(sub.point, sub.width, sub.height)) {
             sub.onClick(gp);
-        } else if (point.hits(can.point, can.width, can.height)) {
-            can.onClick(gp);
+        // } else if (point.hits(can.point, can.width, can.height)) {
+        //     can.onClick(gp);
         }
     }
 }

@@ -49,7 +49,7 @@ class GamePanel {
         this.startNextTurn();
 
         this.selectedPlayer = null;
-        this._action = null;
+        this._actionControl = null;
 
         this.actionsPerformed = 0;
 
@@ -106,23 +106,27 @@ class GamePanel {
     }
 
     setAction(action) {
-        this._action = action;
-        this.addUIElement(new ActionControl(this));
+        const actionControl = new ActionControl(this, action);
+        this._actionControl = actionControl;
+        this.addUIElement(actionControl);
+    }
+    getActionControl() {
+        return this._actionControl;
     }
     getAction() {
-        return this._action;
+        return this._actionControl ? this._actionControl.action : null;
     }
     cancelAction() {
-        const action = this._action;
+        const actionControl = this._actionControl;
+        const action = actionControl ? actionControl.action : null;
         if (action instanceof RunAction) {
             this.layers.getBoardFields().forEach(f => f.isHighlighted = false);
         }
-        this._action = null;
 
-        const actionControl = this.layers.getUIElements().filter(ui => ui instanceof ActionControl)[0];
         if (actionControl != null) {
             this.removeUIElement(actionControl);
         }
+        this._actionControl = null;
     }
     submitAction() {
         this.actionsPerformed++;
@@ -186,9 +190,9 @@ class GamePanel {
     }
 
     respawnTorque() {
-        if (this.actionsPerformed < GamePanel.ACTIONS_PER_TURN) {
-            this.startNextTurn();
-        }
+        // if (this.actionsPerformed < GamePanel.ACTIONS_PER_TURN) {
+        //     this.startNextTurn();
+        // }
 
         const gameObjects = this.layers.getGameObjects();
         const torque = gameObjects.filter(go => go instanceof Torque)[0];

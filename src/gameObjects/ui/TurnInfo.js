@@ -23,7 +23,7 @@ class TurnInfo extends UIElement {
         tCtx.fillStyle = Color.UI_BACKGROUND;
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = this.gp.activeTeam.id == this.gp.team1.id ? Color.TEAM_1 : Color.TEAM_2;
-        tCtx.font="40px Georgia";
+        tCtx.font="40px Arial";
         tCtx.fillText("Active Team: " + (this.gp.activeTeam.id == 1 ? "Blue" : "Red"), 10, 50);
         tCtx.fillText("Actions left: " + this.freeActions, 10, 110);
 

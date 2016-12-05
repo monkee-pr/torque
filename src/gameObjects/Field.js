@@ -109,7 +109,7 @@ class Field extends GameObject {
             const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == thisObj.strikeArea && f.teamSide == thisObj.teamSide);
             const fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque = fieldsOfStrikeArea.filter(f => {
                 const go = f.getGameObjects()[0];
-                if (go instanceof Player && !(go instanceof Ghost)) {
+                if (go instanceof Player) {
                     const player = go;
                     if (player.team.id != thisObj.teamSide) {
                         const opposingPlayer = player;
@@ -173,7 +173,7 @@ class Field extends GameObject {
 
             // draw coords
             const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
-            ctx.font = fontSize + "px Georgia";
+            ctx.font = fontSize + "px Arial";
             ctx.fillStyle="black"
             ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
@@ -203,7 +203,15 @@ class Field extends GameObject {
                 drawBorder = true;
             }
 
-            if (this.isHighlighted && this.isHovered) {
+            if (this.isSelected && this.isHovered) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_SELECT_HOVER;
+                drawBorder = true;
+            } else if (this.isSelected) {
+                ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
+                ctx.strokeStyle = Color.BORDER_SELECT;
+                drawBorder = true;
+            } else if (this.isHighlighted && this.isHovered) {
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
                 ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
                 drawBorder = true;
@@ -218,6 +226,19 @@ class Field extends GameObject {
             }
 
             if (drawBorder) ctx.stroke();
+
+            if (this.isHighlighted) {
+                const action = this.gp.getAction();
+                if (action instanceof RunAction) {
+                    // draw remaining amount of steps in the field
+                    const remainingSteps = RunAction.MAX_PATH_LENGTH - action.path.length;
+                    const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
+                    const fontSize = 100 * Camera.scale;
+                    ctx.font= fontSize + "px Arial";
+                    ctx.fillStyle = Color.BORDER_HIGHLIGHT_HOVER;
+                    ctx.fillText(remainingSteps, point.x - fontSize/4, point.y);
+                }
+            }
         }
 
         if (cameraMode == Camera.MODE_TOP_DOWN && (this.type == Field.TYPE_HOT_ZONE || this.type == Field.TYPE_SUPER_HOT_ZONE)) {
@@ -319,16 +340,21 @@ class Field extends GameObject {
     }
 
     onClick(gp) {
-        const action = gp.getAction();
+        const actionControl = gp.getActionControl();
+        const action = actionControl.action;
         if (action instanceof RunAction) {
             if (action.addFieldToPath(this)) {
 
-                action.moveGhost(this.hex);
+                action.movePlayer(this.hex);
 
                 const hasTorque = this.getGameObjects().filter(go => go instanceof Torque).length > 0;
                 if (hasTorque) {
-                    action.ghost.pickUpTorque();
+                    action.player.pickUpTorque();
                 }
+            }
+
+            if (action.path.length >= RunAction.MAX_PATH_LENGTH) {
+                actionControl.submit(this.gp);
             }
         } else if (action instanceof ThrowAction) {
             action.target(this);
