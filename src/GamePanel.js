@@ -46,7 +46,7 @@ class GamePanel {
 
         this.score = 0; // reaches from -7 to 7
 
-        this.startNextTurn();
+        this.startNextPush();
 
         this.selectedPlayer = null;
         this._actionControl = null;
@@ -132,7 +132,7 @@ class GamePanel {
         this.actionsPerformed++;
 
         if (this.actionsPerformed == GamePanel.ACTIONS_PER_TURN) {
-            this.startNextTurn();
+            this.startNextPush();
         }
     }
 
@@ -196,7 +196,7 @@ class GamePanel {
 
     respawnTorque() {
         // if (this.actionsPerformed < GamePanel.ACTIONS_PER_TURN) {
-        //     this.startNextTurn();
+        //     this.startNextPush();
         // }
 
         const gameObjects = this.layers.getGameObjects();
@@ -206,7 +206,7 @@ class GamePanel {
             const boardFields = this.layers.getBoardFields();
             const spawnFields = boardFields.filter(f => f.isSpawnPoint);
 
-            const spawnFieldIndex = Math.randomInt(0, spawnFields.length-1+1);
+            const spawnFieldIndex = Math.randomInt(0, spawnFields.length-1);
 
             let passingFields = null;
             if (this.activeTeam == this.team1) {
@@ -236,7 +236,7 @@ class GamePanel {
         }
     }
 
-    startNextTurn() {
+    startNextPush() {
         if (this.getAction() == null) {
             const index = this.teams.indexOf(this.activeTeam);
             let nextTeamIndex = index+1;

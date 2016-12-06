@@ -7,7 +7,7 @@ class Field extends GameObject {
         this.type = type;
         this.strikeArea = strikeArea;
         this.isOpen = type == Field.TYPE_HOLE ? false : null;   // only for field of the type "hole"
-        this.isSpawnPoint = type == Field.TYPE_MIDFIELD && hex.q == 0 && Number.isEven(hex.r) ? true : false;
+        this.isSpawnPoint = type == Field.TYPE_MIDFIELD && (hex.q + hex.r)*2 == hex.r ? true : false;
 
         if (type == Field.TYPE_MIDFIELD) {
             this.teamSide = null;
@@ -96,15 +96,6 @@ class Field extends GameObject {
         super.update();
 
         if (this.type == Field.TYPE_HOLE) {
-            if (this.getGameObjects().filter(go => go instanceof Torque).length > 0) {
-                // HOOOLE!!!
-                console.log("HOOOLE!!!");
-                const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
-                this.gp.scoreForTeam(scoringTeam);
-                this.gp.actionsPerformed = GamePanel.ACTIONS_PER_TURN-1;
-                // this.gp.startNextTurn();
-                this.gp.respawnTorque();
-            }
 
             const thisObj = this;
             const boardFields = this.gp.layers.getBoardFields();
@@ -177,7 +168,9 @@ class Field extends GameObject {
             const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
             ctx.font = fontSize + "px Arial";
             ctx.fillStyle="black"
-            ctx.fillText(this.hex.q + "/" + this.hex.r, center.x-fontSize, center.y);
+            ctx.textAlign="center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(this.hex.q + "/" + this.hex.r, center.x, center.y);
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
                 if (this.isOpen == true) {
@@ -234,11 +227,16 @@ class Field extends GameObject {
                 if (action instanceof RunAction) {
                     // draw remaining amount of steps in the field
                     const remainingSteps = RunAction.MAX_PATH_LENGTH - action.path.length;
-                    const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
-                    const fontSize = 100 * Camera.scale;
-                    ctx.font= fontSize + "px Arial";
+                    // const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
+                    const point1 = Hex.hexToPoint(cameraPosition, this.hex);
+                    const point = cameraMode == Camera.MODE_TOP_DOWN ? point1 : point1.toIso(gp.camera.position);
+
+                    const fontSize = (GameObject.BASE_SIZE / 2 * Camera.scale);
+                    ctx.font = fontSize + "px Arial";
                     ctx.fillStyle = Color.BORDER_HIGHLIGHT_HOVER;
-                    ctx.fillText(remainingSteps, point.x - fontSize/4, point.y);
+                    ctx.textAlign="center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(remainingSteps, point.x, point.y);
                 }
             }
         }
@@ -341,26 +339,45 @@ class Field extends GameObject {
         }
     }
 
-    onClick(gp) {
+    onClick() {
+        const gp = this.gp;
         const actionControl = gp.getActionControl();
         const action = actionControl.action;
         if (action instanceof RunAction) {
+            let finishRun = false;
             if (action.addFieldToPath(this)) {
 
                 action.movePlayer(this.hex);
 
-                const hasTorque = this.getGameObjects().filter(go => go instanceof Torque).length > 0;
-                if (hasTorque) {
+                const fieldHasTorque = this.getGameObjects().filter(go => go instanceof Torque).length > 0;
+                if (fieldHasTorque) {
                     action.player.pickUpTorque();
+                    finishRun = true;
                 }
             }
 
             if (action.path.length >= RunAction.MAX_PATH_LENGTH) {
+                finishRun = true;
+            }
+
+            if (finishRun) {
                 actionControl.submit(this.gp);
             }
+
         } else if (action instanceof ThrowAction) {
             action.target(this);
             actionControl.submit(this.gp);
+
+            if (this.getGameObjects().filter(go => go instanceof Torque).length > 0) {
+                // HOOOLE!!!
+                console.log("HOOOLE!!!");
+                const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
+                this.gp.scoreForTeam(scoringTeam);
+                if (scoringTeam == this.gp.activeTeam) {
+                    this.gp.startNextPush();
+                }
+                this.gp.respawnTorque();
+            }
         }
     }
 

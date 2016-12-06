@@ -248,6 +248,14 @@ class Player extends GameObject {
         torque.scatter();
     }
 
+    getBashed() {
+        if (this.status == Player.STATUS_HOLD_TORQUE) {
+            this.dropTorque();
+        }
+
+        this.status = Player.STATUS_BASHED;
+    }
+
     isTeamMateOf(player) {
         return player != null && this.team.id == player.team.id;
     }

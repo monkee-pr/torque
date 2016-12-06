@@ -32,6 +32,12 @@ function loadResources(doneFunc) {
         {name: "playerBladeRedBashed", src: "res/objects/c_r_blade_02.png"},
         {name: "playerMaulRedBashed", src: "res/objects/c_r_maul_02.png"},
         {name: "torque", src: "res/objects/torque.png"},
+        {name: "directionTopLeft", src: "res/directions/tile_direction_01.png"},
+        {name: "directionTopRight", src: "res/directions/tile_direction_02.png"},
+        {name: "directionRight", src: "res/directions/tile_direction_03.png"},
+        {name: "directionBottomRight", src: "res/directions/tile_direction_04.png"},
+        {name: "directionBottomLeft", src: "res/directions/tile_direction_05.png"},
+        {name: "directionLeft", src: "res/directions/tile_direction_06.png"},
     ]
 
     let soundQueue = [

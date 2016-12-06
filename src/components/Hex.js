@@ -8,8 +8,12 @@ class Hex {
         return this.q == hex.q && this.r == hex.r;
     }
 
-    rangeTo(hex) {
-        return 0;
+    distanceTo(hex) {
+        const vq = Math.abs(this.q - hex.q);
+        const vr = Math.abs(this.r - hex.r);
+        const distance = vq + vr;
+
+        return distance;
     }
 }
 

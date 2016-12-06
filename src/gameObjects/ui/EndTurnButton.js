@@ -1,6 +1,6 @@
 class EndTurnButton extends Button {
     constructor(gp) {
-        const onClick = (gp) => gp.startNextTurn();
+        const onClick = (gp) => gp.startNextPush();
         super(new Point(0, 120), 350, 60, "End Turn", onClick);
         this.gp = gp;
     }

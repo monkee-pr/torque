@@ -57,22 +57,24 @@ class CanvasLayers {
                         object.isHovered ||
                         object.isHighlighted ||
                         object.isSelected ||
-                        object.fields
+                        layer == CanvasLayers.LAYER_BOARD
                     )
                 ) {
-                    if (object.fields) {
+                    if (layer == CanvasLayers.LAYER_BOARD) {
                         const specialFields = object.fields.filter(f => f.isHovered || f.isHighlighted || f.isSelected);
                         const orderedFields = [].concat(specialFields.filter(f => f.isHighlighted && !f.isHovered)).concat(specialFields.filter(f => f.isSelected && !f.isHovered)).concat(specialFields.filter(f => f.isHovered));
                         this.add(orderedFields, CanvasLayers.LAYER_HIGHLIGHTS);
                     } else {
                         this.add(object, CanvasLayers.LAYER_HIGHLIGHTS);
                     }
+                } else if (layer == CanvasLayers.LAYER_BOARD) {
+                    // move 3D objects to another layer
                 }
 
                 object.draw(ctx, gp);
             });
         });
-        
+
         this.layers[CanvasLayers.LAYER_HIGHLIGHTS] = [];
     }
 

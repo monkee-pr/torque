@@ -40,6 +40,7 @@ Control.mouseMove = (e, gp) => {
                     go.isHovered = false;
                 }
             });
+            // console.log(reversedGameObjects.filter(go => go.isHovered));
         }
     }
 }

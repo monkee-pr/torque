@@ -30,7 +30,7 @@ class ThrowAction extends Action {
                 return false;
             }
         });
-        const possibleTargetFieldsInRange = possibleTargetFields.filter(f => f.hex.rangeTo(playerField.hex) <= ThrowAction.MAX_RANGE);
+        const possibleTargetFieldsInRange = possibleTargetFields.filter(f => f.hex.distanceTo(playerField.hex) <= ThrowAction.MAX_RANGE);
 
         return possibleTargetFieldsInRange;
     }
