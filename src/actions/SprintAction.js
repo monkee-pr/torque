@@ -5,49 +5,33 @@ class SprintAction extends Action {
         this.gp = gp;
         this.player = player;
         this.path = [];
-        this.addFieldToPath(player.getField());
-
-        this.getNextPossibleSteps();
-    }
-
-    addFieldToPath(field) {
-        // unhighlight all fields
-        const boardFields = this.gp.layers.getBoardFields();
-        boardFields.forEach(f => f.isHighlighted = false);
-
-        const path = this.path;
-        if (path.length < RunAction.MAX_PATH_LENGTH) {
-            // add field to path
-            // const index = path.map(f => f.hex.equals(field.hex)).indexOf(true);
-            // if (index != -1) {
-            //     // shorten path up to first visit on current field
-            //     path.splice(index);
-            // }
-            path.push(field);
-
-            if (path.length < RunAction.MAX_PATH_LENGTH) {
-                // highlight next possible steps
-                const nextPossibleSteps = this.getNextPossibleSteps();
-                nextPossibleSteps.forEach(f => f.isHighlighted = true);
-            }
-
-            return true
-        } else {
-            return false;
-        }
+        this.remainingMoves = 10;
     }
 
     getNextPossibleSteps() {
-        const lastPathField = this.path[this.path.length-1];
-        const secondLastField = this.path[this.path.length-2];
+        const lastPathField = this.player.getField();
         const neighborFields = lastPathField.getNeighbors();
-        const emptyNeighbors = neighborFields.filter(n => (secondLastField && n.hex.equals(secondLastField.hex)) || ((n.isEmpty() || n.getGameObjects().filter(go => go instanceof Torque).length > 0) && n.isAccessible()));
+        const emptyNeighbors = neighborFields.filter(n => ((n.isEmpty() || n.getGameObjects().filter(go => go instanceof Torque).length > 0) && n.isAccessible()));
 
         return emptyNeighbors;
     }
 
     movePlayer(hex) {
+        const playerHex = this.player.hex;
+        const playerDirection = this.player.direction;
+
+        // if new hex is not in player's direction this step consumes more moves
+        const consumingMoves = Hex.getNeighborAt(playerHex, playerDirection).equals(hex) ? 1 : 2;
+        // get consuming moves method
+
         this.player.hex = hex;
+        this.player.direction = playerDirection;
+
+        this.remainingMoves = this.remainingMoves - consumingMoves;
+        if (this.remainingMoves <= 0) {
+            const actionControl = this.gp.getActionControl();
+            actionControl.submit(this.gp);
+        }
     }
 }
-RunAction.MAX_PATH_LENGTH = 1 + 5;  // including the start hex
+RunAction.MAX_MOVES = 10;  // including the start hex

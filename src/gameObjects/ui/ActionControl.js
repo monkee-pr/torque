@@ -58,15 +58,19 @@ class ActionControl extends UIElement {
         const action = gp.getAction();
         let increaseActionCounter = true;
         if (action instanceof RunAction) {
-            const player = action.player;
-            const startHex = action.path[0].hex;
-            if (player.hex.equals(startHex)) {
-                // player didn't move in this action
+            const playerMoved = action.remainingMoves != RunAction.MAX_MOVES;
+            if (!playerMoved) {
                 increaseActionCounter = false;
             }
         } else if (action instanceof ThrowAction) {
             if (action.targetField != null) {
                 action.throwTorque();
+            } else {
+                increaseActionCounter = false;
+            }
+        } else if (action instanceof BashAction) {
+            if (action.targetPlayer != null) {
+                action.bash();
             } else {
                 increaseActionCounter = false;
             }

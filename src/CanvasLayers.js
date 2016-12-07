@@ -97,13 +97,16 @@ class CanvasLayers {
     }
 
     getClickableObjects(gp) {
-        let clickableObjects = [];
+        let clickableObjects = null;
         const action = gp.getAction();
         if (action instanceof RunAction) {
             const fields = action.getNextPossibleSteps();
-            clickableObjects = fields.filter(f => f.isAccessible());
+            const accessibleFields = fields.filter(f => f.isAccessible());
+            clickableObjects = accessibleFields.concat(action.player);
         } else if (action instanceof ThrowAction) {
             clickableObjects = action.possibleTargetFields;
+        } else if (action instanceof BashAction) {
+            clickableObjects = action.possibleTargets;
         } else {
             clickableObjects = this.getGameObjects();
         }

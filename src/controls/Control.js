@@ -33,7 +33,7 @@ Control.mouseMove = (e, gp) => {
             const reversedGameObjects = hoverableObjects.slice().reverse();
             // let brk = false;
             reversedGameObjects.forEach(go => {
-                if (go.hex != null && hex.q == go.hex.q && hex.r == go.hex.r) {
+                if (go.hex != null && hex.equals(go.hex)) {
                     go.isHovered = true;
                     // brk = true;
                 } else {

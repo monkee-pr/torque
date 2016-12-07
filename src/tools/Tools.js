@@ -5,19 +5,25 @@ Math.getTrianglesHeight = (length) => {
 Math.randomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
-    return Math.floor(Math.random() * ((max - min) + 1 + min));
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+// chance calculations
 Math.chance = (chance) => {
     const randomValue = Math.random() * 100;    // 0 - 99.99999999
 
     return randomValue < chance;
+}
+Math.SIDES_ON_DIE = 10;
+Math.rollDie = () => {
+    return Math.randomInt(1, SIDES_ON_DIE);
 }
 Math.rollDice = (amountOfDice) => {
     const amountOfDice1 = amountOfDice || 1;
 
     let values = [];
     for (var i = 0; i < amountOfDice1; i++) {
-        const value = Math.randomInt(1, 6);
+        const value = Math.rollDie();
         values.push(value);
     }
 
@@ -32,6 +38,7 @@ Math.diceValueNeeded = (amountOfDice, minValue, neededAmount) => {
     return diceHigherX(amountOfDice, minValue).length >= neededAmount;
 }
 
+// Number extensions
 Number.isEven = (num) => {
     if (!Number.isInteger(num)) {
         console.error(num + " is not an integer");
@@ -49,11 +56,12 @@ Number.isOdd = (num) => {
     }
 }
 
-// object extensions
+// Object extensions
 Object.toArray = (obj) => {
     return Object.keys(obj).map(key => obj[key]);
 }
 
+// Array extensions
 Array.getRandomElement = (arr) => {
     const i = Math.randomInt(0, arr.length-1);
     return arr[i];

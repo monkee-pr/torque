@@ -225,10 +225,14 @@ class Field extends GameObject {
             if (this.isHighlighted) {
                 const action = this.gp.getAction();
                 if (action instanceof RunAction) {
-                    // draw remaining amount of steps in the field
-                    const remainingSteps = RunAction.MAX_PATH_LENGTH - action.path.length;
-                    const consumingSteps = 1;   // can be 2 in a sprint when direction must change for this
-                    // const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
+                    let text;
+                    if (action.mode == RunAction.MODE_MOVE) {
+                        // draw remaining amount of steps in the field
+                        text = action.remainingSteps;
+                    } else {
+                        text = "@";
+                    }
+
                     const point1 = Hex.hexToPoint(cameraPosition, this.hex);
                     const point = cameraMode == Camera.MODE_TOP_DOWN ? point1 : point1.toIso(gp.camera.position);
 
@@ -237,7 +241,7 @@ class Field extends GameObject {
                     ctx.fillStyle = Color.BORDER_HIGHLIGHT_HOVER;
                     ctx.textAlign="center";
                     ctx.textBaseline = "middle";
-                    ctx.fillText(remainingSteps + "-" + consumingSteps, point.x, point.y);
+                    ctx.fillText(text, point.x, point.y);
                 }
             }
         }
@@ -307,6 +311,16 @@ class Field extends GameObject {
         return false;
     }
 
+    isNeighborAt(neighbor) {
+        const direction = Hex.ALL_DIRECTIONS.filter(d => this.getNeighborAt(d).equals(neighbor))[0];
+
+        if (direction == null) {
+            console.log("Hexes are not direct neighbors");
+        }
+
+        return direction;
+    }
+
     isEmpty() {
         const empty = this.getGameObjects().length == 0;
 
@@ -338,26 +352,21 @@ class Field extends GameObject {
         const actionControl = gp.getActionControl();
         const action = actionControl.action;
         if (action instanceof RunAction) {
-            let finishRun = false;
-            if (action.addFieldToPath(this)) {
-
+            if (action.mode == RunAction.MODE_MOVE) {
                 action.movePlayer(this.hex);
 
-                const fieldHasTorque = this.getGameObjects().filter(go => go instanceof Torque).length > 0;
-                if (fieldHasTorque) {
-                    action.player.pickUpTorque();
-                    finishRun = true;
+                const gameObjectsOfField = this.getGameObjects();
+                const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
+                if (torque != null) {
+                    if (action.player.canHoldTorque()) {
+                        action.player.pickUpTorque();
+                    } else {
+                       torque.scatter();
+                    }
                 }
+            } else {
+                action.turnPlayer(this.hex);
             }
-
-            if (action.path.length >= RunAction.MAX_PATH_LENGTH) {
-                finishRun = true;
-            }
-
-            if (finishRun) {
-                actionControl.submit(this.gp);
-            }
-
         } else if (action instanceof SprintAction) {
             // sprint
         } else if (action instanceof ThrowAction) {

@@ -63,6 +63,16 @@ Hex.getNeighborAt = (hex, direction) => {
     return neighborHex;
 }
 
+Hex.isNeighborAt = (hex, neighbor) => {
+    const direction = Hex.ALL_DIRECTIONS.filter(d => Hex.getNeighborAt(hex, d).equals(neighbor))[0];
+
+    if (direction == null) {
+        console.log("Hexes are not direct neighbors");
+    }
+
+    return direction;
+}
+
 Hex.getNeighbors = (hex) => {
     const directions = Hex.ALL_DIRECTIONS;
 
@@ -123,6 +133,25 @@ Hex.sortDirectionsForDraw = (directions) => {
     const orderedDirections = wishedOrder.filter(dir => directions.indexOf(dir) != -1);
 
     return orderedDirections;
+}
+
+Hex.mirrorDirection = (direction) => {
+    switch (direction) {
+        case Hex.DIRECTION_TOP_LEFT:
+            return Hex.DIRECTION_BOTTOM_RIGHT;
+        case Hex.DIRECTION_TOP_RIGHT:
+            return Hex.DIRECTION_BOTTOM_LEFT;
+        case Hex.DIRECTION_RIGHT:
+            return Hex.DIRECTION_LEFT;
+        case Hex.DIRECTION_BOTTOM_RIGHT:
+            return Hex.DIRECTION_TOP_LEFT;
+        case Hex.DIRECTION_BOTTOM_LEFT:
+            return Hex.DIRECTION_TOP_RIGHT;
+        case Hex.DIRECTION_LEFT:
+            return Hex.DIRECTION_RIGHT;
+        default:
+            console.error("Invalid direction");
+    }
 }
 
 Hex.DIRECTION_TOP_LEFT = "top-left";

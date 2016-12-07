@@ -18,26 +18,45 @@ class GamePanel {
         this.addGameObject(new Torque(this, new Hex(0, 0)));
 
         this.team1 = new Team(Team.TEAM_1);
-        const t1p1 = new Player(this, new Hex(-2, -1), 0, this.team1);
-        const t1p2 = new Player(this, new Hex(-1, 0), 1, this.team1);
-        const t1p3 = new Player(this, new Hex(-3, 0), 2, this.team1);
+        const t1p1 = new Player(this, new Hex(1, -5), 0, this.team1);
+        const t1p2 = new Player(this, new Hex(0, -3), 1, this.team1);
+        const t1p3 = new Player(this, new Hex(-1, -1), 2, this.team1);
+        const t1p4 = new Player(this, new Hex(-2, 1), 0, this.team1);
+        const t1p5 = new Player(this, new Hex(-3, 3), 1, this.team1);
+        const t1p6 = new Player(this, new Hex(-4, 5), 2, this.team1);
         this.team1.addPlayer(t1p1);
         this.team1.addPlayer(t1p2);
         this.team1.addPlayer(t1p3);
+        this.team1.addPlayer(t1p4);
+        this.team1.addPlayer(t1p5);
+        this.team1.addPlayer(t1p6);
         this.addGameObject(t1p1);
         this.addGameObject(t1p2);
         this.addGameObject(t1p3);
+        this.addGameObject(t1p4);
+        this.addGameObject(t1p5);
+        this.addGameObject(t1p6);
 
         this.team2 = new Team(Team.TEAM_2);
-        const t2p1 = new Player(this, new Hex(1, -1), 0, this.team2);
-        const t2p2 = new Player(this, new Hex(1, 1), 1, this.team2);
-        const t2p3 = new Player(this, new Hex(3, 0), 2, this.team2);
+        const t2p1 = new Player(this, new Hex(4, -5), 0, this.team2);
+        const t2p2 = new Player(this, new Hex(3, -3), 1, this.team2);
+        const t2p3 = new Player(this, new Hex(2, -1), 2, this.team2);
+        const t2p4 = new Player(this, new Hex(1, 1), 0, this.team2);
+        const t2p5 = new Player(this, new Hex(0, 3), 1, this.team2);
+        const t2p6 = new Player(this, new Hex(-1, 5), 2, this.team2);
         this.team2.addPlayer(t2p1);
         this.team2.addPlayer(t2p2);
         this.team2.addPlayer(t2p3);
+        this.team2.addPlayer(t2p4);
+        this.team2.addPlayer(t2p5);
+        this.team2.addPlayer(t2p6);
         this.addGameObject(t2p1);
         this.addGameObject(t2p2);
         this.addGameObject(t2p3);
+        this.addGameObject(t2p4);
+        this.addGameObject(t2p5);
+        this.addGameObject(t2p6);
+
 
         this.teams = [
             this.team1,

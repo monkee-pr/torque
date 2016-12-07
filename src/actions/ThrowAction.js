@@ -11,7 +11,7 @@ class ThrowAction extends Action {
 
     getPossibleTargets() {
         const playerField = this.player.getField();
-        const fieldsInScope = this.player.getFieldsInScope();
+        const fieldsInScope = this.player.getScope();
         const possibleTargetFields = fieldsInScope.filter(f => {
             const go = f.getGameObjects()[0];
             if (go instanceof Player && go != this.player) {

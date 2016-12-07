@@ -58,14 +58,17 @@ class Player extends GameObject {
                     case Player.ROLE_MAUL:
                         this.imageRegular = resources.playerMaulBlueRegular;
                         this.imageBashed = resources.playerMaulBlueBashed;
+                        this.imageHolding = resources.playerMaulBlueBashed;
                         break;
                     case Player.ROLE_BLADE:
                         this.imageRegular = resources.playerBladeBlueRegular;
                         this.imageBashed = resources.playerBladeBlueBashed;
+                        this.imageHolding = resources.playerBladeBlueHolding;
                         break;
                     case Player.ROLE_DART:
                         this.imageRegular = resources.playerDartBlueRegular;
                         this.imageBashed = resources.playerDartBlueBashed;
+                        this.imageHolding = resources.playerDartBlueBashed;
                         break;
                 }
                 break;
@@ -74,14 +77,17 @@ class Player extends GameObject {
                     case Player.ROLE_MAUL:
                         this.imageRegular = resources.playerMaulRedRegular;
                         this.imageBashed = resources.playerMaulRedBashed;
+                        this.imageHolding = resources.playerMaulRedBashed;
                         break;
                     case Player.ROLE_BLADE:
                         this.imageRegular = resources.playerBladeRedRegular;
                         this.imageBashed = resources.playerBladeRedBashed;
+                        this.imageHolding = resources.playerBladeRedBashed;
                         break;
                     case Player.ROLE_DART:
                         this.imageRegular = resources.playerDartRedRegular;
                         this.imageBashed = resources.playerDartRedBashed;
+                        this.imageHolding = resources.playerDartRedBashed;
                         break;
                 }
                 break;
@@ -92,7 +98,6 @@ class Player extends GameObject {
         super.update();
 
         this.move();
-        // this.direction = Hex.ALL_DIRECTIONS[Math.randomInt(1, 6)-1];
 
         const field = this.getField();
         field.isSelected = this.isSelected;
@@ -165,8 +170,10 @@ class Player extends GameObject {
                 let image = null;
                 switch (this.status) {
                     case Player.STATUS_BASHED:
-                    case Player.STATUS_HOLD_TORQUE:
                         image = this.imageBashed;
+                        break;
+                    case Player.STATUS_HOLD_TORQUE:
+                        image = this.imageHolding;
                         break;
                     default:
                         image = this.imageRegular;
@@ -187,22 +194,64 @@ class Player extends GameObject {
                 let directionImage = null;
                 switch (direction) {
                     case Hex.DIRECTION_TOP_LEFT:
-                        directionImage = resources.directionBlueTopLeft;
+                        switch (this.team.id) {
+                            case Team.TEAM_1:
+                                directionImage = resources.directionBlueTopLeft;
+                                break;
+                            case Team.TEAM_2:
+                                directionImage = resources.directionRedTopLeft;
+                                break;
+                        }
                         break;
                     case Hex.DIRECTION_TOP_RIGHT:
-                        directionImage = resources.directionBlueTopRight;
+                        switch (this.team.id) {
+                            case Team.TEAM_1:
+                                directionImage = resources.directionBlueTopRight;
+                                break;
+                            case Team.TEAM_2:
+                                directionImage = resources.directionRedTopRight;
+                                break;
+                        }
                         break;
                     case Hex.DIRECTION_RIGHT:
-                        directionImage = resources.directionBlueRight;
+                        switch (this.team.id) {
+                            case Team.TEAM_1:
+                                directionImage = resources.directionBlueRight;
+                                break;
+                            case Team.TEAM_2:
+                                directionImage = resources.directionRedRight;
+                                break;
+                        }
                         break;
                     case Hex.DIRECTION_BOTTOM_RIGHT:
-                        directionImage = resources.directionBlueBottomRight;
+                        switch (this.team.id) {
+                            case Team.TEAM_1:
+                                directionImage = resources.directionBlueBottomRight;
+                                break;
+                            case Team.TEAM_2:
+                                directionImage = resources.directionRedBottomRight;
+                                break;
+                        }
                         break;
                     case Hex.DIRECTION_BOTTOM_LEFT:
-                        directionImage = resources.directionBlueBottomLeft;
+                        switch (this.team.id) {
+                            case Team.TEAM_1:
+                                directionImage = resources.directionBlueBottomLeft;
+                                break;
+                            case Team.TEAM_2:
+                                directionImage = resources.directionRedBottomLeft;
+                                break;
+                        }
                         break;
                     case Hex.DIRECTION_LEFT:
-                        directionImage = resources.directionBlueLeft;
+                        switch (this.team.id) {
+                            case Team.TEAM_1:
+                                directionImage = resources.directionBlueLeft;
+                                break;
+                            case Team.TEAM_2:
+                                directionImage = resources.directionRedLeft;
+                                break;
+                        }
                         break;
                     default:
                         console.error("Invalid direction");
@@ -252,7 +301,16 @@ class Player extends GameObject {
     }
 
     onClick(gp) {
-        gp.selectPlayer(this);
+        const actionControl = this.gp.getActionControl();
+        const action = this.gp.getAction();
+        if (action instanceof RunAction) {
+            action.switchMode();
+        } else if (action instanceof BashAction && this != action.player) {
+            action.target(this);
+            actionControl.submit(this.gp);
+        } else {
+            gp.selectPlayer(this);
+        }
     }
 
     getField() {
@@ -262,7 +320,7 @@ class Player extends GameObject {
         return thisField;
     }
 
-    getFieldsInScope() {
+    getScope() {
         const direction = this.direction;
 
         const boardFields = this.gp.layers.getBoardFields();
@@ -295,8 +353,35 @@ class Player extends GameObject {
         return boardFields.filter(filterFunc);
     }
 
+    getThreadZone() {
+        const frontDirections = Hex.getFrontDirectionsFrom(this.direction);
+
+        const threadZone = [];
+        frontDirections.forEach(d => {
+            const neighbor = this.getField().getNeighborAt(d);
+            threadZone.push(neighbor);
+        });
+
+        return threadZone;
+    }
+
+    isInThreadZone(player) {
+        const threadZone = this.getThreadZone();
+        const players = threadZone.map(f => f.getGameObjects()[0]).filter(go => go instanceof Player);
+
+        return players.indexOf(player) != -1;
+    }
+
     canHoldTorque() {
         if (this.role == Player.ROLE_MAUL) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    canBash() {
+        if (this.role == Player.ROLE_DART) {
             return false;
         } else {
             return true;
@@ -314,19 +399,28 @@ class Player extends GameObject {
 
     // requires a Torque object in the GamePanel's GameObject list
     pickUpTorque() {
-        const gp = this.gp;
-        const boardFields = gp.layers.getBoardFields();
-        const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty());
-        const gameObjectsOfFields = Array.flatten(notEmptyBoardFields.map(f => f.getGameObjects()));
-        const torque = gameObjectsOfFields.filter(go => go instanceof Torque)[0];
-        if (torque != null) {
-            if (this.canHoldTorque()) {
+        if (this.canHoldTorque()) {
+            const gp = this.gp;
+            const boardFields = gp.layers.getBoardFields();
+            const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty());
+            const gameObjectsOfField = this.getField().getGameObjects();
+            const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
+            if (torque != null) {
                 // recognize direction and pickup chance here and remove it from GamePanel's respawnTorque() tileHoleOpenedRed
-                this.status = Player.STATUS_HOLD_TORQUE;
+                const pickUpSucceeds = true;
+                if (pickUpSucceeds) {
+                    this.status = Player.STATUS_HOLD_TORQUE;
 
-                gp.removeGameObject(torque);
-            } else {
-                torque.scatter();
+                    gp.removeGameObject(torque);
+                } else {
+                    torque.scatter();
+                }
+
+                const action = this.gp.getAction();
+                if (action instanceof RunAction && action.player == this) {
+                    action.remainingSteps = 0;
+                    action.mode = RunAction.MODE_TURN;
+                }
             }
         }
     }
@@ -342,6 +436,85 @@ class Player extends GameObject {
         const torque = new Torque(this.gp, new Hex(this.hex.q, this.hex.r));
         this.gp.addGameObject(torque);
         torque.scatter();
+    }
+
+    bash(target) {
+        const direction = Hex.isNeighborAt(this.hex, target.hex);
+
+        const bashResult = 3;   // roll
+
+        let bashWins = false;
+        let counterBashWins = false;
+        let dodgeWins = false;
+        let draw = false;
+        const triggerCounterBash = this.isInThreadZone(target);
+        if (triggerCounterBash) {
+            // trigger counter bash
+            const counterBashResult = target.counterBash();
+            if (counterBashResult > bashResult) {
+                // counter bash succeeded -> player gets bashed
+                counterBashWins = true;
+            } else if (counterBashResult < bashResult) {
+                // counter bash failed -> target gets bashed
+                bashWins = true;
+            } else {
+                // draw -> both players face each other
+                draw = true;
+            }
+        } else {
+            // target tries to dodge
+            const dodgeResult = target.dodge();
+            if (dodgeResult > bashResult) {
+                // dodge succeeded
+                dodgeWins = true;
+            } else if (dodgeResult < bashResult) {
+                // dodge failed
+                bashWins = true;
+            } else {
+                // draw
+                draw = true;
+            }
+        }
+
+        if (bashWins) {
+            this.direction = direction;
+            target.direction = Hex.mirrorDirection(direction);
+
+            target.getBashed();
+            const oldTargetField = target.getField();
+            const newTargetField = oldTargetField.getNeighborAt(direction);
+            if (newTargetField.isEmpty()) {
+                target.hex = newTargetField.hex;
+            }
+        } else if (counterBashWins) {
+            this.direction = direction;
+            target.direction = Hex.mirrorDirection(direction);
+
+            this.getBashed();
+            const oldField = this.getField();
+            const newField = oldField.getNeighborAt(Hex.mirrorDirection(direction));
+            if (newField.isEmpty()) {
+                this.hex = newField.hex;
+            }
+        } else if (dodgeWins) {
+            this.direction = direction;
+        } else {
+            // draw
+            this.direction = direction;
+            target.direction = Hex.mirrorDirection(direction);
+        }
+    }
+
+    counterBash() {
+        const rollResult = 2;   // roll
+
+        return rollResult;
+    }
+
+    dodge() {
+        const rollResult = 0;   // roll
+
+        return rollResult;
     }
 
     getBashed() {

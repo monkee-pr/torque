@@ -120,13 +120,21 @@ class Torque extends GameObject {
     }
 
     scatter() {
-        const amountOfFieldsScattering = 3;
+        const amountOfFieldsScattering = Math.randomInt(1, 6);
+        const direction = Array.getRandomElement(Hex.ALL_DIRECTIONS);
         for (var i = 0; i < amountOfFieldsScattering; i++) {
             const field = this.getField();
-            const neighborFields = field.getNeighbors();
-            const validNeightbors = neighborFields.filter(f => f.isEmpty() && f.isAccessible());
-            const randomizedNeighbor = Array.getRandomElement(validNeightbors);
-            this.hex = new Hex(randomizedNeighbor.hex.q, randomizedNeighbor.hex.r);
+            let neighborField = field.getNeighborAt(direction);
+            if (neighborField == null) {
+                neighborField = field.getNeighborAt(Hex.mirrorDirection(direction));
+            }
+
+            this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
+
+            const playerOfNeighbor = neighborField.getGameObjects().filter(go => go instanceof Player)[0];
+            if (playerOfNeighbor != null) {
+                playerOfNeighbor.pickUpTorque();
+            }
         }
     }
 }

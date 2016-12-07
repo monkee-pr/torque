@@ -10,8 +10,12 @@ class ActionSelection extends Popup {
         const throwingIsPossible = player.holdsTorque() && tempThrowAction.possibleTargetFields.length > 0;
         this.buttonThrow = throwingIsPossible ? new Button(null, 450, 60, "throw", this.throwTorque, {player}) : null;
 
-        this.height += this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0);
-        this.point.y -= this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0);
+        const tempBashAction = new BashAction(gp, player);
+        const bashingIsPossible = player.canBash() && tempBashAction.possibleTargets.length > 0;
+        this.buttonThrow = bashingIsPossible ? new Button(null, 450, 60, "bash", this.bash, {player}) : null;
+
+        this.height += this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0) + (this.buttonBash ? this.buttonBash.height : 0);
+        this.point.y -= this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0) + (this.buttonBash ? this.buttonBash.height : 0);
     }
 
     update() {
@@ -74,13 +78,22 @@ class ActionSelection extends Popup {
         }
     }
 
+    bash(gp, params) {
+        const player = params.player;
+        gp.closeTopPopup();
+        gp.setAction(new BashAction(gp, player));
+    }
+
     onClick(gp, point) {
         const r = this.buttonRun;
         const t = this.buttonThrow;
+        const b = this.buttonThrow;
         if (point.hits(r && r.point, r.width, r.height)) {
             r.onClick(gp);
         } else if(t && point.hits(t.point, t.width, t.height)) {
             t.onClick(gp);
+        } else if(b && point.hits(b.point, b.width, b.height)) {
+            b.onClick(gp);
         }
     }
 }
