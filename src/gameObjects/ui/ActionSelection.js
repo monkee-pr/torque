@@ -1,11 +1,14 @@
 class ActionSelection extends Popup {
-    constructor(player) {
+    constructor(gp, player) {
         super(new Point(760, 410), 450, 260);
 
         this.player = player;
 
         this.buttonRun = new Button(null, 450, 60, "run", this.run, {player});
-        this.buttonThrow = player.holdsTorque() ? new Button(null, 450, 60, "throw", this.throwTorque, {player}) : null;
+
+        const tempThrowAction = new ThrowAction(gp, player);
+        const throwingIsPossible = player.holdsTorque() && tempThrowAction.possibleTargetFields.length > 0;
+        this.buttonThrow = throwingIsPossible ? new Button(null, 450, 60, "throw", this.throwTorque, {player}) : null;
 
         this.height += this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0);
         this.point.y -= this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0);

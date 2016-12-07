@@ -8,6 +8,7 @@ class Player extends GameObject {
         this.id = id;
         this.team = team;
         this.status = status;
+        this.direction = this.team == this.gp.team1 ? Hex.DIRECTION_RIGHT : Hex.DIRECTION_LEFT; // watch to the opponents side
 
         // exclude this in a DB later
         let name, role, rank, stats, skills;
@@ -91,6 +92,7 @@ class Player extends GameObject {
         super.update();
 
         this.move();
+        // this.direction = Hex.ALL_DIRECTIONS[Math.randomInt(1, 6)-1];
 
         const field = this.getField();
         field.isSelected = this.isSelected;
@@ -113,12 +115,12 @@ class Player extends GameObject {
         let p4 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y + scaledSize/2);    // bottom left
         let p5 = new Point(center.x - Math.getTrianglesHeight(scaledSize), center.y - scaledSize/2);    // top left
         if (cameraMode == Camera.MODE_ISOMETRIC) {
-            p0 = p0.toIso(gp.camera.position);
-            p1 = p1.toIso(gp.camera.position);
-            p2 = p2.toIso(gp.camera.position);
-            p3 = p3.toIso(gp.camera.position);
-            p4 = p4.toIso(gp.camera.position);
-            p5 = p5.toIso(gp.camera.position);
+            p0 = p0.toIso(cameraPosition);
+            p1 = p1.toIso(cameraPosition);
+            p2 = p2.toIso(cameraPosition);
+            p3 = p3.toIso(cameraPosition);
+            p4 = p4.toIso(cameraPosition);
+            p5 = p5.toIso(cameraPosition);
         }
 
         // define border
@@ -158,23 +160,80 @@ class Player extends GameObject {
             // drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             // drawBorder();
-            let image = null;
-            switch (this.status) {
-                case Player.STATUS_BASHED:
-                case Player.STATUS_HOLD_TORQUE:
-                    image = this.imageBashed;
-                    break;
-                default:
-                    image = this.imageRegular;
+
+            const drawImage = () => {
+                let image = null;
+                switch (this.status) {
+                    case Player.STATUS_BASHED:
+                    case Player.STATUS_HOLD_TORQUE:
+                        image = this.imageBashed;
+                        break;
+                    default:
+                        image = this.imageRegular;
+                }
+
+                if (image != null) {
+                    const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
+                    const width = image.width * Camera.scale;
+                    const height = image.height * Camera.scale;
+                    const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
+                    ctx.drawImage(image, anchor.x, anchor.y, width, height);
+                }
             }
 
-            if (image != null) {
-                const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
-                const width = image.width * Camera.scale;
-                const height = image.height * Camera.scale;
-                const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
-                ctx.drawImage(image, anchor.x, anchor.y, width, height);
+            const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
+            const directionAnchor = new Point(point.x, point.y);
+            const drawDirection = (direction) => {
+                let directionImage = null;
+                switch (direction) {
+                    case Hex.DIRECTION_TOP_LEFT:
+                        directionImage = resources.directionBlueTopLeft;
+                        break;
+                    case Hex.DIRECTION_TOP_RIGHT:
+                        directionImage = resources.directionBlueTopRight;
+                        break;
+                    case Hex.DIRECTION_RIGHT:
+                        directionImage = resources.directionBlueRight;
+                        break;
+                    case Hex.DIRECTION_BOTTOM_RIGHT:
+                        directionImage = resources.directionBlueBottomRight;
+                        break;
+                    case Hex.DIRECTION_BOTTOM_LEFT:
+                        directionImage = resources.directionBlueBottomLeft;
+                        break;
+                    case Hex.DIRECTION_LEFT:
+                        directionImage = resources.directionBlueLeft;
+                        break;
+                    default:
+                        console.error("Invalid direction");
+                }
+
+                const width = directionImage.width * Camera.scale;
+                const height = directionImage.height * Camera.scale;
+
+                ctx.drawImage(directionImage, directionAnchor.x - width/2, directionAnchor.y - height/2, width, height);
             }
+
+            const frontDirectionsUnordered = Hex.getFrontDirectionsFrom(this.direction);
+            // const frontDirectionsUnordered = Hex.ALL_DIRECTIONS;
+            const frontDirections = Hex.sortDirectionsForDraw(frontDirectionsUnordered);
+
+            let drewImage = false;
+            frontDirections.forEach(dir => {
+                if (
+                    !drewImage &&
+                    (
+                        dir == Hex.DIRECTION_BOTTOM_RIGHT ||
+                        dir == Hex.DIRECTION_LEFT ||
+                        dir == Hex.DIRECTION_BOTTOM_LEFT
+                    )
+                ) {
+                    drawImage();
+                    drewImage = true;
+                }
+                drawDirection(dir);
+            });
+            if (!drewImage) drawImage();
         }
     }
 
@@ -188,6 +247,10 @@ class Player extends GameObject {
         this.vr = 0;
     }
 
+    changeDirection(direction) {
+        this.direction = direction;
+    }
+
     onClick(gp) {
         gp.selectPlayer(this);
     }
@@ -197,6 +260,39 @@ class Player extends GameObject {
         const thisField = fields.filter(f => f.hex.equals(this.hex))[0];
 
         return thisField;
+    }
+
+    getFieldsInScope() {
+        const direction = this.direction;
+
+        const boardFields = this.gp.layers.getBoardFields();
+
+        const hex = this.hex;
+        let filterFunc = null;
+        switch (direction) {
+            case Hex.DIRECTION_TOP_LEFT:
+                filterFunc = (f) => (hex.q - f.hex.q) >= (hex.r - f.hex.r)*2*-1;
+                break;
+            case Hex.DIRECTION_TOP_RIGHT:
+                filterFunc = (f) => (hex.q - f.hex.q) <= hex.r - f.hex.r;
+                break;
+            case Hex.DIRECTION_RIGHT:
+                filterFunc = (f) => (hex.q - f.hex.q)*2 <= (hex.r - f.hex.r)*-1;
+                break;
+            case Hex.DIRECTION_BOTTOM_RIGHT:
+                filterFunc = (f) => (hex.q - f.hex.q) <= (hex.r - f.hex.r)*2*-1;
+                break;
+            case Hex.DIRECTION_BOTTOM_LEFT:
+                filterFunc = (f) => (hex.q - f.hex.q) >= hex.r - f.hex.r;
+                break;
+            case Hex.DIRECTION_LEFT:
+                filterFunc = (f) => (hex.q - f.hex.q)*2 >= (hex.r - f.hex.r)*-1;
+                break;
+            default:
+                console.error("Invalid direction");
+        }
+
+        return boardFields.filter(filterFunc);
     }
 
     canHoldTorque() {

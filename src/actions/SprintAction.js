@@ -1,4 +1,4 @@
-class RunAction extends Action {
+class SprintAction extends Action {
     constructor(gp, player) {
         super();
 

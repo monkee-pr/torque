@@ -11,8 +11,8 @@ class ThrowAction extends Action {
 
     getPossibleTargets() {
         const playerField = this.player.getField();
-        const boardFields = this.gp.layers.getBoardFields();
-        const possibleTargetFields = boardFields.filter(f => {
+        const fieldsInScope = this.player.getFieldsInScope();
+        const possibleTargetFields = fieldsInScope.filter(f => {
             const go = f.getGameObjects()[0];
             if (go instanceof Player && go != this.player) {
                 // team mate or opposing player

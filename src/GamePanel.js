@@ -268,7 +268,7 @@ class GamePanel {
             this.selectedPlayer = player;
 
             const playerOfActiveTeam = player.team.id == this.activeTeam.id;
-            const uiElement = playerOfActiveTeam ? new ActionSelection(player) : new PlayerInfo(player);
+            const uiElement = playerOfActiveTeam ? new ActionSelection(this, player) : new PlayerInfo(player);
             this.addUIElement(uiElement);
 
             // // highlight neighbor fields

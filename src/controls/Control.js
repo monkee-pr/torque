@@ -118,4 +118,8 @@ Control.scroll = (e, gp) => {
     const oldScale = Camera.scale;
     Camera.scale = Math.max(Camera.MIN_SCALE, Math.min(Camera.MAX_SCALE, Camera.scale * (1 - (step))));
     const newScale = Camera.scale;
+
+    // also update hover effects on scrolling
+    // not needed when the scroll effect anchors on the mouse position
+    Control.mouseMove(e, gp);
 }

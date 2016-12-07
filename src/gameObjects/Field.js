@@ -227,6 +227,7 @@ class Field extends GameObject {
                 if (action instanceof RunAction) {
                     // draw remaining amount of steps in the field
                     const remainingSteps = RunAction.MAX_PATH_LENGTH - action.path.length;
+                    const consumingSteps = 1;   // can be 2 in a sprint when direction must change for this
                     // const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(gp.camera.position);
                     const point1 = Hex.hexToPoint(cameraPosition, this.hex);
                     const point = cameraMode == Camera.MODE_TOP_DOWN ? point1 : point1.toIso(gp.camera.position);
@@ -236,7 +237,7 @@ class Field extends GameObject {
                     ctx.fillStyle = Color.BORDER_HIGHLIGHT_HOVER;
                     ctx.textAlign="center";
                     ctx.textBaseline = "middle";
-                    ctx.fillText(remainingSteps, point.x, point.y);
+                    ctx.fillText(remainingSteps + "-" + consumingSteps, point.x, point.y);
                 }
             }
         }
@@ -281,14 +282,7 @@ class Field extends GameObject {
     }
 
     getNeighbors() {
-        const directions = [
-            Hex.DIRECTION_TOP_RIGHT,
-            Hex.DIRECTION_RIGHT,
-            Hex.DIRECTION_BOTTOM_RIGHT,
-            Hex.DIRECTION_BOTTOM_LEFT,
-            Hex.DIRECTION_LEFT,
-            Hex.DIRECTION_TOP_LEFT,
-        ];
+        const directions = Hex.ALL_DIRECTIONS;
 
         const neighbors = directions.map(d => this.getNeighborAt(d)).filter(n => n != null);
         // const neighbors = Hex.getNeighbors(this);
@@ -364,6 +358,8 @@ class Field extends GameObject {
                 actionControl.submit(this.gp);
             }
 
+        } else if (action instanceof SprintAction) {
+            // sprint
         } else if (action instanceof ThrowAction) {
             action.target(this);
             actionControl.submit(this.gp);
@@ -428,3 +424,4 @@ Field.STRIKE_AREA_LEFT = "left";
 Field.STRIKE_AREA_RIGHT = "right";
 
 Field.BORDER_WIDTH = GameObject.BASE_SIZE / 50;
+// Field.BORDER_WIDTH = 1;
