@@ -156,14 +156,33 @@ class GamePanel {
     }
 
     update() {
-        this.layers.update();
-        // const torques = this.layers.getGameObjects().filter(go => go instanceof Torque);
-        // console.log(torques.length);
 
         const boardFields = this.layers.getBoardFields();
+        const gameObjects = this.layers.getGameObjects();
+        const fieldsAndGOs = boardFields.concat(gameObjects);
         const clickableObjects = this.layers.getClickableObjects(this);
-        boardFields.forEach(f => f.isHighlighted = clickableObjects.indexOf(f) != -1);
-        clickableObjects.forEach(go => go.isHighlighted = true);
+
+        let field;
+        let player;
+        if (this.getAction() instanceof BashAction) {
+            field = boardFields.filter(f => f.hex.equals(new Hex(1, 1)))[0];
+            player = field.getGameObjects()[0];
+            const x = fieldsAndGOs.indexOf(player);
+            const y = clickableObjects.indexOf(player);
+            // debugger;
+        }
+        // highlight only clickable objects
+        boardFields.forEach(f => {
+            f.isHighlighted = (clickableObjects.indexOf(f) != -1);
+            // if (f == field) debugger;
+        });
+        gameObjects.forEach(go => {
+            go.isHighlighted = (clickableObjects.indexOf(go) != -1);
+            // if (go == player) debugger;
+        });
+        // if (field) debugger;
+
+        this.layers.update();
     }
 
     draw() {

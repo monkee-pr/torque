@@ -31,8 +31,6 @@ class BashAction extends Action {
             }
         }).filter(go => go instanceof Player);
 
-        console.log(possibleTargets);
-
         return possibleTargets;
     }
 

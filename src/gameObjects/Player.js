@@ -100,6 +100,7 @@ class Player extends GameObject {
         this.move();
 
         const field = this.getField();
+        // if (this.gp.getAction() instanceof BashAction && this.hex.equals(new Hex(1, 1))) debugger;
         field.isSelected = this.isSelected;
         field.isHighlighted = this.isHighlighted;
         field.isHovered = this.isHovered;

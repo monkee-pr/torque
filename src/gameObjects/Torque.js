@@ -129,11 +129,24 @@ class Torque extends GameObject {
                 neighborField = field.getNeighborAt(Hex.mirrorDirection(direction));
             }
 
-            this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
+            if (!neighborField.isAccessible()) {
+                // neighbor field is not accessible
 
-            const playerOfNeighbor = neighborField.getGameObjects().filter(go => go instanceof Player)[0];
-            if (playerOfNeighbor != null) {
-                playerOfNeighbor.pickUpTorque();
+                if (neighborField.type == Field.TYPE_PIT) {
+                    this.gp.respawnTorque();
+                    return;
+                } else if (neighborField.type == Field.TYPE_HOLE) {
+                    this.scatter();
+                    return;
+                }
+            } else {
+                this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
+
+                const playerOfNeighbor = neighborField.getGameObjects().filter(go => go instanceof Player)[0];
+                if (playerOfNeighbor != null) {
+                    playerOfNeighbor.pickUpTorque();
+                    return;
+                }
             }
         }
     }

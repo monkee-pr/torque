@@ -12,7 +12,7 @@ class ActionSelection extends Popup {
 
         const tempBashAction = new BashAction(gp, player);
         const bashingIsPossible = player.canBash() && tempBashAction.possibleTargets.length > 0;
-        this.buttonThrow = bashingIsPossible ? new Button(null, 450, 60, "bash", this.bash, {player}) : null;
+        this.buttonBash = bashingIsPossible ? new Button(null, 450, 60, "bash", this.bash, {player}) : null;
 
         this.height += this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0) + (this.buttonBash ? this.buttonBash.height : 0);
         this.point.y -= this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0) + (this.buttonBash ? this.buttonBash.height : 0);
@@ -56,9 +56,16 @@ class ActionSelection extends Popup {
 
         ctx.drawImage(tCv, this.point.x, this.point.y + this.buttonRun.height + (this.buttonThrow ? this.buttonThrow.height : 0), tCv.width, tCv.height);
 
+        let buttonMargin = 0;
         this.buttonRun.draw(ctx, new Point(this.point.x, this.point.y));   // above the info
+        buttonMargin += 60;
         if (this.buttonThrow) {
-            this.buttonThrow.draw(ctx, new Point(this.point.x, this.point.y + 60));   // above the info
+            this.buttonThrow.draw(ctx, new Point(this.point.x, this.point.y + buttonMargin));   // above the info
+            buttonMargin += 60;
+        }
+        if (this.buttonBash) {
+            this.buttonBash.draw(ctx, new Point(this.point.x, this.point.y + buttonMargin));   // above the info
+            buttonMargin += 60;
         }
     }
 
@@ -87,7 +94,7 @@ class ActionSelection extends Popup {
     onClick(gp, point) {
         const r = this.buttonRun;
         const t = this.buttonThrow;
-        const b = this.buttonThrow;
+        const b = this.buttonBash;
         if (point.hits(r && r.point, r.width, r.height)) {
             r.onClick(gp);
         } else if(t && point.hits(t.point, t.width, t.height)) {

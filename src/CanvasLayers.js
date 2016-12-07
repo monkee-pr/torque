@@ -115,11 +115,14 @@ class CanvasLayers {
     }
 
     getHoverableObjects(gp) {
+        const action = gp.getAction();
         const fields = this.getBoardFields();
         let hoverableFields = fields.filter(f => f.isAccessible());
-        if (gp.getAction() instanceof ThrowAction) {
+        if (action instanceof ThrowAction) {
             const openHoles = fields.filter(f => f.type == Field.TYPE_HOLE && f.isOpen == true);
             hoverableFields.push(openHoles);
+        // } else if (action instanceof RunAction && action.mode == RunAction.MODE_TURN) {
+        //     hoverableFields.push(fields.filter(f => !f.isAccessible()));
         }
         const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
 

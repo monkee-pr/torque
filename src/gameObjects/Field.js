@@ -219,6 +219,7 @@ class Field extends GameObject {
                 ctx.strokeStyle = Color.BORDER_HOVER;
                 drawBorder = true;
             }
+            // if (this.gp.getAction() instanceof BashAction && this.hex.equals(new Hex(1, 1))) debugger;
 
             if (drawBorder) ctx.stroke();
 
