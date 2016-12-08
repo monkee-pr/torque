@@ -4,7 +4,7 @@ class CanvasLayers {
             [CanvasLayers.LAYER_BACKGROUND] : [],
             [CanvasLayers.LAYER_BOARD] : [],
             [CanvasLayers.LAYER_HIGHLIGHTS] : [],
-            [CanvasLayers.LAYER_GAME_OBJECTS] : [],
+            [CanvasLayers.LAYER_PARTICIPATING_OBJECTS] : [],
             [CanvasLayers.LAYER_UI] : [],
         };
 
@@ -36,9 +36,9 @@ class CanvasLayers {
         });
     }
 
-    update() {
+    update(now) {
         Object.toArray(this.layers).forEach(objects => {
-            objects.forEach(go => go.update());
+            objects.forEach(go => go.update(now));
         });
     }
 
@@ -90,10 +90,10 @@ class CanvasLayers {
         return uiElements;
     }
 
-    getGameObjects() {
-        const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
+    getParticipatingObjects() {
+        const participatingObjects = this.layers[CanvasLayers.LAYER_PARTICIPATING_OBJECTS];
 
-        return gameObjects;
+        return participatingObjects;
     }
 
     getClickableObjects(gp) {
@@ -108,7 +108,7 @@ class CanvasLayers {
         } else if (action instanceof BashAction) {
             clickableObjects = action.possibleTargets;
         } else {
-            clickableObjects = this.getGameObjects();
+            clickableObjects = this.getParticipatingObjects();
         }
 
         return clickableObjects;
@@ -124,9 +124,9 @@ class CanvasLayers {
         // } else if (action instanceof RunAction && action.mode == RunAction.MODE_TURN) {
         //     hoverableFields.push(fields.filter(f => !f.isAccessible()));
         }
-        const gameObjects = this.layers[CanvasLayers.LAYER_GAME_OBJECTS];
+        const participatingObjects = this.layers[CanvasLayers.LAYER_PARTICIPATING_OBJECTS];
 
-        const hoverableObjects = hoverableFields.concat(gameObjects);
+        const hoverableObjects = hoverableFields.concat(participatingObjects);
 
         return hoverableObjects;
     }
@@ -134,7 +134,7 @@ class CanvasLayers {
 CanvasLayers.LAYER_BACKGROUND = 0;
 CanvasLayers.LAYER_BOARD = 1;
 CanvasLayers.LAYER_HIGHLIGHTS = 2;
-CanvasLayers.LAYER_GAME_OBJECTS = 3;
+CanvasLayers.LAYER_PARTICIPATING_OBJECTS = 3;
 CanvasLayers.LAYER_UI = 4;
 
 CanvasLayers.sortForDrawing = (a, b) => {

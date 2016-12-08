@@ -1,5 +1,6 @@
 class GameObject {
-    constructor() {
+    constructor(gp) {
+        this.gp = gp;
         this.isHovered = false;
         this.isHighlighted = false;
         this.isSelected = false;
@@ -9,11 +10,7 @@ class GameObject {
         // if (this.isHovered) console.log(this.hex);
     }
 
-    draw(ctx, gp) {
-    }
-
-    onClick(gp) {
-        // console.log(this);
+    draw(ctx) {
     }
 }
 

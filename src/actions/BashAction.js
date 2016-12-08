@@ -13,7 +13,7 @@ class BashAction extends Action {
         const playerField = this.player.getField();
         const threadZone = this.player.getThreadZone();
         const possibleTargets = threadZone.map(f => {
-            const go = f.getGameObjects()[0];
+            const go = f.getParticipatingObjects()[0];
             if (go instanceof Player) {
                 // team mate or opposing player
                 if (go.isTeamMateOf(this.player)) {

@@ -1,10 +1,7 @@
-class Player extends GameObject {
+class Player extends ParticipatingObject {
     constructor(gp, hex, id, team, status = Player.STATUS_NORMAL) {
-        super();
+        super(gp, hex);
 
-        this.gp = gp;
-
-        this.hex = hex;
         this.id = id;
         this.team = team;
         this.status = status;
@@ -97,7 +94,7 @@ class Player extends GameObject {
     update() {
         super.update();
 
-        this.move();
+        // this.move();
 
         const field = this.getField();
         // if (this.gp.getAction() instanceof BashAction && this.hex.equals(new Hex(1, 1))) debugger;
@@ -168,29 +165,30 @@ class Player extends GameObject {
             // drawBorder();
 
             const drawImage = () => {
-                let image = null;
                 switch (this.status) {
                     case Player.STATUS_BASHED:
-                        image = this.imageBashed;
+                        this.image = this.imageBashed;
                         break;
                     case Player.STATUS_HOLD_TORQUE:
-                        image = this.imageHolding;
+                        this.image = this.imageHolding;
                         break;
                     default:
-                        image = this.imageRegular;
+                        this.image = this.imageRegular;
                 }
 
+                const image = this.image;
                 if (image != null) {
                     const neighborField = this.getField().getNeighborAt(Hex.DIRECTION_TOP_RIGHT);
-                    const neighborFieldHasGameObjects = neighborField != null && neighborField.getGameObjects().length > 0;
+                    const neighborFieldHasGameObjects = neighborField != null && neighborField.getParticipatingObjects().length > 0;
                     if (neighborFieldHasGameObjects) {
                         ctx.globalAlpha = 0.5;
                     }
                     const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
                     const width = image.width * Camera.scale;
                     const height = image.height * Camera.scale;
-                    const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
-                    ctx.drawImage(image, anchor.x, anchor.y, width, height);
+                    // const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
+                    const anchor = this.imageAnchor;
+                    if (anchor) ctx.drawImage(image, anchor.x, anchor.y, width, height);
                     if (neighborFieldHasGameObjects) {
                         ctx.globalAlpha = 1;
                     }
@@ -378,7 +376,7 @@ class Player extends GameObject {
 
     isInThreadZone(player) {
         const threadZone = this.getThreadZone();
-        const players = threadZone.map(f => f.getGameObjects()[0]).filter(go => go instanceof Player);
+        const players = threadZone.map(f => f.getParticipatingObjects()[0]).filter(go => go instanceof Player);
 
         return players.indexOf(player) != -1;
     }
@@ -411,7 +409,7 @@ class Player extends GameObject {
     // requires a Torque object in the GamePanel's GameObject list
     pickUpTorque() {
         const gp = this.gp;
-        const gameObjectsOfField = this.getField().getGameObjects();
+        const gameObjectsOfField = this.getField().getParticipatingObjects();
         const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
 
         if (torque != null) {
@@ -421,7 +419,7 @@ class Player extends GameObject {
                 if (pickUpSucceeds) {
                     this.status = Player.STATUS_HOLD_TORQUE;
 
-                    gp.removeGameObject(torque);
+                    gp.removeParticipatingObject(torque);
                 } else {
                     torque.scatter();
                 }
@@ -446,7 +444,7 @@ class Player extends GameObject {
     dropTorque() {
         this.status = Player.NORMAL;
         const torque = new Torque(this.gp, new Hex(this.hex.q, this.hex.r));
-        this.gp.addGameObject(torque);
+        this.gp.addParticipatingObject(torque);
         torque.scatter();
     }
 

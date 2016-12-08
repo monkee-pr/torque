@@ -15,7 +15,7 @@ class RunAction extends Action {
         const neighborFields = lastPathField.getNeighbors();
 
         if (this.mode == RunAction.MODE_MOVE) {
-            const emptyNeighbors = neighborFields.filter(n => ((n.isEmpty() || n.getGameObjects().filter(go => go instanceof Torque).length > 0) && n.isAccessible()));
+            const emptyNeighbors = neighborFields.filter(n => ((n.isEmpty() || n.getParticipatingObjects().filter(go => go instanceof Torque).length > 0) && n.isAccessible()));
 
             return emptyNeighbors;
         } else {
@@ -24,7 +24,8 @@ class RunAction extends Action {
     }
 
     movePlayer(hex) {
-        this.player.hex = hex;
+        // this.player.hex = hex;
+        this.player.move(hex);
 
         this.remainingSteps--;
         if (this.remainingSteps <= 0) {

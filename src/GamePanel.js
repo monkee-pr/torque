@@ -9,13 +9,13 @@ class GamePanel {
         this.setBackground(new Background(null, Color.WINDOW_BACKGROUND));
 
         const board = new Board(this);
-        this.addGameObject(board);
-        // board.fields.forEach(f => this.addGameObject(f));
+        this.setBoard(board);
+        // board.fields.forEach(f => this.addParticipatingObject(f));
         const originField = this.layers.getBoardFields().filter(f => f.hex.equals(new Hex(0, 0)))[0];
         this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_ISOMETRIC);
         // this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_TOP_DOWN);
 
-        this.addGameObject(new Torque(this, new Hex(0, 0)));
+        this.addParticipatingObject(new Torque(this, new Hex(0, 0)));
 
         this.team1 = new Team(Team.TEAM_1);
         const t1p1 = new Player(this, new Hex(1, -5), 0, this.team1);
@@ -30,12 +30,12 @@ class GamePanel {
         this.team1.addPlayer(t1p4);
         this.team1.addPlayer(t1p5);
         this.team1.addPlayer(t1p6);
-        this.addGameObject(t1p1);
-        this.addGameObject(t1p2);
-        this.addGameObject(t1p3);
-        this.addGameObject(t1p4);
-        this.addGameObject(t1p5);
-        this.addGameObject(t1p6);
+        this.addParticipatingObject(t1p1);
+        this.addParticipatingObject(t1p2);
+        this.addParticipatingObject(t1p3);
+        this.addParticipatingObject(t1p4);
+        this.addParticipatingObject(t1p5);
+        this.addParticipatingObject(t1p6);
 
         this.team2 = new Team(Team.TEAM_2);
         const t2p1 = new Player(this, new Hex(4, -5), 0, this.team2);
@@ -50,12 +50,12 @@ class GamePanel {
         this.team2.addPlayer(t2p4);
         this.team2.addPlayer(t2p5);
         this.team2.addPlayer(t2p6);
-        this.addGameObject(t2p1);
-        this.addGameObject(t2p2);
-        this.addGameObject(t2p3);
-        this.addGameObject(t2p4);
-        this.addGameObject(t2p5);
-        this.addGameObject(t2p6);
+        this.addParticipatingObject(t2p1);
+        this.addParticipatingObject(t2p2);
+        this.addParticipatingObject(t2p3);
+        this.addParticipatingObject(t2p4);
+        this.addParticipatingObject(t2p5);
+        this.addParticipatingObject(t2p6);
 
 
         this.teams = [
@@ -80,31 +80,31 @@ class GamePanel {
     setBackground(bg) {
         if (!(bg instanceof Background)) {
             console.error(bg + " is not an instance of Background");
-            return;
         }
         this.layers.layers[CanvasLayers.LAYER_BACKGROUND] = [bg];
     }
 
-    addGameObject(go) {
-        if (!(go instanceof GameObject)) {
-            console.error(go + " is not an instance of GameObject");
-            return;
+    setBoard(board) {
+        if (!(board instanceof Board)) {
+            console.error(board + " is not an instance of Field");
         } else {
-            let targetLayer = null;
-            if (go instanceof Field || go instanceof Board) {
-                targetLayer = CanvasLayers.LAYER_BOARD;
-            } else {
-                targetLayer = CanvasLayers.LAYER_GAME_OBJECTS;
-            }
-            this.layers.add(go, targetLayer);
+            this.layers.layers[CanvasLayers.LAYER_BOARD] = [board];
         }
     }
-    removeGameObject(go) {
-        if (go == null) {
-            console.log("Object not found in panel's list");
-            console.log(go);
+
+    addParticipatingObject(po) {
+        if (!(po instanceof ParticipatingObject)) {
+            console.error("Object is not an instance of ParticipatingObject");
+            console.error(po);
         } else {
-            this.layers.remove(go, CanvasLayers.LAYER_GAME_OBJECTS);
+            this.layers.add(po, CanvasLayers.LAYER_PARTICIPATING_OBJECTS);
+        }
+    }
+    removeParticipatingObject(po) {
+        if (po == null) {
+            console.log("Object 'null' not found in panel's list");
+        } else {
+            this.layers.remove(po, CanvasLayers.LAYER_PARTICIPATING_OBJECTS);
         }
     }
 
@@ -117,8 +117,7 @@ class GamePanel {
     }
     removeUIElement(ui) {
         if (ui == null) {
-            console.log("Object not found in panel's list");
-            console.log(ui);
+            console.log("Object 'null' not found in panel's list");
         } else {
             this.layers.remove(ui, CanvasLayers.LAYER_UI);
         }
@@ -155,10 +154,10 @@ class GamePanel {
         }
     }
 
-    update() {
+    update(now) {
 
         const boardFields = this.layers.getBoardFields();
-        const gameObjects = this.layers.getGameObjects();
+        const gameObjects = this.layers.getParticipatingObjects();
         const fieldsAndGOs = boardFields.concat(gameObjects);
         const clickableObjects = this.layers.getClickableObjects(this);
 
@@ -166,7 +165,7 @@ class GamePanel {
         let player;
         if (this.getAction() instanceof BashAction) {
             field = boardFields.filter(f => f.hex.equals(new Hex(1, 1)))[0];
-            player = field.getGameObjects()[0];
+            player = field.getParticipatingObjects()[0];
             const x = fieldsAndGOs.indexOf(player);
             const y = clickableObjects.indexOf(player);
             // debugger;
@@ -182,7 +181,7 @@ class GamePanel {
         });
         // if (field) debugger;
 
-        this.layers.update();
+        this.layers.update(now);
     }
 
     draw() {
@@ -237,7 +236,7 @@ class GamePanel {
         //     this.startNextPush();
         // }
 
-        const gameObjects = this.layers.getGameObjects();
+        const gameObjects = this.layers.getParticipatingObjects();
         const torque = gameObjects.filter(go => go instanceof Torque)[0];
 
         if (torque != null) {
@@ -253,12 +252,12 @@ class GamePanel {
                 passingFields = spawnFields.slice(spawnFieldIndex, spawnFields.length-1+1).reverse();
             }
 
-            const playersPassing = Array.flatten(passingFields.map(f => f.getGameObjects())).filter(go => go instanceof Player);
+            const playersPassing = Array.flatten(passingFields.map(f => f.getParticipatingObjects())).filter(go => go instanceof Player);
             const playerCollidingWith = playersPassing[0];
 
             if (playerCollidingWith != null) {
                 // torque collides with player
-                const landingField = passingFields.filter(f => f.getGameObjects().indexOf(playerCollidingWith) != -1)[0];
+                const landingField = passingFields.filter(f => f.getParticipatingObjects().indexOf(playerCollidingWith) != -1)[0];
                 torque.hex = new Hex(landingField.hex.q, landingField.hex.r);
                 if (false) { // player faces the torque
                     playerCollidingWith.pickUpTorque();

@@ -101,7 +101,7 @@ class Field extends GameObject {
             const boardFields = this.gp.layers.getBoardFields();
             const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == thisObj.strikeArea && f.teamSide == thisObj.teamSide);
             const fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque = fieldsOfStrikeArea.filter(f => {
-                const go = f.getGameObjects()[0];
+                const go = f.getParticipatingObjects()[0];
                 if (go instanceof Player) {
                     const player = go;
                     if (player.team.id != thisObj.teamSide) {
@@ -342,13 +342,13 @@ class Field extends GameObject {
     }
 
     isEmpty() {
-        const empty = this.getGameObjects().length == 0;
+        const empty = this.getParticipatingObjects().length == 0;
 
         return empty;
     }
 
-    getGameObjects() {
-        const gameObjects = this.gp.layers.getGameObjects();
+    getParticipatingObjects() {
+        const gameObjects = this.gp.layers.getParticipatingObjects();
         const objectsOnThisHex = gameObjects.filter(go => {
             return go.hex.equals(this.hex)
         });
@@ -375,7 +375,7 @@ class Field extends GameObject {
             if (action.mode == RunAction.MODE_MOVE) {
                 action.movePlayer(this.hex);
 
-                const gameObjectsOfField = this.getGameObjects();
+                const gameObjectsOfField = this.getParticipatingObjects();
                 const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
                 if (torque != null) {
                     if (action.player.canHoldTorque()) {
@@ -393,7 +393,7 @@ class Field extends GameObject {
             action.target(this);
             actionControl.submit(this.gp);
 
-            if (this.getGameObjects().filter(go => go instanceof Torque).length > 0) {
+            if (this.getParticipatingObjects().filter(go => go instanceof Torque).length > 0) {
                 // HOOOLE!!!
                 console.log("HOOOLE!!!");
                 const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;

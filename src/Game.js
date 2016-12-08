@@ -21,7 +21,8 @@ class Game {
         requestAnimationFrame(() => this.run());
 
         // do calculations
-        this.gp.update();
+        const now = Date.now();
+        this.gp.update(now);
 
         this.gp.draw();
     }

@@ -30,9 +30,9 @@ Control.mouseMove = (e, gp) => {
             Control.hoveredHex = hex;
 
             const hoverableObjects = gp.layers.getHoverableObjects(gp);
-            const reversedGameObjects = hoverableObjects.slice().reverse();
+            const reversedHoverableObjects = hoverableObjects.slice().reverse();
             // let brk = false;
-            reversedGameObjects.forEach(go => {
+            reversedHoverableObjects.forEach(go => {
                 if (go.hex != null && hex.equals(go.hex)) {
                     go.isHovered = true;
                     // brk = true;
@@ -40,7 +40,7 @@ Control.mouseMove = (e, gp) => {
                     go.isHovered = false;
                 }
             });
-            // console.log(reversedGameObjects.filter(go => go.isHovered));
+            // console.log(reversedHoverableObjects.filter(go => go.isHovered));
         }
     }
 }
@@ -93,9 +93,9 @@ Control.click = (e, gp) => {
 
                 // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
                 const clickableObjects = gp.layers.getClickableObjects(gp);
-                const reversedGameObjects = clickableObjects.slice().reverse();
+                const reversedClickableObjects = clickableObjects.slice().reverse();
                 let brk = false;
-                reversedGameObjects.forEach(go => {
+                reversedClickableObjects.forEach(go => {
                     if (!brk && go.hex != null && hex.equals(go.hex)) {
                         go.onClick(gp);
                         // console.log("click");

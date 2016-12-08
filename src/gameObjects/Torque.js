@@ -1,9 +1,6 @@
-class Torque extends GameObject {
+class Torque extends ParticipatingObject {
     constructor(gp, hex) {
-        super();
-
-        this.gp = gp;
-        this.hex = hex;
+        super(gp, hex);
 
         this.vq = 0;
         this.vr = 0;
@@ -14,7 +11,7 @@ class Torque extends GameObject {
 
     update() {
         super.update();
-        this.move();
+        // this.move();
     }
 
     draw(ctx) {
@@ -146,7 +143,7 @@ class Torque extends GameObject {
                 this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
                 // console.log(this.hex);
 
-                const playerOfNeighbor = neighborField.getGameObjects().filter(go => go instanceof Player)[0];
+                const playerOfNeighbor = neighborField.getParticipatingObjects().filter(go => go instanceof Player)[0];
                 if (playerOfNeighbor != null) {
                     playerOfNeighbor.pickUpTorque();
                     return;

@@ -11,7 +11,7 @@ class SprintAction extends Action {
     getNextPossibleSteps() {
         const lastPathField = this.player.getField();
         const neighborFields = lastPathField.getNeighbors();
-        const emptyNeighbors = neighborFields.filter(n => ((n.isEmpty() || n.getGameObjects().filter(go => go instanceof Torque).length > 0) && n.isAccessible()));
+        const emptyNeighbors = neighborFields.filter(n => ((n.isEmpty() || n.getParticipatingObjects().filter(go => go instanceof Torque).length > 0) && n.isAccessible()));
 
         return emptyNeighbors;
     }

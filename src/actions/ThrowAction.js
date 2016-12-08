@@ -13,7 +13,7 @@ class ThrowAction extends Action {
         const playerField = this.player.getField();
         const fieldsInScope = this.player.getScope();
         const possibleTargetFields = fieldsInScope.filter(f => {
-            const go = f.getGameObjects()[0];
+            const go = f.getParticipatingObjects()[0];
             if (go instanceof Player && go != this.player) {
                 // team mate or opposing player
                 if (go.isTeamMateOf(this.player) && !go.canHoldTorque()) {
@@ -47,9 +47,9 @@ class ThrowAction extends Action {
             const field = this.targetField;
             const hex = this.targetField.hex;
             const torque = new Torque(this.gp, new Hex(hex.q, hex.r));
-            this.gp.addGameObject(torque);
+            this.gp.addParticipatingObject(torque);
 
-            field.getGameObjects().forEach(go => {
+            field.getParticipatingObjects().forEach(go => {
                 if (go instanceof Player) {
                     const targetPlayer = go;
                     if (true || targetPlayer.isTeamMateOf(this.player)) {
