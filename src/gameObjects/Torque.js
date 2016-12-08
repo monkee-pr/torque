@@ -121,12 +121,15 @@ class Torque extends GameObject {
 
     scatter() {
         const amountOfFieldsScattering = Math.randomInt(1, 6);
-        const direction = Array.getRandomElement(Hex.ALL_DIRECTIONS);
+        let direction = Array.getRandomElement(Hex.ALL_DIRECTIONS);
+        // console.log("scatter");
+        // console.log(amountOfFieldsScattering + " " + direction);
         for (var i = 0; i < amountOfFieldsScattering; i++) {
             const field = this.getField();
             let neighborField = field.getNeighborAt(direction);
             if (neighborField == null) {
-                neighborField = field.getNeighborAt(Hex.mirrorDirection(direction));
+                direction = field.getReboundDirection(direction);
+                neighborField = field.getNeighborAt(direction);
             }
 
             if (!neighborField.isAccessible()) {
@@ -141,6 +144,7 @@ class Torque extends GameObject {
                 }
             } else {
                 this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
+                console.log(this.hex);
 
                 const playerOfNeighbor = neighborField.getGameObjects().filter(go => go instanceof Player)[0];
                 if (playerOfNeighbor != null) {

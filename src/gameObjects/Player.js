@@ -360,7 +360,9 @@ class Player extends GameObject {
         const threadZone = [];
         frontDirections.forEach(d => {
             const neighbor = this.getField().getNeighborAt(d);
-            threadZone.push(neighbor);
+            if (neighbor != null) {
+                threadZone.push(neighbor);
+            }
         });
 
         return threadZone;
@@ -400,13 +402,12 @@ class Player extends GameObject {
 
     // requires a Torque object in the GamePanel's GameObject list
     pickUpTorque() {
-        if (this.canHoldTorque()) {
-            const gp = this.gp;
-            const boardFields = gp.layers.getBoardFields();
-            const notEmptyBoardFields = boardFields.filter(f => !f.isEmpty());
-            const gameObjectsOfField = this.getField().getGameObjects();
-            const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
-            if (torque != null) {
+        const gp = this.gp;
+        const gameObjectsOfField = this.getField().getGameObjects();
+        const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
+
+        if (torque != null) {
+            if (this.canHoldTorque()) {
                 // recognize direction and pickup chance here and remove it from GamePanel's respawnTorque() tileHoleOpenedRed
                 const pickUpSucceeds = true;
                 if (pickUpSucceeds) {
@@ -422,6 +423,8 @@ class Player extends GameObject {
                     action.remainingSteps = 0;
                     action.mode = RunAction.MODE_TURN;
                 }
+            } else {
+                torque.scatter();
             }
         }
     }

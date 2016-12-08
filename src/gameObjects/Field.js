@@ -280,6 +280,25 @@ class Field extends GameObject {
         return neighbor;
     }
 
+    getReboundDirection(direction) {
+        const neighbors = this.getNeighbors();
+        const directionsWithoutNeighbor = Hex.ALL_DIRECTIONS.filter(d => {
+            const neighbor = this.getNeighborAt(d);
+            const neighborFoundAtThatDirection = neighbors.indexOf(neighbor) != -1;
+
+            return !neighborFoundAtThatDirection;
+        });
+
+        const index = directionsWithoutNeighbor.indexOf(direction);
+        let reboundDirection = direction;
+        if (index != -1) {
+            const mirroredDirectionsWithoutNeighbor = directionsWithoutNeighbor.slice().reverse();
+            reboundDirection = Hex.mirrorDirection(mirroredDirectionsWithoutNeighbor[index]);
+        }
+
+        return reboundDirection;
+    }
+
     hasNeighborAt(direction) {
         const neighbor = this.getNeighborAt(direction);
 
