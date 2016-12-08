@@ -120,7 +120,7 @@ class Torque extends GameObject {
     }
 
     scatter() {
-        const amountOfFieldsScattering = Math.randomInt(1, 6);
+        const amountOfFieldsScattering = Math.randomInt(Torque.SCATTERING_DISTANCE_MIN, Torque.SCATTERING_DISTANCE_MAX);
         let direction = Array.getRandomElement(Hex.ALL_DIRECTIONS);
         // console.log("scatter");
         // console.log(amountOfFieldsScattering + " " + direction);
@@ -144,7 +144,7 @@ class Torque extends GameObject {
                 }
             } else {
                 this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
-                console.log(this.hex);
+                // console.log(this.hex);
 
                 const playerOfNeighbor = neighborField.getGameObjects().filter(go => go instanceof Player)[0];
                 if (playerOfNeighbor != null) {
@@ -155,3 +155,6 @@ class Torque extends GameObject {
         }
     }
 }
+
+Torque.SCATTERING_DISTANCE_MIN = 1;
+Torque.SCATTERING_DISTANCE_MAX = 6;

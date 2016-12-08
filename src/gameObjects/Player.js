@@ -181,11 +181,19 @@ class Player extends GameObject {
                 }
 
                 if (image != null) {
+                    const neighborField = this.getField().getNeighborAt(Hex.DIRECTION_TOP_RIGHT);
+                    const neighborFieldHasGameObjects = neighborField != null && neighborField.getGameObjects().length > 0;
+                    if (neighborFieldHasGameObjects) {
+                        ctx.globalAlpha = 0.5;
+                    }
                     const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
                     const width = image.width * Camera.scale;
                     const height = image.height * Camera.scale;
                     const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
                     ctx.drawImage(image, anchor.x, anchor.y, width, height);
+                    if (neighborFieldHasGameObjects) {
+                        ctx.globalAlpha = 1;
+                    }
                 }
             }
 
