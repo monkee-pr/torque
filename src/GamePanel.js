@@ -3,6 +3,8 @@ class GamePanel {
         this.cv = cv;
         this.ctx = cv.getContext("2d");
 
+        this.activeClickBlockers = [];
+
         // layers for drawable objects
         this.layers = new CanvasLayers();
 
@@ -168,18 +170,10 @@ class GamePanel {
             player = field.getParticipatingObjects()[0];
             const x = fieldsAndGOs.indexOf(player);
             const y = clickableObjects.indexOf(player);
-            // debugger;
         }
         // highlight only clickable objects
-        boardFields.forEach(f => {
-            f.isHighlighted = (clickableObjects.indexOf(f) != -1);
-            // if (f == field) debugger;
-        });
-        gameObjects.forEach(go => {
-            go.isHighlighted = (clickableObjects.indexOf(go) != -1);
-            // if (go == player) debugger;
-        });
-        // if (field) debugger;
+        boardFields.forEach(f => f.isHighlighted = (clickableObjects.indexOf(f) != -1));
+        gameObjects.forEach(go => go.isHighlighted = (clickableObjects.indexOf(go) != -1));
 
         this.layers.update(now);
     }

@@ -24,8 +24,7 @@ class RunAction extends Action {
     }
 
     movePlayer(hex) {
-        // this.player.hex = hex;
-        this.player.move(hex);
+        this.player.addMovement(hex);
 
         this.remainingSteps--;
         if (this.remainingSteps <= 0) {

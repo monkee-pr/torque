@@ -91,16 +91,20 @@ class Player extends ParticipatingObject {
         }
     }
 
-    update() {
-        super.update();
+    update(now) {
+        super.update(now);
 
-        // this.move();
-
+        // handover player's highlight effects to its field
         const field = this.getField();
-        // if (this.gp.getAction() instanceof BashAction && this.hex.equals(new Hex(1, 1))) debugger;
         field.isSelected = this.isSelected;
         field.isHighlighted = this.isHighlighted;
         field.isHovered = this.isHovered;
+
+        // pickup torque if it's on player's field
+        const isOnSameFieldAsTorque = this.getField().getParticipatingObjects().filter(go => go instanceof Torque).length > 0;
+        if (isOnSameFieldAsTorque) {
+            this.pickUpTorque();
+        }
     }
 
     draw(ctx, gp) {
@@ -183,12 +187,15 @@ class Player extends ParticipatingObject {
                     if (neighborFieldHasGameObjects) {
                         ctx.globalAlpha = 0.5;
                     }
-                    const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
-                    const width = image.width * Camera.scale;
-                    const height = image.height * Camera.scale;
-                    // const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
-                    const anchor = this.imageAnchor;
-                    if (anchor) ctx.drawImage(image, anchor.x, anchor.y, width, height);
+                    const point = this.center;
+
+                    if (point) {
+                        const width = image.width * Camera.scale;
+                        const height = image.height * Camera.scale;
+                        const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
+
+                        ctx.drawImage(image, anchor.x, anchor.y, width, height);
+                    }
                     if (neighborFieldHasGameObjects) {
                         ctx.globalAlpha = 1;
                     }
@@ -196,7 +203,7 @@ class Player extends ParticipatingObject {
             }
 
             const point = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
-            const directionAnchor = new Point(point.x, point.y);
+            const directionAnchor = this.center;
             const drawDirection = (direction) => {
                 let directionImage = null;
                 switch (direction) {
@@ -267,7 +274,7 @@ class Player extends ParticipatingObject {
                 const width = directionImage.width * Camera.scale;
                 const height = directionImage.height * Camera.scale;
 
-                ctx.drawImage(directionImage, directionAnchor.x - width/2, directionAnchor.y - height/2, width, height);
+                if (directionAnchor) ctx.drawImage(directionImage, directionAnchor.x - width/2, directionAnchor.y - height/2, width, height);
             }
 
             const frontDirectionsUnordered = Hex.getFrontDirectionsFrom(this.direction);
@@ -291,16 +298,6 @@ class Player extends ParticipatingObject {
             });
             if (!drewImage) drawImage();
         }
-    }
-
-    move() {
-        // set new position
-        const vector = new Hex(this.vq, this.vr);
-        this.hex = Hex.add(this.hex, vector);
-
-        // reset movement
-        this.vq = 0;
-        this.vr = 0;
     }
 
     changeDirection(direction) {
@@ -409,8 +406,8 @@ class Player extends ParticipatingObject {
     // requires a Torque object in the GamePanel's GameObject list
     pickUpTorque() {
         const gp = this.gp;
-        const gameObjectsOfField = this.getField().getParticipatingObjects();
-        const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
+        const participatingObjectsOfField = this.getField().getParticipatingObjects();
+        const torque = participatingObjectsOfField.filter(go => go instanceof Torque)[0];
 
         if (torque != null) {
             if (this.canHoldTorque()) {
@@ -432,6 +429,8 @@ class Player extends ParticipatingObject {
             } else {
                 torque.scatter();
             }
+        } else {
+            console.error("wtf");
         }
     }
 
@@ -494,7 +493,7 @@ class Player extends ParticipatingObject {
             const oldTargetField = target.getField();
             const newTargetField = oldTargetField.getNeighborAt(direction);
             if (newTargetField.isEmpty()) {
-                target.hex = newTargetField.hex;
+                target.addMovement(newTargetField.hex);
             }
         } else if (counterBashWins) {
             this.direction = direction;

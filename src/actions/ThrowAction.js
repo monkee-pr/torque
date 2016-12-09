@@ -57,7 +57,7 @@ class ThrowAction extends Action {
                         targetPlayer.pickUpTorque();
                     } else {
                         // hit opposing player
-                        // targetPlayer.bash();
+                        targetPlayer.getBashed();
                         torque.scatter();
                     }
                 }

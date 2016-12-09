@@ -2,16 +2,12 @@ class Torque extends ParticipatingObject {
     constructor(gp, hex) {
         super(gp, hex);
 
-        this.vq = 0;
-        this.vr = 0;
-
         this.color = Color.TORQUE;
         this.image = resources.torque;
     }
 
-    update() {
-        super.update();
-        // this.move();
+    update(now) {
+        super.update(now);
     }
 
     draw(ctx) {
@@ -86,11 +82,13 @@ class Torque extends ParticipatingObject {
             drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
             if (this.image != null) {
-                const point = center.toIso(cameraPosition);
-                // const point = new Point(point1.x-4, point1.y-4);
-                const width = this.image.width * Camera.scale;
-                const height = this.image.height * Camera.scale;
-                ctx.drawImage(this.image, point.x - width/2, point.y - height/2, width, height);
+                const point = this.center;//center.toIso(cameraPosition);
+                if (point != null) {
+                    const width = this.image.width * Camera.scale;
+                    const height = this.image.height * Camera.scale;
+                    const anchor = new Point(point.x - width/2, point.y - height/2);
+                    ctx.drawImage(this.image, anchor.x, anchor.y, width, height);
+                }
             }
             // drawBorder();
         }
@@ -99,15 +97,15 @@ class Torque extends ParticipatingObject {
     onClick() {
     }
 
-    move() {
-        // set new position
-        const vector = new Hex(this.vq, this.vr);
-        this.hex = Hex.add(this.hex, vector);
-
-        // reset movement
-        this.vq = 0;
-        this.vr = 0;
-    }
+    // move() {
+    //     // set new position
+    //     const vector = new Hex(this.vq, this.vr);
+    //     this.hex = Hex.add(this.hex, vector);
+    //
+    //     // reset movement
+    //     this.vq = 0;
+    //     this.vr = 0;
+    // }
 
     getField() {
         const fields = this.gp.layers.getBoardFields();
@@ -117,36 +115,41 @@ class Torque extends ParticipatingObject {
     }
 
     scatter() {
-        const amountOfFieldsScattering = Math.randomInt(Torque.SCATTERING_DISTANCE_MIN, Torque.SCATTERING_DISTANCE_MAX);
-        let direction = Array.getRandomElement(Hex.ALL_DIRECTIONS);
-        // console.log("scatter");
-        // console.log(amountOfFieldsScattering + " " + direction);
-        for (var i = 0; i < amountOfFieldsScattering; i++) {
-            const field = this.getField();
-            let neighborField = field.getNeighborAt(direction);
-            if (neighborField == null) {
-                direction = field.getReboundDirection(direction);
-                neighborField = field.getNeighborAt(direction);
-            }
-
-            if (!neighborField.isAccessible()) {
-                // neighbor field is not accessible
-
-                if (neighborField.type == Field.TYPE_PIT) {
-                    this.gp.respawnTorque();
-                    return;
-                } else if (neighborField.type == Field.TYPE_HOLE) {
-                    this.scatter();
-                    return;
+        if (!this.isMoving) {
+            const amountOfFieldsScattering = Math.randomInt(Torque.SCATTERING_DISTANCE_MIN, Torque.SCATTERING_DISTANCE_MAX);
+            let direction = Array.getRandomElement(Hex.ALL_DIRECTIONS);
+            console.log("scatter");
+            console.log(amountOfFieldsScattering + " " + direction);
+            // debugger;
+            for (var i = 0; i < amountOfFieldsScattering; i++) {
+                const field = this.getField();
+                let neighborField = field.getNeighborAt(direction);
+                if (neighborField == null) {
+                    direction = field.getReboundDirection(direction);
+                    neighborField = field.getNeighborAt(direction);
                 }
-            } else {
-                this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
-                // console.log(this.hex);
 
-                const playerOfNeighbor = neighborField.getParticipatingObjects().filter(go => go instanceof Player)[0];
-                if (playerOfNeighbor != null) {
-                    playerOfNeighbor.pickUpTorque();
-                    return;
+                if (!neighborField.isAccessible()) {
+                    // neighbor field is not accessible
+
+                    if (neighborField.type == Field.TYPE_PIT) {
+                        this.gp.respawnTorque();
+                        return;
+                    } else if (neighborField.type == Field.TYPE_HOLE) {
+                        this.scatter();
+                        return;
+                    }
+                } else {
+                    // console.log("add torque move");
+                    this.addMovement(new Hex(neighborField.hex.q, neighborField.hex.r));
+                    // this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
+                    // console.log(this.hex);
+
+                    const playerOfNeighbor = neighborField.getParticipatingObjects().filter(go => go instanceof Player)[0];
+                    if (playerOfNeighbor != null) {
+                        playerOfNeighbor.pickUpTorque();
+                        return;
+                    }
                 }
             }
         }

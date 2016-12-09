@@ -121,6 +121,16 @@ class Field extends GameObject {
                 this.closeHole();
             }
         }
+
+        const participatingObjectsOfField = this.getParticipatingObjects();
+        const torque = participatingObjectsOfField.filter(go => go instanceof Torque)[0];
+        if (torque != null && (!this.isAccessible())) {
+            if (this.type == Field.TYPE_PIT) {
+                torque.respawn();
+            } else if (this.type == Field.TYPE_HOLE) {
+                torque.scatter();
+            }
+        }
     }
 
     draw(ctx) {
@@ -219,7 +229,6 @@ class Field extends GameObject {
                 ctx.strokeStyle = Color.BORDER_HOVER;
                 drawBorder = true;
             }
-            // if (this.gp.getAction() instanceof BashAction && this.hex.equals(new Hex(1, 1))) debugger;
 
             if (drawBorder) ctx.stroke();
 
@@ -348,10 +357,8 @@ class Field extends GameObject {
     }
 
     getParticipatingObjects() {
-        const gameObjects = this.gp.layers.getParticipatingObjects();
-        const objectsOnThisHex = gameObjects.filter(go => {
-            return go.hex.equals(this.hex)
-        });
+        const participatingObjects = this.gp.layers.getParticipatingObjects();
+        const objectsOnThisHex = participatingObjects.filter(po => po.hex.equals(this.hex));
 
         return objectsOnThisHex;
     }
@@ -375,15 +382,11 @@ class Field extends GameObject {
             if (action.mode == RunAction.MODE_MOVE) {
                 action.movePlayer(this.hex);
 
-                const gameObjectsOfField = this.getParticipatingObjects();
-                const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
-                if (torque != null) {
-                    if (action.player.canHoldTorque()) {
-                        action.player.pickUpTorque();
-                    } else {
-                       torque.scatter();
-                    }
-                }
+                // const gameObjectsOfField = this.getParticipatingObjects();
+                // const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
+                // if (torque != null) {
+                //     action.player.pickUpTorque();
+                // }
             } else {
                 action.turnPlayer(this.hex);
             }

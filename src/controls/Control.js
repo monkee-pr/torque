@@ -66,7 +66,7 @@ Control.click = (e, gp) => {
     const dragged = draggedDistance > Control.dragTolerance;
     Control.dragAnchor = null;
 
-    if (!dragged) {
+    if (!dragged && gp.activeClickBlockers.length <= 0) {
         const target = e.target;
         const x = target.width / target.clientWidth * e.clientX;
         const y = target.height / target.clientHeight * e.clientY;
