@@ -49,27 +49,8 @@ class ThrowAction extends Action {
             const currentHex = this.player.hex;
             const targetHex = field.hex;
             const torque = new Torque(this.gp, new Hex(currentHex.q, currentHex.r));
-            console.log("TORQUE");
-            console.log(torque);
             this.gp.addParticipatingObject(torque);
-            const participatingObjectsOfField = field.getParticipatingObjects();
-            const torque1 = participatingObjectsOfField.filter(go => go instanceof Torque)[0];
-            console.log(torque1);
             torque.addMovement(targetHex);
-
-            field.getParticipatingObjects().forEach(go => {
-                if (go instanceof Player) {
-                    const targetPlayer = go;
-                    if (true || targetPlayer.isTeamMateOf(this.player)) {
-                        // pass torque
-                        targetPlayer.pickUpTorque();
-                    } else {
-                        // hit opposing player
-                        targetPlayer.getBashed();
-                        torque.scatter();
-                    }
-                }
-            });
 
             // reset action's target field
             this.targetField = null;

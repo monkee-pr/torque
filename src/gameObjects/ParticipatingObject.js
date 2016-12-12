@@ -9,13 +9,12 @@ class ParticipatingObject extends GameObject {
         // this.standingAnimation = new Animation(sprites, 1000, Animation.TYPE_LOOP);
         this.isMoving = false;
         this.moveStartTime = null;
-        this.moveDuration = 200;   // ms
+        this.moveDuration = 500;   // ms
         this.movements = [];
-        // this.funcs = [];
+        this.funcs = [];
     }
 
     update(now) {
-        // if (this.movements.length > 0) console.log(this.movements[0]);
         super.update();
 
         const cameraPosition = this.gp.camera.position;
@@ -23,12 +22,10 @@ class ParticipatingObject extends GameObject {
         let centerPoint = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
         if (this.movements.length > 0) {
             // move
-            if (this instanceof Torque) console.log(this.movements);
-            const endHex = this.movements[0];
-            // if (this.constructor.name == "Torque") debugger;
 
             const cameraMode = this.gp.camera.getMode();
             if (cameraMode == Camera.MODE_ISOMETRIC) {
+                const endHex = this.movements[0];
                 if (this.moveStartTime == null) {
                     // start movement step
                     this.moveStartTime = Date.now();
@@ -46,17 +43,19 @@ class ParticipatingObject extends GameObject {
                         const runningTime = now - this.moveStartTime;
 
                         if (runningTime >= this.moveDuration) {
-                            console.log("end movement");
-                            console.log(this.movements[0]);
+                            // move animation is done
                             centerPoint = endPoint;
                             this.hex = endHex;
                             this.movements = this.movements.slice(1);
-                            this.moveStartTime = null;
-                            const index = this.gp.activeClickBlockers.indexOf(this);
-                            if (index >= -1) {
-                                this.gp.activeClickBlockers.splice(index, 1);
+                            this.moveStartTime = this.movements.length > 0 ? now : null;
+                            if (this.movements.length == 0) {
+                                const index = this.gp.activeClickBlockers.indexOf(this);
+                                if (index >= -1) {
+                                    this.gp.activeClickBlockers.splice(index, 1);
+                                }
                             }
                         } else {
+                            // move animation is still running
                             const x = startPoint.x + (dx / this.moveDuration * runningTime);
                             const y = startPoint.y + (dy / this.moveDuration * runningTime);
                             centerPoint = new Point(x, y);
@@ -64,14 +63,18 @@ class ParticipatingObject extends GameObject {
                     }
                 }
             } else {
-                this.hex = hex;
+                // const endHex = this.movements[0];
+                const endHex = this.movements[this.movements.length-1];
+                this.hex = endHex;
+                // this.movements = this.movements.slice(1);
+                this.movements = [];
             }
         } else {
             this.isMoving = false;
 
-            // if (this.funcs.length > 0) {
-            //     this.funcs.forEach(f => f());
-            // }
+            if (this.funcs.length > 0) {
+                this.funcs.forEach(f => f());
+            }
         }
 
         this.center = centerPoint;
@@ -85,7 +88,7 @@ class ParticipatingObject extends GameObject {
         // console.log(this);
     }
 
-    addMovement(steps) {    //, func
+    addMovement(steps, func) {
         // "steps" can be a single Hex object or an array of it
         // "func" is a function called after the last step of "steps" is finished (this will be moved if other steps are added before the spool is empty)
 
@@ -97,11 +100,11 @@ class ParticipatingObject extends GameObject {
         // ];
         // if (!(this.movements.length > 0 && steps.equals(this.movements[this.movements.length-1]))) {
             this.movements = this.movements.concat(steps);
-            console.log("move added to " + this.constructor.name);
-            console.log(steps);
+            // console.log("move added to " + this.constructor.name);
+            // console.log(steps);
             this.isMoving = true;
         // }
-        // if (typeof func == "function") this.funcs = this.funcs.concat(func);
+        if (typeof func == "function") this.funcs = this.funcs.concat(func);
 
     }
 }

@@ -175,6 +175,7 @@ class GamePanel {
         // highlight only clickable objects and only during an active action
         boardFields.forEach(f => f.isHighlighted = (action && clickableObjects.indexOf(f) != -1));
         gameObjects.forEach(go => go.isHighlighted = (action && clickableObjects.indexOf(go) != -1));
+        // console.log(boardFields.filter(f => f.isHovered));   // why is the open hole hovered always after a score?
 
         this.layers.update(now);
     }

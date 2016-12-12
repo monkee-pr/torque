@@ -118,39 +118,38 @@ class Torque extends ParticipatingObject {
         if (!this.isMoving) {
             const amountOfFieldsScattering = Math.randomInt(Torque.SCATTERING_DISTANCE_MIN, Torque.SCATTERING_DISTANCE_MAX);
             let direction = Array.getRandomElement(Hex.ALL_DIRECTIONS);
-            console.log("scatter");
-            console.log(amountOfFieldsScattering + " " + direction);
-            // debugger;
+            // console.log("scatter");
+            // console.log(amountOfFieldsScattering + " " + direction);
+            let batchHex = this.hex;
             for (var i = 0; i < amountOfFieldsScattering; i++) {
-                const field = this.getField();
-                let neighborField = field.getNeighborAt(direction);
+                const batchField = this.gp.layers.getBoardFields().filter(f => f.hex.equals(batchHex))[0];
+
+                let neighborField = batchField.getNeighborAt(direction);
                 if (neighborField == null) {
-                    direction = field.getReboundDirection(direction);
-                    neighborField = field.getNeighborAt(direction);
+                    direction = batchField.getReboundDirection(direction);
+                    neighborField = batchField.getNeighborAt(direction);
                 }
 
-                if (!neighborField.isAccessible()) {
-                    // neighbor field is not accessible
-
-                    if (neighborField.type == Field.TYPE_PIT) {
-                        this.gp.respawnTorque();
-                        return;
-                    } else if (neighborField.type == Field.TYPE_HOLE) {
-                        this.scatter();
-                        return;
-                    }
-                } else {
-                    // console.log("add torque move");
-                    this.addMovement(new Hex(neighborField.hex.q, neighborField.hex.r));
-                    // this.hex = new Hex(neighborField.hex.q, neighborField.hex.r);
-                    // console.log(this.hex);
+                // if (!neighborField.isAccessible()) {
+                //     // neighbor field is not accessible
+                //
+                //     if (neighborField.type == Field.TYPE_PIT) {
+                //         // this.gp.respawnTorque();
+                //         return;
+                //     } else if (neighborField.type == Field.TYPE_HOLE) {
+                //         // this.scatter();
+                //         return;
+                //     }
+                // } else {
+                    batchHex = new Hex(neighborField.hex.q, neighborField.hex.r);
+                    this.addMovement(batchHex);
 
                     const playerOfNeighbor = neighborField.getParticipatingObjects().filter(go => go instanceof Player)[0];
-                    if (playerOfNeighbor != null) {
-                        playerOfNeighbor.pickUpTorque();
+                    if (playerOfNeighbor != null || neighborField.type == Field.TYPE_PIT || neighborField.type == Field.TYPE_HOLE) {
+                        // torque got stopped by other player or special field
                         return;
                     }
-                }
+                // }
             }
         }
     }

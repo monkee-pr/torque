@@ -6,7 +6,10 @@ Control.dragTolerance = 5;
 Control.hoveredHex = null;
 
 Control.mouseDown = (e, gp) => {
-    Control.dragAnchor = new Point(e.x, e.y);
+    if (e.button == 0) {
+        // left click
+        Control.dragAnchor = new Point(e.x, e.y);
+    }
 }
 
 Control.mouseUp = (e, gp) => {
@@ -60,53 +63,55 @@ Control.drag = (e, gp) => {
 }
 
 Control.click = (e, gp) => {
-    const draggedWidth = Math.abs(e.x - Control.dragAnchor.x);
-    const draggedHeight = Math.abs(e.y - Control.dragAnchor.y);
-    const draggedDistance = Math.sqrt(Math.pow(draggedWidth, 2) + Math.pow(draggedHeight, 2));
-    const dragged = draggedDistance > Control.dragTolerance;
-    Control.dragAnchor = null;
+    if (e.button == 0) {
+        const draggedWidth = Math.abs(e.x - Control.dragAnchor.x);
+        const draggedHeight = Math.abs(e.y - Control.dragAnchor.y);
+        const draggedDistance = Math.sqrt(Math.pow(draggedWidth, 2) + Math.pow(draggedHeight, 2));
+        const dragged = draggedDistance > Control.dragTolerance;
+        Control.dragAnchor = null;
 
-    if (!dragged && gp.activeClickBlockers.length <= 0) {
-        const target = e.target;
-        const x = target.width / target.clientWidth * e.clientX;
-        const y = target.height / target.clientHeight * e.clientY;
-        const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
+        if (!dragged && gp.activeClickBlockers.length <= 0) {
+            const target = e.target;
+            const x = target.width / target.clientWidth * e.clientX;
+            const y = target.height / target.clientHeight * e.clientY;
+            const point = new Point(x, y);  // x and y are stretched to the actual displayed pixels
 
-        const uiElements = gp.layers.getUIElements();
-        let uiElementClicked = false;
-        uiElements.forEach(ui => {
-            if (!uiElementClicked && point.hits(ui.point, ui.width, ui.height)) {
-                ui.onClick(gp, point);
-                uiElementClicked = true;
-            }
-        });
+            const uiElements = gp.layers.getUIElements();
+            let uiElementClicked = false;
+            uiElements.forEach(ui => {
+                if (!uiElementClicked && point.hits(ui.point, ui.width, ui.height)) {
+                    ui.onClick(gp, point);
+                    uiElementClicked = true;
+                }
+            });
 
-        if (!uiElementClicked) {
-            if (gp.isPopupOpen()) {
-                gp.closeTopPopup();
-                gp.selectPlayer(gp.selectedPlayer);
-            } else {
-                const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular(gp.camera.position) : point;
+            if (!uiElementClicked) {
+                if (gp.isPopupOpen()) {
+                    gp.closeTopPopup();
+                    gp.selectPlayer(gp.selectedPlayer);
+                } else {
+                    const perspectivePoint = gp.camera.getMode() == Camera.MODE_ISOMETRIC ? point.toRegular(gp.camera.position) : point;
 
-                const anchor = gp.camera.position;
-                const hex = Point.pointToHex(anchor, perspectivePoint);
+                    const anchor = gp.camera.position;
+                    const hex = Point.pointToHex(anchor, perspectivePoint);
 
-                // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
-                const clickableObjects = gp.layers.getClickableObjects(gp);
-                const reversedClickableObjects = clickableObjects.slice().reverse();
-                let brk = false;
-                reversedClickableObjects.forEach(go => {
-                    if (!brk && go.hex != null && hex.equals(go.hex)) {
-                        go.onClick(gp);
-                        // console.log("click");
-                        // console.log(go);
-                        brk = true;
-                    }
-                });
+                    // reversing the array and breaking after the first hit will make only trigger the onClick of the latest GO added to the array
+                    const clickableObjects = gp.layers.getClickableObjects(gp);
+                    const reversedClickableObjects = clickableObjects.slice().reverse();
+                    let brk = false;
+                    reversedClickableObjects.forEach(go => {
+                        if (!brk && go.hex != null && hex.equals(go.hex)) {
+                            go.onClick(gp);
+                            // console.log("click");
+                            // console.log(go);
+                            brk = true;
+                        }
+                    });
+                }
             }
         }
+        Control.dragged = false;
     }
-    Control.dragged = false;
 }
 
 Control.scroll = (e, gp) => {

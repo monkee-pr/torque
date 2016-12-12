@@ -126,7 +126,7 @@ class Field extends GameObject {
         const torque = participatingObjects.filter(go => go instanceof Torque)[0];
         if (torque != null && (!this.isAccessible())) {
             if (this.type == Field.TYPE_PIT) {
-                torque.respawn();
+                this.gp.respawnTorque();
             } else if (this.type == Field.TYPE_HOLE) {
                 torque.scatter();
             }
@@ -381,12 +381,6 @@ class Field extends GameObject {
         if (action instanceof RunAction) {
             if (action.mode == RunAction.MODE_MOVE) {
                 action.movePlayer(this.hex);
-
-                // const gameObjectsOfField = this.getParticipatingObjects();
-                // const torque = gameObjectsOfField.filter(go => go instanceof Torque)[0];
-                // if (torque != null) {
-                //     action.player.pickUpTorque();
-                // }
             } else {
                 action.turnPlayer(this.hex);
             }
@@ -396,16 +390,16 @@ class Field extends GameObject {
             action.target(this);
             actionControl.submit(this.gp);
 
-            if (this.getParticipatingObjects().filter(go => go instanceof Torque).length > 0) {
-                // HOOOLE!!!
-                console.log("HOOOLE!!!");
-                const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
-                this.gp.scoreForTeam(scoringTeam);
-                if (scoringTeam == this.gp.activeTeam) {
-                    this.gp.startNextPush();
-                }
-                this.gp.respawnTorque();
-            }
+            // if (this.getParticipatingObjects().filter(go => go instanceof Torque).length > 0) {
+            //     // HOOOLE!!!
+            //     console.log("HOOOLE!!!");
+            //     const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
+            //     this.gp.scoreForTeam(scoringTeam);
+            //     if (scoringTeam == this.gp.activeTeam) {
+            //         this.gp.startNextPush();
+            //     }
+            //     this.gp.respawnTorque();
+            // }
         }
     }
 

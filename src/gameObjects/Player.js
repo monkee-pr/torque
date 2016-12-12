@@ -155,9 +155,24 @@ class Player extends ParticipatingObject {
         }
 
         // pickup torque if it's on player's field
-        const isOnSameFieldAsTorque = this.getField().getParticipatingObjects().filter(go => go instanceof Torque).length > 0;
-        if (isOnSameFieldAsTorque) {
-            this.pickUpTorque();
+        const torque = this.getField().getParticipatingObjects().filter(go => go instanceof Torque)[0];
+        if (torque != null) {
+            const action = this.gp.getAction();
+            if (action instanceof ThrowAction) {
+                // torque got thrown
+                const torqueThrownByTeamMate = action.player.isTeamMateOf(this);
+                if (torqueThrownByTeamMate) {
+                    // player tries to catch the torque
+                    this.pickUpTorque();
+                } else {
+                    // player gets git by the torque
+                    this.getBashed();
+                    torque.scatter();
+                }
+            } else {
+                // player was stepping on torque or torque was scattering to him
+                this.pickUpTorque();
+            }
         }
     }
 
@@ -194,40 +209,23 @@ class Player extends ParticipatingObject {
         ctx.lineTo(p5.x, p5.y);
         ctx.closePath();
 
-        // const drawBorder = () => {
-        //     // draw border
-        //     if (this.isHighlighted && this.isHovered) {
-        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-        //         ctx.strokeStyle = Color.BORDER_HIGHLIGHT_HOVER;
-        //     } else if (this.isHighlighted) {
-        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-        //         ctx.strokeStyle = Color.BORDER_HIGHLIGHT;
-        //     } else if (this.isHovered) {
-        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale * 2;
-        //         ctx.strokeStyle = Color.BORDER_HOVER;
-        //     } else {
-        //         ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
-        //         ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
-        //     }
-        //     ctx.stroke();
-        // }
-
         if (cameraMode == Camera.MODE_TOP_DOWN) {
             // fill area
             if (this.color) {
                 ctx.fillStyle = this.color;
                 ctx.fill();
             }
-            // drawBorder();
         } else if (cameraMode == Camera.MODE_ISOMETRIC) {
-            // drawBorder();
-
             const drawImage = () => {
                 const image = this.image;
                 if (image != null) {
                     const neighborField = this.getField().getNeighborAt(Hex.DIRECTION_TOP_RIGHT);
                     const neighborFieldHasGameObjects = neighborField != null && neighborField.getParticipatingObjects().length > 0;
-                    if (neighborFieldHasGameObjects) {
+                    // const neighborFieldIsHovered = neighborField != null && neighborField.isHovered;
+                    if (
+                        neighborFieldHasGameObjects
+                        // && neighborFieldIsHovered
+                    ) {
                         ctx.globalAlpha = 0.5;
                     }
                     const point = this.center;
@@ -254,7 +252,10 @@ class Player extends ParticipatingObject {
 
                         ctx.drawImage(imageForDirection, anchor.x, anchor.y, width, height);
                     }
-                    if (neighborFieldHasGameObjects) {
+                    if (
+                        neighborFieldHasGameObjects
+                        // && neighborFieldIsHovered
+                    ) {
                         ctx.globalAlpha = 1;
                     }
                 }
@@ -377,7 +378,13 @@ class Player extends ParticipatingObject {
 
     getField() {
         const fields = this.gp.layers.getBoardFields();
-        const thisField = fields.filter(f => f.hex.equals(this.hex))[0];
+        const theseFields = fields.filter(f => f.hex.equals(this.hex));
+        const thisField = theseFields[0];
+        if (thisField == undefined) {
+            console.log("data");
+            console.log(this);
+            console.log(theseFields);
+        }
 
         return thisField;
     }
@@ -469,7 +476,7 @@ class Player extends ParticipatingObject {
         if (torque != null) {
             if (!this.isMoving && !torque.isMoving) {
                 if (this.canHoldTorque()) {
-                    // recognize direction and pickup chance here and remove it from GamePanel's respawnTorque() tileHoleOpenedRed
+                    // recognize direction and pickup chance here
                     const pickUpSucceeds = true;
                     if (pickUpSucceeds) {
                         this.status = Player.STATUS_HOLD_TORQUE;
@@ -488,9 +495,8 @@ class Player extends ParticipatingObject {
                     torque.scatter();
                 }
             }
-        } else {
-            console.error("wtf");
-            // debugger;
+        // } else {
+        //     console.error("wtf");
         }
     }
 

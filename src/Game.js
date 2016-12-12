@@ -1,6 +1,10 @@
 class Game {
     constructor() {
         const cv = document.getElementById("canvas");
+        cv.oncontextmenu = (e) => {
+            // return false;
+            e.preventDefault();
+        }
 
         // create game panel
         this.gp = new GamePanel(cv);
@@ -11,7 +15,6 @@ class Game {
         cv.addEventListener("mouseup", e => Control.mouseUp(e, this.gp));
         cv.addEventListener("click", e => Control.click(e, this.gp));
         cv.addEventListener("mousewheel", e => Control.scroll(e, this.gp));
-        cv.addEventListener("dragstart", e => Control.drag(e, this.gp));
 
 
         this.run();
