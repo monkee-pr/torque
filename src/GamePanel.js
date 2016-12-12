@@ -165,15 +165,16 @@ class GamePanel {
 
         let field;
         let player;
-        if (this.getAction() instanceof BashAction) {
+        const action = this.getAction();
+        if (action instanceof BashAction) {
             field = boardFields.filter(f => f.hex.equals(new Hex(1, 1)))[0];
             player = field.getParticipatingObjects()[0];
             const x = fieldsAndGOs.indexOf(player);
             const y = clickableObjects.indexOf(player);
         }
-        // highlight only clickable objects
-        boardFields.forEach(f => f.isHighlighted = (clickableObjects.indexOf(f) != -1));
-        gameObjects.forEach(go => go.isHighlighted = (clickableObjects.indexOf(go) != -1));
+        // highlight only clickable objects and only during an active action
+        boardFields.forEach(f => f.isHighlighted = (action && clickableObjects.indexOf(f) != -1));
+        gameObjects.forEach(go => go.isHighlighted = (action && clickableObjects.indexOf(go) != -1));
 
         this.layers.update(now);
     }

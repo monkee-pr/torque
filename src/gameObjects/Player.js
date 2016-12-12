@@ -46,45 +46,67 @@ class Player extends ParticipatingObject {
                 break;
         }
 
-        // image for iso perspective
-        this.imageRegular = null;  // size of 560x665 px
-        this.imageBashed = null;  // size of 560x665 px
+        // images for iso perspective (size of 560x665 px)
+        this.imageRegularLeft = null;
+        this.imageBashedLeft = null;
+        this.imageHoldingLeft = null;
+        this.imageRegularRight = null;
+        this.imageBashedRight = null;
+        this.imageHoldingRight = null;
         switch (this.team.id) {
             case Team.TEAM_1:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.imageRegular = resources.playerMaulBlueRegular;
-                        this.imageBashed = resources.playerMaulBlueBashed;
-                        this.imageHolding = resources.playerMaulBlueBashed;
+                        this.imageRegularLeft = resources.playerMaulBlueRegularLeft;
+                        this.imageRegularRight = resources.playerMaulBlueRegularRight;
+                        this.imageBashedLeft = resources.playerMaulBlueBashedLeft;
+                        this.imageBashedRight = resources.playerMaulBlueBashedRight;
+                        this.imageHoldingLeft = resources.playerMaulBlueBashedLeft;
+                        this.imageHoldingRight = resources.playerMaulBlueBashedRight;
                         break;
                     case Player.ROLE_BLADE:
-                        this.imageRegular = resources.playerBladeBlueRegular;
-                        this.imageBashed = resources.playerBladeBlueBashed;
-                        this.imageHolding = resources.playerBladeBlueHolding;
+                        this.imageRegularLeft = resources.playerBladeBlueRegularLeft;
+                        this.imageRegularRight = resources.playerBladeBlueRegularRight;
+                        this.imageBashedLeft = resources.playerBladeBlueBashedLeft;
+                        this.imageBashedRight = resources.playerBladeBlueBashedRight;
+                        this.imageHoldingLeft = resources.playerBladeBlueHoldingLeft;
+                        this.imageHoldingRight = resources.playerBladeBlueHoldingRight;
                         break;
                     case Player.ROLE_DART:
-                        this.imageRegular = resources.playerDartBlueRegular;
-                        this.imageBashed = resources.playerDartBlueBashed;
-                        this.imageHolding = resources.playerDartBlueBashed;
+                        this.imageRegularLeft = resources.playerDartBlueRegularLeft;
+                        this.imageRegularRight = resources.playerDartBlueRegularRight;
+                        this.imageBashedLeft = resources.playerDartBlueBashedLeft;
+                        this.imageBashedRight = resources.playerDartBlueBashedRight;
+                        this.imageHoldingLeft = resources.playerDartBlueBashedLeft;
+                        this.imageHoldingRight = resources.playerDartBlueBashedRight;
                         break;
                 }
                 break;
             case Team.TEAM_2:
                 switch (this.role) {
                     case Player.ROLE_MAUL:
-                        this.imageRegular = resources.playerMaulRedRegular;
-                        this.imageBashed = resources.playerMaulRedBashed;
-                        this.imageHolding = resources.playerMaulRedBashed;
+                        this.imageRegularLeft = resources.playerMaulRedRegularLeft;
+                        this.imageRegularRight = resources.playerMaulRedRegularRight;
+                        this.imageBashedLeft = resources.playerMaulRedBashedLeft;
+                        this.imageBashedRight = resources.playerMaulRedBashedRight;
+                        this.imageHoldingLeft = resources.playerMaulRedBashedLeft;
+                        this.imageHoldingRight = resources.playerMaulRedBashedRight;
                         break;
                     case Player.ROLE_BLADE:
-                        this.imageRegular = resources.playerBladeRedRegular;
-                        this.imageBashed = resources.playerBladeRedBashed;
-                        this.imageHolding = resources.playerBladeRedBashed;
+                        this.imageRegularLeft = resources.playerBladeRedRegularLeft;
+                        this.imageRegularRight = resources.playerBladeRedRegularRight;
+                        this.imageBashedLeft = resources.playerBladeRedBashedLeft;
+                        this.imageBashedRight = resources.playerBladeRedBashedRight;
+                        this.imageHoldingLeft = resources.playerBladeRedBashedLeft;
+                        this.imageHoldingRight = resources.playerBladeRedBashedRight;
                         break;
                     case Player.ROLE_DART:
-                        this.imageRegular = resources.playerDartRedRegular;
-                        this.imageBashed = resources.playerDartRedBashed;
-                        this.imageHolding = resources.playerDartRedBashed;
+                        this.imageRegularLeft = resources.playerDartRedRegularLeft;
+                        this.imageRegularRight = resources.playerDartRedRegularRight;
+                        this.imageBashedLeft = resources.playerDartRedBashedLeft;
+                        this.imageBashedRight = resources.playerDartRedBashedRight;
+                        this.imageHoldingLeft = resources.playerDartRedBashedLeft;
+                        this.imageHoldingRight = resources.playerDartRedBashedRight;
                         break;
                 }
                 break;
@@ -99,6 +121,38 @@ class Player extends ParticipatingObject {
         field.isSelected = this.isSelected;
         field.isHighlighted = this.isHighlighted;
         field.isHovered = this.isHovered;
+
+        // image
+        switch (this.direction) {
+            // case Hex.DIRECTION_TOP_RIGHT:
+            // case Hex.DIRECTION_RIGHT:
+            // case Hex.DIRECTION_BOTTOM_RIGHT:
+            case Hex.DIRECTION_RIGHT:
+            case Hex.DIRECTION_BOTTOM_RIGHT:
+            case Hex.DIRECTION_BOTTOM_LEFT:
+                switch (this.status) {
+                    case Player.STATUS_BASHED:
+                        this.image = this.imageBashedRight;
+                        break;
+                    case Player.STATUS_HOLD_TORQUE:
+                        this.image = this.imageHoldingRight;
+                        break;
+                    default:
+                        this.image = this.imageRegularRight;
+                }
+                break;
+            default:
+                switch (this.status) {
+                    case Player.STATUS_BASHED:
+                        this.image = this.imageBashedLeft;
+                        break;
+                    case Player.STATUS_HOLD_TORQUE:
+                        this.image = this.imageHoldingLeft;
+                        break;
+                    default:
+                        this.image = this.imageRegularLeft;
+                }
+        }
 
         // pickup torque if it's on player's field
         const isOnSameFieldAsTorque = this.getField().getParticipatingObjects().filter(go => go instanceof Torque).length > 0;
@@ -169,17 +223,6 @@ class Player extends ParticipatingObject {
             // drawBorder();
 
             const drawImage = () => {
-                switch (this.status) {
-                    case Player.STATUS_BASHED:
-                        this.image = this.imageBashed;
-                        break;
-                    case Player.STATUS_HOLD_TORQUE:
-                        this.image = this.imageHolding;
-                        break;
-                    default:
-                        this.image = this.imageRegular;
-                }
-
                 const image = this.image;
                 if (image != null) {
                     const neighborField = this.getField().getNeighborAt(Hex.DIRECTION_TOP_RIGHT);
@@ -194,7 +237,22 @@ class Player extends ParticipatingObject {
                         const height = image.height * Camera.scale;
                         const anchor = new Point(point.x - width/2, point.y - (height - 150*Camera.scale));
 
-                        ctx.drawImage(image, anchor.x, anchor.y, width, height);
+                        let imageForDirection = null;
+                        switch (this.direction) {
+                            case Hex.DIRECTION_TOP_RIGHT:
+                            case Hex.DIRECTION_RIGHT:
+                            case Hex.DIRECTION_BOTTOM_RIGHT:
+                            // case Hex.DIRECTION_RIGHT:
+                            // case Hex.DIRECTION_BOTTOM_RIGHT:
+                            // case Hex.DIRECTION_BOTTOM_LEFT:
+                                imageForDirection = image;  // right
+                                break;
+                            default:
+                                imageForDirection = image;
+                        }
+                        // if (this.hex.equals(new Hex(1, -1))) console.log(imageForDirection);
+
+                        ctx.drawImage(imageForDirection, anchor.x, anchor.y, width, height);
                     }
                     if (neighborFieldHasGameObjects) {
                         ctx.globalAlpha = 1;
@@ -408,29 +466,31 @@ class Player extends ParticipatingObject {
         const gp = this.gp;
         const participatingObjectsOfField = this.getField().getParticipatingObjects();
         const torque = participatingObjectsOfField.filter(go => go instanceof Torque)[0];
-
         if (torque != null) {
-            if (this.canHoldTorque()) {
-                // recognize direction and pickup chance here and remove it from GamePanel's respawnTorque() tileHoleOpenedRed
-                const pickUpSucceeds = true;
-                if (pickUpSucceeds) {
-                    this.status = Player.STATUS_HOLD_TORQUE;
+            if (!this.isMoving && !torque.isMoving) {
+                if (this.canHoldTorque()) {
+                    // recognize direction and pickup chance here and remove it from GamePanel's respawnTorque() tileHoleOpenedRed
+                    const pickUpSucceeds = true;
+                    if (pickUpSucceeds) {
+                        this.status = Player.STATUS_HOLD_TORQUE;
 
-                    gp.removeParticipatingObject(torque);
+                        gp.removeParticipatingObject(torque);
+                    } else {
+                        torque.scatter();
+                    }
+
+                    const action = this.gp.getAction();
+                    if (action instanceof RunAction && action.player == this) {
+                        action.remainingSteps = 0;
+                        action.mode = RunAction.MODE_TURN;
+                    }
                 } else {
                     torque.scatter();
                 }
-
-                const action = this.gp.getAction();
-                if (action instanceof RunAction && action.player == this) {
-                    action.remainingSteps = 0;
-                    action.mode = RunAction.MODE_TURN;
-                }
-            } else {
-                torque.scatter();
             }
         } else {
             console.error("wtf");
+            // debugger;
         }
     }
 

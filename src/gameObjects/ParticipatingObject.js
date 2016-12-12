@@ -9,11 +9,9 @@ class ParticipatingObject extends GameObject {
         // this.standingAnimation = new Animation(sprites, 1000, Animation.TYPE_LOOP);
         this.isMoving = false;
         this.moveStartTime = null;
-        this.moveDuration = 500;   // ms
+        this.moveDuration = 200;   // ms
         this.movements = [];
-        this.funcs = [];
-
-        // this.movingAnimation =
+        // this.funcs = [];
     }
 
     update(now) {
@@ -25,8 +23,7 @@ class ParticipatingObject extends GameObject {
         let centerPoint = Hex.hexToPoint(cameraPosition, this.hex).toIso(cameraPosition);
         if (this.movements.length > 0) {
             // move
-            // console.log(this.movements);
-            this.isMoving = true;
+            if (this instanceof Torque) console.log(this.movements);
             const endHex = this.movements[0];
             // if (this.constructor.name == "Torque") debugger;
 
@@ -72,9 +69,9 @@ class ParticipatingObject extends GameObject {
         } else {
             this.isMoving = false;
 
-            if (this.funcs.length > 0) {
-                this.funcs.forEach(f => f());
-            }
+            // if (this.funcs.length > 0) {
+            //     this.funcs.forEach(f => f());
+            // }
         }
 
         this.center = centerPoint;
@@ -88,7 +85,7 @@ class ParticipatingObject extends GameObject {
         // console.log(this);
     }
 
-    addMovement(steps, func) {
+    addMovement(steps) {    //, func
         // "steps" can be a single Hex object or an array of it
         // "func" is a function called after the last step of "steps" is finished (this will be moved if other steps are added before the spool is empty)
 
@@ -102,8 +99,9 @@ class ParticipatingObject extends GameObject {
             this.movements = this.movements.concat(steps);
             console.log("move added to " + this.constructor.name);
             console.log(steps);
+            this.isMoving = true;
         // }
-        if (typeof func == "function") this.funcs = this.funcs.concat(func);
+        // if (typeof func == "function") this.funcs = this.funcs.concat(func);
 
     }
 }

@@ -122,8 +122,8 @@ class Field extends GameObject {
             }
         }
 
-        const participatingObjectsOfField = this.getParticipatingObjects();
-        const torque = participatingObjectsOfField.filter(go => go instanceof Torque)[0];
+        const participatingObjects = this.getParticipatingObjects();
+        const torque = participatingObjects.filter(go => go instanceof Torque)[0];
         if (torque != null && (!this.isAccessible())) {
             if (this.type == Field.TYPE_PIT) {
                 torque.respawn();
@@ -240,7 +240,7 @@ class Field extends GameObject {
                         // draw remaining amount of steps in the field
                         text = action.remainingSteps;
                     } else {
-                        text = "@";
+                        text = "";
                     }
 
                     const point1 = Hex.hexToPoint(cameraPosition, this.hex);
