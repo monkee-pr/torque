@@ -7,6 +7,7 @@ class Field extends GameObject {
         this.type = type;
         this.strikeArea = strikeArea;
         this.isOpen = type == Field.TYPE_HOLE ? false : null;   // only for field of the type "hole"
+        this.isTargeted = false;    // only for type "hole". It's targeted during the torque's movement animation if it's thrown at it
         this.isSpawnPoint = type == Field.TYPE_MIDFIELD && (hex.q + hex.r)*2 == hex.r ? true : false;
 
         if (type == Field.TYPE_MIDFIELD) {
@@ -95,8 +96,8 @@ class Field extends GameObject {
     update() {
         super.update();
 
+        // open / close the hole
         if (this.type == Field.TYPE_HOLE) {
-
             const thisObj = this;
             const boardFields = this.gp.layers.getBoardFields();
             const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == thisObj.strikeArea && f.teamSide == thisObj.teamSide);
@@ -115,20 +116,48 @@ class Field extends GameObject {
                 return false;
             });
 
-            if (fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque.length > 0) {
-                this.openHole();
+            const action = this.gp.getAction();
+            if (this.isOpen) {
+                if (fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque.length == 0 && !this.isTargeted) {
+                    this.closeHole();
+                }
             } else {
-                this.closeHole();
+                if (fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque.length > 0 || this.isTargeted) {
+                    this.openHole();
+                }
             }
         }
 
+        // interact with the torque
         const participatingObjects = this.getParticipatingObjects();
         const torque = participatingObjects.filter(go => go instanceof Torque)[0];
-        if (torque != null && (!this.isAccessible())) {
+        // if (this.hex.equals(new Hex(5, 3))) {
+        //     console.log(torque != null);
+        //     console.log(!this.isAccessible());
+        // }
+        if (
+            torque != null
+            && (
+                !this.type == Field.TYPE_PIT
+                || this.type == Field.TYPE_HOLE
+            )
+        ) {
             if (this.type == Field.TYPE_PIT) {
                 this.gp.respawnTorque();
             } else if (this.type == Field.TYPE_HOLE) {
-                torque.scatter();
+                if (this.isOpen) {
+                    // HOOOLE!!!
+                    console.log("HOOOLE!!!");
+                    this.isTargeted = false;
+                    const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
+                    this.gp.scoreForTeam(scoringTeam);
+                    if (scoringTeam == this.gp.activeTeam) {
+                        this.gp.startNextPush();
+                    }
+                    this.gp.respawnTorque();
+                } else {
+                    torque.scatter();
+                }
             }
         }
     }
@@ -201,7 +230,7 @@ class Field extends GameObject {
         if (true) {//cameraMode == Camera.MODE_TOP_DOWN || this.type != Field.TYPE_HOLE) {
             // draw border
             let drawBorder = false;
-            if (this.type != Field.TYPE_HOLE) {
+            if (this.type != Field.TYPE_HOLE && this.type != Field.TYPE_RESPAWN) {
                 // regular border
                 ctx.lineWidth = Field.BORDER_WIDTH * Camera.scale;
                 ctx.strokeStyle = Color.FIELD_BORDER_REGULAR;
@@ -444,6 +473,7 @@ Field.TYPE_HOT_ZONE = "hot_zone";
 Field.TYPE_SUPER_HOT_ZONE = "super_hot_zone";
 Field.TYPE_PIT = "pit";
 Field.TYPE_MIDFIELD = "midfield";
+Field.TYPE_RESPAWN = "respawn";
 
 Field.STRIKE_AREA_BACK = "back";
 Field.STRIKE_AREA_LEFT = "left";

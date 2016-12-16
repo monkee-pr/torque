@@ -45,6 +45,7 @@ class ThrowAction extends Action {
         // spawn torque in target field
         if (this.targetField != null) {
             const field = this.targetField;
+            field.isTargeted = true;
 
             const currentHex = this.player.hex;
             const targetHex = field.hex;

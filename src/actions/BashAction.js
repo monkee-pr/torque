@@ -38,8 +38,6 @@ class BashAction extends Action {
         const x = this.possibleTargets.indexOf(player);
         if (player != null && this.possibleTargets.indexOf(player) != -1) {
             this.targetPlayer = player;
-            console.log("target");
-            console.log(player);
         }
     }
 

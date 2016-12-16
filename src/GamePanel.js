@@ -74,9 +74,9 @@ class GamePanel {
 
         this.actionsPerformed = 0;
 
-        this.addUIElement(new TurnInfo(this));
-        this.addUIElement(new SwitchPerspective(this));
-        this.addUIElement(new ScoreInfo(this));
+        // this.addUIElement(new TurnInfo(this));
+        // this.addUIElement(new SwitchPerspective(this));
+        // this.addUIElement(new ScoreInfo(this));
     }
 
     setBackground(bg) {
@@ -228,10 +228,6 @@ class GamePanel {
     }
 
     respawnTorque() {
-        // if (this.actionsPerformed < GamePanel.ACTIONS_PER_TURN) {
-        //     this.startNextPush();
-        // }
-
         const gameObjects = this.layers.getParticipatingObjects();
         const torque = gameObjects.filter(go => go instanceof Torque)[0];
 
@@ -253,19 +249,13 @@ class GamePanel {
 
             if (playerCollidingWith != null) {
                 // torque collides with player
-                const landingField = passingFields.filter(f => f.getParticipatingObjects().indexOf(playerCollidingWith) != -1)[0];
-                torque.hex = new Hex(landingField.hex.q, landingField.hex.r);
-                if (false) { // player faces the torque
-                    playerCollidingWith.pickUpTorque();
-                } else {
-                    // bash player
-                    torque.scatter();
-                }
-            } else {
-                // torque reaches landing field without any collisions
-                const landingField = passingFields[passingFields.length-1];
-                torque.hex = new Hex(landingField.hex.q, landingField.hex.r);
+                const shortenIndex = passingFields.indexOf(playerCollidingWith.getField());
+                passingFields.splice(shortenIndex+1);
             }
+
+            const passingHexes = passingFields.map(f => f.hex);
+            torque.addMovement(passingHexes);
+            torque.hex = this.activeTeam == this.team1 ? new Hex(3, -6) : new Hex(-3, 6);
         }
     }
 
