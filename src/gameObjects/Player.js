@@ -61,8 +61,8 @@ class Player extends ParticipatingObject {
                         this.imageRegularRight = resources.playerMaulBlueRegularRight;
                         this.imageBashedLeft = resources.playerMaulBlueBashedLeft;
                         this.imageBashedRight = resources.playerMaulBlueBashedRight;
-                        this.imageHoldingLeft = resources.playerMaulBlueBashedLeft;
-                        this.imageHoldingRight = resources.playerMaulBlueBashedRight;
+                        this.imageHoldingLeft = resources.playerMaulBlueHoldingLeft;
+                        this.imageHoldingRight = resources.playerMaulBlueHoldingRight;
                         break;
                     case Player.ROLE_BLADE:
                         this.imageRegularLeft = resources.playerBladeBlueRegularLeft;
@@ -77,8 +77,8 @@ class Player extends ParticipatingObject {
                         this.imageRegularRight = resources.playerDartBlueRegularRight;
                         this.imageBashedLeft = resources.playerDartBlueBashedLeft;
                         this.imageBashedRight = resources.playerDartBlueBashedRight;
-                        this.imageHoldingLeft = resources.playerDartBlueBashedLeft;
-                        this.imageHoldingRight = resources.playerDartBlueBashedRight;
+                        this.imageHoldingLeft = resources.playerDartBlueHoldingLeft;
+                        this.imageHoldingRight = resources.playerDartBlueHoldingRight;
                         break;
                 }
                 break;
@@ -89,24 +89,24 @@ class Player extends ParticipatingObject {
                         this.imageRegularRight = resources.playerMaulRedRegularRight;
                         this.imageBashedLeft = resources.playerMaulRedBashedLeft;
                         this.imageBashedRight = resources.playerMaulRedBashedRight;
-                        this.imageHoldingLeft = resources.playerMaulRedBashedLeft;
-                        this.imageHoldingRight = resources.playerMaulRedBashedRight;
+                        this.imageHoldingLeft = resources.playerMaulRedHoldingLeft;
+                        this.imageHoldingRight = resources.playerMaulRedHoldingRight;
                         break;
                     case Player.ROLE_BLADE:
                         this.imageRegularLeft = resources.playerBladeRedRegularLeft;
                         this.imageRegularRight = resources.playerBladeRedRegularRight;
                         this.imageBashedLeft = resources.playerBladeRedBashedLeft;
                         this.imageBashedRight = resources.playerBladeRedBashedRight;
-                        this.imageHoldingLeft = resources.playerBladeRedBashedLeft;
-                        this.imageHoldingRight = resources.playerBladeRedBashedRight;
+                        this.imageHoldingLeft = resources.playerBladeRedHoldingLeft;
+                        this.imageHoldingRight = resources.playerBladeRedHoldingRight;
                         break;
                     case Player.ROLE_DART:
                         this.imageRegularLeft = resources.playerDartRedRegularLeft;
                         this.imageRegularRight = resources.playerDartRedRegularRight;
                         this.imageBashedLeft = resources.playerDartRedBashedLeft;
                         this.imageBashedRight = resources.playerDartRedBashedRight;
-                        this.imageHoldingLeft = resources.playerDartRedBashedLeft;
-                        this.imageHoldingRight = resources.playerDartRedBashedRight;
+                        this.imageHoldingLeft = resources.playerDartRedHoldingLeft;
+                        this.imageHoldingRight = resources.playerDartRedHoldingRight;
                         break;
                 }
                 break;
@@ -166,7 +166,7 @@ class Player extends ParticipatingObject {
                     this.pickUpTorque();
                 } else {
                     // player gets git by the torque
-                    this.getBashed();
+                    this.fall();
                     torque.scatter();
                 }
             } else {
@@ -380,11 +380,6 @@ class Player extends ParticipatingObject {
         const fields = this.gp.layers.getBoardFields();
         const theseFields = fields.filter(f => f.hex.equals(this.hex));
         const thisField = theseFields[0];
-        if (thisField == undefined) {
-            console.log("data");
-            console.log(this);
-            console.log(theseFields);
-        }
 
         return thisField;
     }
@@ -436,11 +431,11 @@ class Player extends ParticipatingObject {
         return threadZone;
     }
 
-    isInThreadZone(player) {
-        const threadZone = this.getThreadZone();
-        const players = threadZone.map(f => f.getParticipatingObjects()[0]).filter(go => go instanceof Player);
+    isInThreadZoneOf(player) {
+        const threadZone = player.getThreadZone();
+        const players = threadZone.map(f => f.getParticipatingObjects()[0]).filter(po => po instanceof Player);
 
-        return players.indexOf(player) != -1;
+        return players.indexOf(this) != -1;
     }
 
     canHoldTorque() {
@@ -516,16 +511,20 @@ class Player extends ParticipatingObject {
     bash(target) {
         const direction = Hex.isNeighborAt(this.hex, target.hex);
 
-        const bashResult = 3;   // roll
+        const bashRolls = this.getBashRolls();
+        const playerStrength = this.getStrength();
+        const bashResult = Chance.amountSuccessfullRolls(bashRolls, playerStrength);
 
         let bashWins = false;
         let counterBashWins = false;
         let dodgeWins = false;
         let draw = false;
-        const triggerCounterBash = this.isInThreadZone(target);
+        const triggerCounterBash = this.isInThreadZoneOf(target);
         if (triggerCounterBash) {
             // trigger counter bash
-            const counterBashResult = target.counterBash();
+            const counterBashRolls = target.getCounterBashRolls();
+            const targetStrength = target.getStrength();
+            const counterBashResult = Chance.amountSuccessfullRolls(counterBashRolls, targetStrength);
             if (counterBashResult > bashResult) {
                 // counter bash succeeded -> player gets bashed
                 counterBashWins = true;
@@ -538,7 +537,9 @@ class Player extends ParticipatingObject {
             }
         } else {
             // target tries to dodge
-            const dodgeResult = target.dodge();
+            const dodgeRolls = target.getDodgeRolls();
+            const targetAgility = target.getAgility();
+            const dodgeResult = Chance.amountSuccessfullRolls(dodgeRolls, targetAgility);
             if (dodgeResult > bashResult) {
                 // dodge succeeded
                 dodgeWins = true;
@@ -555,7 +556,7 @@ class Player extends ParticipatingObject {
             this.direction = direction;
             target.direction = Hex.mirrorDirection(direction);
 
-            target.getBashed();
+            target.fall();
             const oldTargetField = target.getField();
             const newTargetField = oldTargetField.getNeighborAt(direction);
             if (newTargetField.isEmpty()) {
@@ -565,7 +566,7 @@ class Player extends ParticipatingObject {
             this.direction = direction;
             target.direction = Hex.mirrorDirection(direction);
 
-            this.getBashed();
+            this.fall();
             const oldField = this.getField();
             const newField = oldField.getNeighborAt(Hex.mirrorDirection(direction));
             if (newField.isEmpty()) {
@@ -580,19 +581,7 @@ class Player extends ParticipatingObject {
         }
     }
 
-    counterBash() {
-        const rollResult = 2;   // roll
-
-        return rollResult;
-    }
-
-    dodge() {
-        const rollResult = 0;   // roll
-
-        return rollResult;
-    }
-
-    getBashed() {
+    fall() {
         if (this.status == Player.STATUS_HOLD_TORQUE) {
             this.dropTorque();
         }
@@ -604,18 +593,93 @@ class Player extends ParticipatingObject {
         return player != null && this.team.id == player.team.id;
     }
 
-    actionRun() {
+    getBashRolls() {
+        const baseRolls = 3;
 
+        const rollsAddedByRole = this.role == Player.ROLE_MAUL ? 1 : 0;
+
+        const playerMoved = false;
+        const rollsAddedByMovement = playerMoved ? 1 : 0;
+
+        const opposingPlayersInNeighborFields = this.getField().getNeighbors().map(f => f.getParticipatingObjects().filter(po => po instanceof Player)[0]).filter(p => p != null);
+        const threateningOpponents = opposingPlayersInNeighborFields.filter(p => this.isInThreadZoneOf(p));
+        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that's about to get bashed -> -1
+        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+
+        const rolls = baseRolls + rollsAddedByRole + rollsAddedByMovement - rollsSubtractedByThreateningOpponents;
+        return rolls;
     }
 
-    // add this after demo
-    actionSprint() {
+    getCounterBashRolls() {
+        const baseRolls = 3;
+
+        const rollsAddedByRole = this.role == Player.ROLE_MAUL ? 1 : 0;
+
+        const opposingPlayersInNeighborFields = this.getField().getNeighbors().map(f => f.getParticipatingObjects().filter(po => po instanceof Player)[0]).filter(p => p != null);
+        const threateningOpponents = opposingPlayersInNeighborFields.filter(p => this.isInThreadZoneOf(p));
+        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that's about to get bashed -> -1
+        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+
+        const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
+        return rolls;
     }
 
-    actionBash() {
+    getDodgeRolls() {
+        const baseRolls = 3;
+
+        const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
+
+        const opposingPlayersInNeighborFields = this.getField().getNeighbors().map(f => f.getParticipatingObjects().filter(po => po instanceof Player)[0]).filter(p => p != null);
+        const threateningOpponents = opposingPlayersInNeighborFields.filter(p => this.isInThreadZoneOf(p));
+        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that's about to get bashed -> -1
+        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+
+        const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
+        return rolls;
     }
 
-    actionThrow() {
+    getStrength()  {
+        switch (this.role) {
+            case Player.ROLE_MAUL:
+                return 3;
+            case Player.ROLE_BLADE:
+                return 4;
+            case Player.ROLE_DART:
+                return 5;
+        }
+    }
+
+    getAgility()  {
+        switch (this.role) {
+            case Player.ROLE_MAUL:
+                return 4;
+            case Player.ROLE_BLADE:
+                return 3;
+            case Player.ROLE_DART:
+                return 3;
+        }
+    }
+
+    getDexterity()  {
+        switch (this.role) {
+            case Player.ROLE_MAUL:
+                return 5;
+            case Player.ROLE_BLADE:
+                return 4;
+            case Player.ROLE_DART:
+                return 3;
+        }
+    }
+
+    getArmor()  {
+        switch (this.role) {
+            case Player.ROLE_MAUL:
+                return 3;
+            case Player.ROLE_BLADE:
+                return 4;
+            case Player.ROLE_DART:
+                return 4;
+        }
     }
 }
 

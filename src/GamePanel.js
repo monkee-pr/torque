@@ -74,9 +74,9 @@ class GamePanel {
 
         this.actionsPerformed = 0;
 
-        // this.addUIElement(new TurnInfo(this));
-        // this.addUIElement(new SwitchPerspective(this));
-        // this.addUIElement(new ScoreInfo(this));
+        this.addUIElement(new TurnInfo(this));
+        this.addUIElement(new SwitchPerspective(this));
+        this.addUIElement(new ScoreInfo(this));
     }
 
     setBackground(bg) {

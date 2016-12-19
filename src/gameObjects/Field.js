@@ -409,7 +409,37 @@ class Field extends GameObject {
         const action = actionControl.action;
         if (action instanceof RunAction) {
             if (action.mode == RunAction.MODE_MOVE) {
+
+                // move player in every case
                 action.movePlayer(this.hex);
+
+                const player = action.player;
+
+                const playerField = player.getField();
+                const playerFieldNeighbors = playerField.getNeighbors();
+                const playersOnPlayerFieldNeighbors = Array.flatten(playerFieldNeighbors.map(n => n.getParticipatingObjects())).filter(po => po instanceof Player);
+                const opposingPlayersOnPlayerFieldNeighbors = playersOnPlayerFieldNeighbors.filter(p => !p.isTeamMateOf(player));
+                const opposingPlayersHotZoneContainingCurrentPlayerField = opposingPlayersOnPlayerFieldNeighbors.filter(p => player.isInThreadZoneOf(p));
+
+                const neighbors = this.getNeighbors();
+                const playersOnNeighbors = Array.flatten(neighbors.map(n => n.getParticipatingObjects())).filter(po => po instanceof Player);
+                const opposingPlayersOnNeighbors = playersOnNeighbors.filter(p => !p.isTeamMateOf(player));
+                const opposingPlayersHotZoneContainingThisField = opposingPlayersOnNeighbors.filter(p => player.isInThreadZoneOf(p));
+
+                const playersThreadZoneLeft = opposingPlayersHotZoneContainingCurrentPlayerField.filter(p => opposingPlayersHotZoneContainingThisField.indexOf(p) == -1);
+
+                if (playersThreadZoneLeft.length > 0) {
+                    const dodgeRolls = player.getDodgeRolls();
+                    const playerAgility = player.getAgility();
+                    const dodgedSuccessfull = Chance.enoughSuccessfullRolls(dodgeRolls, playerAgility, action.dodgedSteps + 1);
+
+                    if (dodgedSuccessfull) {
+                        action.dodgedSteps++;
+                    } else {
+                        player.fall();
+                        actionControl.submit(gp);
+                    }
+                }
             } else {
                 action.turnPlayer(this.hex);
             }

@@ -7,6 +7,8 @@ class RunAction extends Action {
         this.path = [];
         this.remainingSteps = RunAction.MAX_STEPS;
 
+        this.dodgedSteps = 0;   // this increases by 1 everytime the player succesfully dodges on leaving an opposing player's thread zone
+
         this.mode = RunAction.MODE_MOVE;
     }
 
