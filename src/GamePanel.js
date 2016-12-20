@@ -163,22 +163,17 @@ class GamePanel {
         const fieldsAndGOs = boardFields.concat(gameObjects);
         const clickableObjects = this.layers.getClickableObjects(this);
 
-        let field;
-        let player;
         const action = this.getAction();
-        if (action instanceof BashAction) {
-            field = boardFields.filter(f => f.hex.equals(new Hex(1, 1)))[0];
-            player = field.getParticipatingObjects()[0];
-            const x = fieldsAndGOs.indexOf(player);
-            const y = clickableObjects.indexOf(player);
-        } else if (action instanceof StandUpAction) {
-            action.standUp();
-            this.getActionControl().submit(this);
-        }
+        
         // highlight only clickable objects and only during an active action
         boardFields.forEach(f => f.isHighlighted = (action && clickableObjects.indexOf(f) != -1));
         gameObjects.forEach(go => go.isHighlighted = (action && clickableObjects.indexOf(go) != -1));
         // console.log(boardFields.filter(f => f.isHovered));   // why is the open hole hovered always after a score?
+
+        // automatically handle active standup actions
+        if (action instanceof StandUpAction && action.mode == StandUpAction.MODE_CALCULATE) {
+            action.standUp();
+        }
 
         this.layers.update(now);
     }

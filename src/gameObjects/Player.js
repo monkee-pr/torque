@@ -425,23 +425,23 @@ class Player extends ParticipatingObject {
         return boardFields.filter(filterFunc);
     }
 
-    getThreadZone() {
+    getThreatZone() {
         const frontDirections = Hex.getFrontDirectionsFrom(this.direction);
 
-        const threadZone = [];
+        const threatZone = [];
         frontDirections.forEach(d => {
             const neighbor = this.getField().getNeighborAt(d);
             if (neighbor != null) {
-                threadZone.push(neighbor);
+                threatZone.push(neighbor);
             }
         });
 
-        return threadZone;
+        return threatZone;
     }
 
-    isInThreadZoneOf(player) {
-        const threadZone = player.getThreadZone();
-        const players = threadZone.map(f => f.getParticipatingObjects()[0]).filter(po => po instanceof Player);
+    isInThreatZoneOf(player) {
+        const threatZone = player.getThreatZone();
+        const players = threatZone.map(f => f.getParticipatingObjects()[0]).filter(po => po instanceof Player);
 
         return players.indexOf(this) != -1;
     }
@@ -461,7 +461,7 @@ class Player extends ParticipatingObject {
     getThreateningPlayers() {
         const players = this.getNeighbors();
         const opposingPlayers = players.filter(p => !p.isTeamMateOf(this));
-        const threateningPlayers = opposingPlayers.filter(p => this.isInThreadZoneOf(p));
+        const threateningPlayers = opposingPlayers.filter(p => this.isInThreatZoneOf(p));
 
         return threateningPlayers;
     }
@@ -561,7 +561,7 @@ class Player extends ParticipatingObject {
         let counterBashWins = false;
         let dodgeWins = false;
         let draw = false;
-        const triggerCounterBash = this.isInThreadZoneOf(target);
+        const triggerCounterBash = this.isInThreatZoneOf(target);
         if (triggerCounterBash) {
             // trigger counter bash
             const counterBashRolls = target.getCounterBashRolls();
@@ -645,7 +645,7 @@ class Player extends ParticipatingObject {
         let counterBashWins = false;
         let dodgeWins = false;
         let draw = false;
-        const triggerCounterBash = this.isInThreadZoneOf(target);
+        const triggerCounterBash = this.isInThreatZoneOf(target);
         if (triggerCounterBash) {
             // trigger counter bash
             const counterBashRolls = target.getCounterBashRolls();
@@ -720,7 +720,27 @@ class Player extends ParticipatingObject {
     }
 
     standUp() {
-        this.status = Player.STATUS_NORMAL;
+        const standUpRolls = this.getStandUpRolls();
+        const playerAgility = this.getAgility();
+        const standUpSucceeded = Chance.enoughSuccessfullRolls(standUpRolls, playerAgility, 1);
+        if (standUpSucceeded) {
+            this.status = Player.STATUS_NORMAL;
+        }
+
+        return standUpSucceeded;
+    }
+
+    getStandUpRolls() {
+        const baseRolls = 3;
+
+        const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
+
+        const threateningOpponents = this.getThreateningPlayers();
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length - 1, 0);  // do not consider the player that's about to get bashed -> -1
+        const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
+
+        const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
+        return rolls;
     }
 
     getBashRolls() {
@@ -732,8 +752,8 @@ class Player extends ParticipatingObject {
         const rollsAddedByMovement = playerMoved ? 1 : 0;
 
         const threateningOpponents = this.getThreateningPlayers();
-        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that's about to get bashed -> -1
-        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length - 1, 0);  // do not consider the player that's about to get bashed -> -1
+        const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole + rollsAddedByMovement - rollsSubtractedByThreateningOpponents;
         return rolls;
@@ -745,8 +765,8 @@ class Player extends ParticipatingObject {
         const rollsAddedByRole = this.role == Player.ROLE_MAUL ? 1 : 0;
 
         const threateningOpponents = this.getThreateningPlayers();
-        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that did the bash -> -1
-        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length - 1, 0);  // do not consider the player that did the bash -> -1
+        const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
         return rolls;
@@ -758,8 +778,8 @@ class Player extends ParticipatingObject {
         const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
 
         const threateningOpponents = this.getThreateningPlayers();
-        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that did the bash -> -1
-        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length - 1, 0);  // do not consider the player that did the bash -> -1
+        const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
         return rolls;
@@ -771,8 +791,8 @@ class Player extends ParticipatingObject {
         const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
 
         const threateningOpponents = this.getThreateningPlayers();
-        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player you try to steal the torque from -> -1
-        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length - 1, 0);  // do not consider the player you try to steal the torque from -> -1
+        const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
         return rolls;

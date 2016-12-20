@@ -18,7 +18,6 @@ Chance.chance = (chance) => {
 Chance.SIDES_ON_DIE = 6;
 Chance.rollDie = () => {
     const value = Math.randomInt(1, Chance.SIDES_ON_DIE);
-    // console.log(value);
     return value;
 }
 Chance.rollDice = (amountOfDice) => {
@@ -34,11 +33,16 @@ Chance.rollDice = (amountOfDice) => {
 }
 Chance.amountSuccessfullRolls = (amountOfDice, minValue) => {
     const values = Chance.rollDice(amountOfDice);
+    const successfullRolls = values.filter(v => v >= minValue).length;
+    console.log("Rolled " + amountOfDice + " dice. Result: [" + values + "]. MinValue: " + minValue + ". Succeeded " + successfullRolls + ".");
 
-    return values.filter(v => v >= minValue).length;
+    return successfullRolls;
 }
 Chance.enoughSuccessfullRolls = (amountOfDice, minValue, neededAmount) => {
-    return Chance.amountSuccessfullRolls(amountOfDice, minValue) >= neededAmount;
+    const values = Chance.rollDice(amountOfDice);
+    const successfullRolls = values.filter(v => v >= minValue).length;
+    console.log("Rolled " + amountOfDice + " dice. Result: [" + values + "]. MinValue: " + minValue + ". Succeeded " + successfullRolls + " out of " + neededAmount + " needed successes.");
+    return successfullRolls >= neededAmount;
 }
 
 // Number extensions

@@ -99,7 +99,9 @@ class CanvasLayers {
     getClickableObjects(gp) {
         let clickableObjects = null;
         const action = gp.getAction();
-        if (action instanceof RunAction) {
+        if (action instanceof StandUpAction) {
+            clickableObjects = action.getNextPossibleSteps();
+        } else if (action instanceof RunAction) {
             const fields = action.getNextPossibleSteps();
             const accessibleFields = fields.filter(f => f.isAccessible());
             clickableObjects = accessibleFields.concat(action.player);

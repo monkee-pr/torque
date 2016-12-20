@@ -33,7 +33,9 @@ class ActionControl extends UIElement {
         tCtx.fillStyle = "black";
         tCtx.font="40px Arial";
         let actionName;
-        if (this.action instanceof RunAction) {
+        if (this.action instanceof StandUpAction) {
+            actionName = "Stand Up";
+        } else if(this.action instanceof RunAction) {
             actionName = "Run";
         } else if(this.action instanceof ThrowAction) {
             actionName = "Throw";
@@ -61,7 +63,7 @@ class ActionControl extends UIElement {
         const action = gp.getAction();
         let increaseActionCounter = true;
         if (action instanceof StandUpAction) {
-
+            // don't do anything special
         } else if (action instanceof RunAction) {
             const playerMoved = action.playerMoved;
             if (!playerMoved) {

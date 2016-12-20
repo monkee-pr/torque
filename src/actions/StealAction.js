@@ -11,8 +11,8 @@ class StealAction extends Action {
 
     getPossibleTargets() {
         const playerField = this.player.getField();
-        const threadZone = this.player.getThreadZone();
-        const possibleTargets = threadZone.map(f => {
+        const threatZone = this.player.getThreatZone();
+        const possibleTargets = threatZone.map(f => {
             const go = f.getParticipatingObjects()[0];
             if (go instanceof Player) {
                 // team mate or opposing player

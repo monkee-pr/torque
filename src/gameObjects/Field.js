@@ -407,7 +407,9 @@ class Field extends GameObject {
         const gp = this.gp;
         const actionControl = gp.getActionControl();
         const action = actionControl.action;
-        if (action instanceof RunAction) {
+        if (action instanceof StandUpAction && action.mode == StandUpAction.MODE_TURN) {
+            action.turnPlayer(this.hex);
+        } else if (action instanceof RunAction) {
             if (action.mode == RunAction.MODE_MOVE) {
 
                 // move player in every case
@@ -419,21 +421,21 @@ class Field extends GameObject {
                 const playerFieldNeighbors = playerField.getNeighbors();
                 const playersOnPlayerFieldNeighbors = Array.flatten(playerFieldNeighbors.map(n => n.getParticipatingObjects())).filter(po => po instanceof Player);
                 const opposingPlayersOnPlayerFieldNeighbors = playersOnPlayerFieldNeighbors.filter(p => !p.isTeamMateOf(player));
-                const opposingPlayersHotZoneContainingCurrentPlayerField = opposingPlayersOnPlayerFieldNeighbors.filter(p => player.isInThreadZoneOf(p));
+                const opposingPlayersHotZoneContainingCurrentPlayerField = opposingPlayersOnPlayerFieldNeighbors.filter(p => player.isInThreatZoneOf(p));
 
                 const neighbors = this.getNeighbors();
                 const playersOnNeighbors = Array.flatten(neighbors.map(n => n.getParticipatingObjects())).filter(po => po instanceof Player);
                 const opposingPlayersOnNeighbors = playersOnNeighbors.filter(p => !p.isTeamMateOf(player));
-                const opposingPlayersHotZoneContainingThisField = opposingPlayersOnNeighbors.filter(p => player.isInThreadZoneOf(p));
+                const opposingPlayersHotZoneContainingThisField = opposingPlayersOnNeighbors.filter(p => this.isInThreatZoneOf(p));
 
-                const playersThreadZoneLeft = opposingPlayersHotZoneContainingCurrentPlayerField.filter(p => opposingPlayersHotZoneContainingThisField.indexOf(p) == -1);
+                const playersThreatZoneLeft = opposingPlayersHotZoneContainingCurrentPlayerField.filter(p => opposingPlayersHotZoneContainingThisField.indexOf(p) == -1);
 
-                if (playersThreadZoneLeft.length > 0) {
+                if (playersThreatZoneLeft.length > 0) {
                     const dodgeRolls = player.getDodgeRolls();
                     const playerAgility = player.getAgility();
-                    const dodgedSuccessfull = Chance.enoughSuccessfullRolls(dodgeRolls, playerAgility, action.dodgedSteps + 1);
+                    const dodgeSucceeded = Chance.enoughSuccessfullRolls(dodgeRolls, playerAgility, action.dodgedSteps + 1);
 
-                    if (dodgedSuccessfull) {
+                    if (dodgeSucceeded) {
                         action.dodgedSteps++;
                     } else {
                         player.fall();
@@ -494,6 +496,12 @@ class Field extends GameObject {
             }
             this.color = Color.FIELD_HOLE_CLOSED_BACKGROUND;
         }
+    }
+
+    isInThreatZoneOf(player) {
+        const threatZone = player.getThreatZone();
+
+        return threatZone.indexOf(this) != -1;
     }
 }
 
