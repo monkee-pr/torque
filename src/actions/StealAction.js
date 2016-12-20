@@ -1,4 +1,4 @@
-class BashAction extends Action {
+class StealAction extends Action {
     constructor(gp, player) {
         super();
 
@@ -17,12 +17,12 @@ class BashAction extends Action {
             if (go instanceof Player) {
                 // team mate or opposing player
                 if (go.isTeamMateOf(this.player)) {
-                    // can't bash team mates
+                    // can't steal from team mates
                     return null;
                 } else {
                     // opposing player
 
-                    return !go.isBashed() ? go : null;
+                    return go.holdsTorque() ? go : null;
                 }
             } else {
                 return null;
@@ -39,15 +39,15 @@ class BashAction extends Action {
         }
     }
 
-    bash() {
+    steal() {
         // spawn torque in target field
         if (this.targetPlayer != null) {
             const target = this.targetPlayer;
             const player = this.player;
 
-            player.bash(target);
+            player.steal(target);
         } else {
-            console.log("Can't bash. No target selected");
+            console.log("Can't steal. No target selected");
         }
     }
 }

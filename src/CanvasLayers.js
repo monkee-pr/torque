@@ -107,6 +107,8 @@ class CanvasLayers {
             clickableObjects = action.possibleTargetFields;
         } else if (action instanceof BashAction) {
             clickableObjects = action.possibleTargets;
+        } else if (action instanceof StealAction) {
+            clickableObjects = action.possibleTargets;
         } else {
             clickableObjects = this.getParticipatingObjects();
         }

@@ -171,6 +171,9 @@ class GamePanel {
             player = field.getParticipatingObjects()[0];
             const x = fieldsAndGOs.indexOf(player);
             const y = clickableObjects.indexOf(player);
+        } else if (action instanceof StandUpAction) {
+            action.standUp();
+            this.getActionControl().submit(this);
         }
         // highlight only clickable objects and only during an active action
         boardFields.forEach(f => f.isHighlighted = (action && clickableObjects.indexOf(f) != -1));

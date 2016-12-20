@@ -154,7 +154,7 @@ class Player extends ParticipatingObject {
                 }
         }
 
-        // pickup torque if it's on player's field
+        // interact with torque if it's on player's field
         const torque = this.getField().getParticipatingObjects().filter(go => go instanceof Torque)[0];
         if (torque != null) {
             const action = this.gp.getAction();
@@ -170,8 +170,13 @@ class Player extends ParticipatingObject {
                     torque.scatter();
                 }
             } else {
-                // player was stepping on torque or torque was scattering to him
-                this.pickUpTorque();
+                if (this.isBashed()) {
+                    // player was falling on torque or torque was scattering to him
+                    torque.scatter();
+                } else {
+                    // player was stepping on torque or torque was scattering to him
+                    this.pickUpTorque();
+                }
             }
         }
     }
@@ -371,6 +376,9 @@ class Player extends ParticipatingObject {
         } else if (action instanceof BashAction && this != action.player) {
             action.target(this);
             actionControl.submit(this.gp);
+        } else if (action instanceof StealAction && this != action.player) {
+            action.target(this);
+            actionControl.submit(this.gp);
         } else {
             gp.selectPlayer(this);
         }
@@ -438,6 +446,26 @@ class Player extends ParticipatingObject {
         return players.indexOf(this) != -1;
     }
 
+    isTeamMateOf(player) {
+        return player != null && this.team.id == player.team.id;
+    }
+
+    getNeighbors() {
+        const field = this.getField();
+        const neighborFields = field.getNeighbors();
+        const players = Array.flatten(neighborFields.map(f => f.getParticipatingObjects().filter(po => po instanceof Player)));
+
+        return players;
+    }
+
+    getThreateningPlayers() {
+        const players = this.getNeighbors();
+        const opposingPlayers = players.filter(p => !p.isTeamMateOf(this));
+        const threateningPlayers = opposingPlayers.filter(p => this.isInThreadZoneOf(p));
+
+        return threateningPlayers;
+    }
+
     canHoldTorque() {
         if (this.role == Player.ROLE_MAUL) {
             return false;
@@ -457,6 +485,15 @@ class Player extends ParticipatingObject {
     holdsTorque() {
         switch (this.status) {
             case Player.STATUS_HOLD_TORQUE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    isBashed() {
+        switch (this.status) {
+            case Player.STATUS_BASHED:
                 return true;
             default:
                 return false;
@@ -509,6 +546,11 @@ class Player extends ParticipatingObject {
     }
 
     bash(target) {
+        if (!this.canBash()) {
+            console.log("A " + this.role + " can't bash");
+            return;
+        }
+
         const direction = Hex.isNeighborAt(this.hex, target.hex);
 
         const bashRolls = this.getBashRolls();
@@ -559,9 +601,97 @@ class Player extends ParticipatingObject {
             target.fall();
             const oldTargetField = target.getField();
             const newTargetField = oldTargetField.getNeighborAt(direction);
-            if (newTargetField.isEmpty()) {
+            if (
+                newTargetField.isEmpty()
+                || newTargetField.getParticipatingObjects().filter(go => go instanceof Torque)[0]
+            ) {
                 target.addMovement(newTargetField.hex);
             }
+        } else if (counterBashWins) {
+            this.direction = direction;
+            target.direction = Hex.mirrorDirection(direction);
+
+            this.fall();
+            const oldField = this.getField();
+            const newField = oldField.getNeighborAt(Hex.mirrorDirection(direction));
+            if (newField.isEmpty()) {
+                this.hex = newField.hex;
+            }
+        } else if (dodgeWins) {
+            this.direction = direction;
+        } else {
+            // draw
+            this.direction = direction;
+            target.direction = Hex.mirrorDirection(direction);
+        }
+    }
+
+    steal(target) {
+        if (!this.canHoldTorque()) {
+            console.log("A " + this.role + " can't hold the torque and therefore not steal it");
+            return;
+        } else if (!target.holdsTorque()) {
+            console.log("Can't steal the torque because the target player is not holding it");
+            return;
+        }
+
+        const direction = Hex.isNeighborAt(this.hex, target.hex);
+
+        const stealRolls = this.getStealRolls();
+        const playerAgility = this.getAgility();
+        const stealResult = Chance.amountSuccessfullRolls(stealRolls, playerAgility);
+
+        let stealWins = false;
+        let counterBashWins = false;
+        let dodgeWins = false;
+        let draw = false;
+        const triggerCounterBash = this.isInThreadZoneOf(target);
+        if (triggerCounterBash) {
+            // trigger counter bash
+            const counterBashRolls = target.getCounterBashRolls();
+            const targetStrength = target.getStrength();
+            const counterBashResult = Chance.amountSuccessfullRolls(counterBashRolls, targetStrength);
+            if (counterBashResult > stealResult) {
+                // counter bash succeeded -> player gets bashed
+                counterBashWins = true;
+            } else if (counterBashResult < stealResult) {
+                // counter bash failed -> target gets bashed
+                stealWins = true;
+            } else {
+                // draw -> both players face each other
+                draw = true;
+            }
+        } else {
+            // target tries to dodge
+            const dodgeRolls = target.getDodgeRolls();
+            const targetAgility = target.getAgility();
+            const dodgeResult = Chance.amountSuccessfullRolls(dodgeRolls, targetAgility);
+            if (dodgeResult > stealResult) {
+                // dodge succeeded
+                dodgeWins = true;
+            } else if (dodgeResult < stealResult) {
+                // dodge failed
+                stealWins = true;
+            } else {
+                // draw
+                draw = true;
+            }
+        }
+
+        if (stealWins) {
+            // this.direction = direction;
+            // target.direction = Hex.mirrorDirection(direction);
+
+            // target.fall();
+            target.dropTorque();
+            // const oldTargetField = target.getField();
+            // const newTargetField = oldTargetField.getNeighborAt(direction);
+            // if (
+            //     newTargetField.isEmpty()
+            //     || newTargetField.getParticipatingObjects().filter(go => go instanceof Torque)[0]
+            // ) {
+            //     target.addMovement(newTargetField.hex);
+            // }
         } else if (counterBashWins) {
             this.direction = direction;
             target.direction = Hex.mirrorDirection(direction);
@@ -589,8 +719,8 @@ class Player extends ParticipatingObject {
         this.status = Player.STATUS_BASHED;
     }
 
-    isTeamMateOf(player) {
-        return player != null && this.team.id == player.team.id;
+    standUp() {
+        this.status = Player.STATUS_NORMAL;
     }
 
     getBashRolls() {
@@ -601,8 +731,7 @@ class Player extends ParticipatingObject {
         const playerMoved = false;
         const rollsAddedByMovement = playerMoved ? 1 : 0;
 
-        const opposingPlayersInNeighborFields = this.getField().getNeighbors().map(f => f.getParticipatingObjects().filter(po => po instanceof Player)[0]).filter(p => p != null);
-        const threateningOpponents = opposingPlayersInNeighborFields.filter(p => this.isInThreadZoneOf(p));
+        const threateningOpponents = this.getThreateningPlayers();
         const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that's about to get bashed -> -1
         const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
 
@@ -615,9 +744,8 @@ class Player extends ParticipatingObject {
 
         const rollsAddedByRole = this.role == Player.ROLE_MAUL ? 1 : 0;
 
-        const opposingPlayersInNeighborFields = this.getField().getNeighbors().map(f => f.getParticipatingObjects().filter(po => po instanceof Player)[0]).filter(p => p != null);
-        const threateningOpponents = opposingPlayersInNeighborFields.filter(p => this.isInThreadZoneOf(p));
-        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that's about to get bashed -> -1
+        const threateningOpponents = this.getThreateningPlayers();
+        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that did the bash -> -1
         const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
@@ -629,9 +757,21 @@ class Player extends ParticipatingObject {
 
         const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
 
-        const opposingPlayersInNeighborFields = this.getField().getNeighbors().map(f => f.getParticipatingObjects().filter(po => po instanceof Player)[0]).filter(p => p != null);
-        const threateningOpponents = opposingPlayersInNeighborFields.filter(p => this.isInThreadZoneOf(p));
-        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that's about to get bashed -> -1
+        const threateningOpponents = this.getThreateningPlayers();
+        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player that did the bash -> -1
+        const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
+
+        const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
+        return rolls;
+    }
+
+    getStealRolls() {
+        const baseRolls = 3;
+
+        const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
+
+        const threateningOpponents = this.getThreateningPlayers();
+        const amountOfThreateningPlayers = threateningOpponents.length - 1;  // do not consider the player you try to steal the torque from -> -1
         const rollsSubtractedByThreateningOpponents = Math.max(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;

@@ -9,7 +9,7 @@ class ParticipatingObject extends GameObject {
         // this.standingAnimation = new Animation(sprites, 1000, Animation.TYPE_LOOP);
         this.isMoving = false;
         this.moveStartTime = null;
-        this.moveDuration = 500;   // ms
+        this.moveDuration = 200;   // ms
         this.movements = [];
         this.funcs = [];
     }

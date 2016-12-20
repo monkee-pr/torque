@@ -4,8 +4,9 @@ class RunAction extends Action {
 
         this.gp = gp;
         this.player = player;
-        this.path = [];
+        // this.path = [];
         this.remainingSteps = RunAction.MAX_STEPS;
+        this.playerMoved = false;
 
         this.dodgedSteps = 0;   // this increases by 1 everytime the player succesfully dodges on leaving an opposing player's thread zone
 
@@ -27,6 +28,7 @@ class RunAction extends Action {
 
     movePlayer(hex) {
         this.player.addMovement(hex);
+        this.playerMoved = true;
 
         this.remainingSteps--;
         if (this.remainingSteps <= 0) {
@@ -38,6 +40,7 @@ class RunAction extends Action {
         const direction = Hex.isNeighborAt(this.player.hex, hex);
         if (direction != null) {
             this.player.direction = direction;
+            this.playerMoved = true;
         } else {
             console.error("Can't turn player. Invalid direction");
         }

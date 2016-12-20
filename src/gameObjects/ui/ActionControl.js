@@ -11,7 +11,6 @@ class ActionControl extends UIElement {
         const buttonWidth = 150;
         const buttonHeight = 60;
         this.submitButton = new Button(new Point(canvasWidth - (buttonWidth+10), canvasHeight - buttonHeight), buttonWidth, buttonHeight, "submit", this.submit, this.action);
-        // this.cancelButton = new Button(new Point(canvasWidth - buttonWidth, canvasHeight - buttonHeight), buttonWidth, buttonHeight, "cancel", this.cancel, this.action);
 
         this.width += this.submitButton.width;
         this.point.x -= this.submitButton.width;
@@ -33,11 +32,15 @@ class ActionControl extends UIElement {
         tCtx.fillRect(0, 0, tCv.width, tCv.height);
         tCtx.fillStyle = "black";
         tCtx.font="40px Arial";
-        let actionName
+        let actionName;
         if (this.action instanceof RunAction) {
             actionName = "Run";
         } else if(this.action instanceof ThrowAction) {
             actionName = "Throw";
+        } else if(this.action instanceof BashAction) {
+            actionName = "Bash";
+        } else if(this.action instanceof StealAction) {
+            actionName = "Steal";
         } else {
             actionName = "undefined";
         }
@@ -57,8 +60,10 @@ class ActionControl extends UIElement {
     submit(gp) {
         const action = gp.getAction();
         let increaseActionCounter = true;
-        if (action instanceof RunAction) {
-            const playerMoved = action.remainingMoves != RunAction.MAX_MOVES;
+        if (action instanceof StandUpAction) {
+
+        } else if (action instanceof RunAction) {
+            const playerMoved = action.playerMoved;
             if (!playerMoved) {
                 increaseActionCounter = false;
             }
@@ -71,6 +76,12 @@ class ActionControl extends UIElement {
         } else if (action instanceof BashAction) {
             if (action.targetPlayer != null) {
                 action.bash();
+            } else {
+                increaseActionCounter = false;
+            }
+        } else if (action instanceof StealAction) {
+            if (action.targetPlayer != null) {
+                action.steal();
             } else {
                 increaseActionCounter = false;
             }
