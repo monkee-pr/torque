@@ -70,12 +70,15 @@ class ParticipatingObject extends GameObject {
                 this.movements = [];
             }
         } else {
-            this.isMoving = false;
-
             if (this.funcs.length > 0) {
                 this.funcs.forEach(f => f());
             }
         }
+
+        if (this.movements.length == 0) {
+            this.isMoving = false;
+        }
+
 
         this.center = centerPoint;
     }

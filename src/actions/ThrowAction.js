@@ -53,17 +53,10 @@ class ThrowAction extends Action {
             this.gp.addParticipatingObject(torque);
             torque.addMovement(targetHex);
 
-            // reset action's target field
-            this.targetField = null;
-
             this.player.throwTorque();
         } else {
             console.log("Can't throw torque. No target selected");
         }
-    }
-
-    submit() {
-        
     }
 }
 ThrowAction.MAX_RANGE = 9;

@@ -70,9 +70,7 @@ class ActionControl extends UIElement {
                 increaseActionCounter = false;
             }
         } else if (action instanceof ThrowAction) {
-            if (action.targetField != null) {
-                action.submit();
-            } else {
+            if (action.targetField == null) {
                 increaseActionCounter = false;
             }
         } else if (action instanceof BashAction) {

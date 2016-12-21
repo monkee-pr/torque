@@ -99,14 +99,13 @@ class Field extends GameObject {
         // open / close the hole
         const action = this.gp.getAction();
         if (this.type == Field.TYPE_HOLE) {
-            const thisObj = this;
             const boardFields = this.gp.layers.getBoardFields();
-            const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == thisObj.strikeArea && f.teamSide == thisObj.teamSide);
+            const fieldsOfStrikeArea = boardFields.filter(f => f.strikeArea == this.strikeArea && f.teamSide == this.teamSide);
             const fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque = fieldsOfStrikeArea.filter(f => {
                 const go = f.getParticipatingObjects()[0];
                 if (go instanceof Player) {
                     const player = go;
-                    if (player.team.id != thisObj.teamSide) {
+                    if (player.team.id != this.teamSide) {
                         const opposingPlayer = player;
                         if (opposingPlayer.holdsTorque()) {
                             return true;
@@ -118,6 +117,12 @@ class Field extends GameObject {
             });
 
             if (this.isOpen) {
+
+                if (this.hex.equals(new Hex(10, 0))) {
+                    console.log(fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque);
+                    console.log(fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque.length);
+                    console.log(!this.isTargeted);
+                }
                 if (fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque.length == 0 && !this.isTargeted) {
                     this.closeHole();
                 }
@@ -131,44 +136,49 @@ class Field extends GameObject {
         // interact with the torque
         const participatingObjects = this.getParticipatingObjects();
         const torque = participatingObjects.filter(go => go instanceof Torque)[0];
-        // if (this.hex.equals(new Hex(5, 3))) {
-        //     console.log(torque != null);
-        //     console.log(!this.isAccessible());
-        // }
-        if (
-            torque != null
-            && (
-                !this.type == Field.TYPE_PIT
-                || this.type == Field.TYPE_HOLE
-            )
-        ) {
+        if (torque != null) {
             if (this.type == Field.TYPE_PIT) {
                 this.gp.respawnTorque();
             } else if (this.type == Field.TYPE_HOLE) {
                 if (this.isOpen) {
-                    // HOOOLE!!!
-                    console.log("HOOOLE!!!");
-                    this.isTargeted = false;
-                    const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
+                     if (action instanceof ThrowAction) {
+                         this.isTargeted = false;
 
-                    // calc points for hole
-                    let points = 1;
-                    if (action instanceof ThrowAction && action.player.getField().type == Field.TYPE_SUPER_HOT_ZONE) {
-                        points = points + 1;
-                    }
-                    if (this.strikeArea == Field.STRIKE_AREA_BACK) {
-                        points = points + 2;
-                    }
+                         const scoreRolls = action.player.getThrowRolls(action);
+                         const playerDexterity = action.player.getDexterity();
+                         const throwSucceeded = Chance.enoughSuccessfullRolls(scoreRolls, playerDexterity, 1);
 
-                    this.gp.scoreForTeam(scoringTeam, points);
+                         // reset action's target field (after calculating score rolls because it needs the field)
+                         action.targetField = null;
 
-                    // submit ThrowAction
-                    this.gp.getActionControl().submit(this.gp);
+                         // submit ThrowAction
+                         this.gp.getActionControl().submit(this.gp);
 
-                    if (scoringTeam == this.gp.activeTeam) {
-                        this.gp.startNextPush();
-                    }
-                    this.gp.respawnTorque();
+                         if (throwSucceeded) {
+                             // HOOOLE!!!
+                             console.log("HOOOLE!!!");
+                             const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
+
+                             // calc points for hole
+                             let points = 1;
+                             if (action.player.getField().type == Field.TYPE_SUPER_HOT_ZONE) {
+                                 points = points + 1;
+                             }
+                             if (this.strikeArea == Field.STRIKE_AREA_BACK) {
+                                 points = points + 2;
+                             }
+
+                             this.gp.scoreForTeam(scoringTeam, points);
+
+                             if (scoringTeam == this.gp.activeTeam) {
+                                 this.gp.startNextPush();
+                             }
+                             this.gp.respawnTorque();
+                         } else {
+                             console.log("failed");
+                             torque.scatter();
+                         }
+                     }
                 } else {
                     torque.scatter();
                 }

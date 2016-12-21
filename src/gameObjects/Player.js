@@ -159,19 +159,44 @@ class Player extends ParticipatingObject {
         if (torque != null) {
             const action = this.gp.getAction();
             if (action instanceof ThrowAction) {
-                // torque got thrown
-                const torqueThrownByTeamMate = action.player.isTeamMateOf(this);
-                if (torqueThrownByTeamMate) {
-                    // player tries to catch the torque
-                    this.pickUpTorque();
-                } else {
-                    // player gets git by the torque
-                    this.fall();
-                    torque.scatter();
+                if (action.targetField.getParticipatingObjects().indexOf(this) != -1) {
+                    // torque got thrown and is about to get catched or dash a player
+
+                    // calculate throw result
+                    const scoreRolls = action.player.getThrowRolls(action);
+                    const playerDexterity = action.player.getDexterity();
+                    const throwResult = Chance.amountSuccessfullRolls(scoreRolls, playerDexterity);
+
+                    const torqueThrownByTeamMate = action.player.isTeamMateOf(this);
+                    if (torqueThrownByTeamMate) {
+                        // player tries to catch the torque
+                        const catchRolls = this.getCatchRolls(throwResult);
+                        const catcherDexterity = this.getDexterity();
+                        const passSucceeded = Chance.enoughSuccessfullRolls(catchRolls, catcherDexterity, 1);
+                        if (passSucceeded) {
+                            this.takeTorque();
+                        } else {
+                            torque.scatter();
+                        }
+                    } else {
+                        const dodgeRolls = this.getDodgeRolls(action.player);
+                        const dodgerAgility = this.getAgility();
+                        const dodgeResult = Chance.amountSuccessfullRolls(dodgeRolls, dodgerAgility);
+                        if (throwResult > dodgeResult) {
+                            // player gets hit by the torque
+                            this.fall();
+                            torque.scatter();
+                        } else {
+                            torque.scatter();
+                        }
+                    }
+
+                    // reset action's target field (after calculating score rolls because it needs the field)
+                    action.targetField = null;
+
+                    // submit ThrowAction
+                    this.gp.getActionControl().submit(this.gp);
                 }
-                
-                // submit ThrowAction
-                this.gp.getActionControl().submit(this.gp);
             } else {
                 if (this.isBashed()) {
                     // player was falling on torque or torque was scattering to him
@@ -503,7 +528,19 @@ class Player extends ParticipatingObject {
         }
     }
 
-    // requires a Torque object in the GamePanel's GameObject list
+    // equip the torque directly (no chance included)
+    takeTorque() {
+        const gp = this.gp;
+        const participatingObjectsOfField = this.getField().getParticipatingObjects();
+        const torque = participatingObjectsOfField.filter(go => go instanceof Torque)[0];
+        if (torque != null) {
+            this.status = Player.STATUS_HOLD_TORQUE;
+
+            gp.removeParticipatingObject(torque);
+        }
+    }
+
+    // pick up the torque from the ground (includes a failing chance)
     pickUpTorque() {
         const gp = this.gp;
         const participatingObjectsOfField = this.getField().getParticipatingObjects();
@@ -514,9 +551,7 @@ class Player extends ParticipatingObject {
                     // recognize direction and pickup chance here
                     const pickUpSucceeds = true;
                     if (pickUpSucceeds) {
-                        this.status = Player.STATUS_HOLD_TORQUE;
-
-                        gp.removeParticipatingObject(torque);
+                        this.takeTorque();
                     } else {
                         torque.scatter();
                     }
@@ -775,13 +810,13 @@ class Player extends ParticipatingObject {
         return rolls;
     }
 
-    getDodgeRolls() {
+    getDodgeRolls(throwingPlayer) { // throwingPlayer is only set if a player is dodging a throw
         const baseRolls = 3;
 
         const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
 
         const threateningOpponents = this.getThreateningPlayers();
-        const amountOfThreateningPlayers = Math.max(threateningOpponents.length - 1, 0);  // do not consider the player that did the bash -> -1
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length - (throwingPlayer && threateningOpponents.indexOf(throwingPlayer) != -1 ? 1 : 0), 0);  // do not consider the player that did the bash -> -1
         const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
@@ -798,6 +833,40 @@ class Player extends ParticipatingObject {
         const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
 
         const rolls = baseRolls + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
+        return rolls;
+    }
+
+    getThrowRolls(action) {
+        const baseRolls = 3;
+
+        const player = action.player;
+        const distance = player.hex.distanceTo(action.targetField.hex);
+        const rollsSubtractedByDistance = Math.ceil(distance / 3);  // 1-3: 1, 4-6: 2, 7-9: 3
+
+        const rollsAddedByRole = player.role == Player.ROLE_DART ? 1 : 0;
+
+        const targetIsHole = action.targetField.type == Field.TYPE_HOLE;
+        const rollsSubtractedByTarget = targetIsHole ? 1 : 0;
+
+        const playerMoved = false;  // player moved within the ThrowAction
+        const rollsSubtractedByMovement = playerMoved ? 1 : 0;
+
+        const threateningOpponents = player.getThreateningPlayers();
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length, 0);
+        const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
+
+        const rolls = baseRolls - rollsSubtractedByDistance + rollsAddedByRole - rollsSubtractedByTarget - rollsSubtractedByMovement - rollsSubtractedByThreateningOpponents;
+        return rolls;
+    }
+
+    getCatchRolls(throwResult) {
+        const rollsAddedByRole = this.role == Player.ROLE_DART ? 1 : 0;
+
+        const threateningOpponents = this.getThreateningPlayers();
+        const amountOfThreateningPlayers = Math.max(threateningOpponents.length, 0);
+        const rollsSubtractedByThreateningOpponents = Math.min(amountOfThreateningPlayers, 2);
+
+        const rolls = throwResult + rollsAddedByRole - rollsSubtractedByThreateningOpponents;
         return rolls;
     }
 
