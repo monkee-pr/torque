@@ -2,12 +2,9 @@ class Game {
     constructor() {
         const cv = document.getElementById("canvas");
         cv.oncontextmenu = (e) => {
-            // return false;
+            // prevent the browser's right-click-popup
             e.preventDefault();
         }
-
-        // create game panel
-        this.gp = new GamePanel(cv);
 
         // add controls
         cv.addEventListener("mousemove", e => Control.mouseMove(e, this.gp));
@@ -15,6 +12,9 @@ class Game {
         cv.addEventListener("mouseup", e => Control.mouseUp(e, this.gp));
         cv.addEventListener("click", e => Control.click(e, this.gp));
         cv.addEventListener("mousewheel", e => Control.scroll(e, this.gp));
+
+        // create game panel
+        this.gp = new GamePanel(cv);
 
 
         this.run();

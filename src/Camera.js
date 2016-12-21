@@ -1,5 +1,6 @@
 class Camera {
-    constructor(position, mode) {
+    constructor(gp, position, mode) {
+        this.gp = gp;
         this.startPosition = position;
         this.position = position;
         this.setMode(mode);
@@ -24,7 +25,7 @@ class Camera {
 
         this.position = this.startPosition;
 
-        const canvas = document.getElementById("canvas");
+        const canvas = this.gp.cv;
         this.position = new Point(this.position.x + canvas.width/2, this.position.y + canvas.height/2);
 
         // Camera.scale = Math.max(Camera.MIN_SCALE, Math.min(Camera.MAX_SCALE, Camera.scale));
@@ -39,6 +40,6 @@ Camera.MODE_TOP_DOWN = "top-down";
 Camera.MIN_SCALE = 0.25;
 Camera.MAX_SCALE = 1;
 
-// transforming data for isometric perspective
+// transformation data for isometric perspective
 Camera.ROTATE_Z = 45;
 Camera.SCALE_Y = 0.5;

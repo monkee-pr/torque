@@ -169,6 +169,9 @@ class Player extends ParticipatingObject {
                     this.fall();
                     torque.scatter();
                 }
+                
+                // submit ThrowAction
+                this.gp.getActionControl().submit(this.gp);
             } else {
                 if (this.isBashed()) {
                     // player was falling on torque or torque was scattering to him

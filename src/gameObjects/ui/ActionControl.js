@@ -71,7 +71,7 @@ class ActionControl extends UIElement {
             }
         } else if (action instanceof ThrowAction) {
             if (action.targetField != null) {
-                action.throwTorque();
+                action.submit();
             } else {
                 increaseActionCounter = false;
             }

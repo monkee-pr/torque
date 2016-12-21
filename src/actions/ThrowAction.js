@@ -61,5 +61,9 @@ class ThrowAction extends Action {
             console.log("Can't throw torque. No target selected");
         }
     }
+
+    submit() {
+        
+    }
 }
 ThrowAction.MAX_RANGE = 9;

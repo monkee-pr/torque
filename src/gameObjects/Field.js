@@ -97,6 +97,7 @@ class Field extends GameObject {
         super.update();
 
         // open / close the hole
+        const action = this.gp.getAction();
         if (this.type == Field.TYPE_HOLE) {
             const thisObj = this;
             const boardFields = this.gp.layers.getBoardFields();
@@ -116,7 +117,6 @@ class Field extends GameObject {
                 return false;
             });
 
-            const action = this.gp.getAction();
             if (this.isOpen) {
                 if (fieldsOfStrikeAreaWithOpposingPlayerHoldingTorque.length == 0 && !this.isTargeted) {
                     this.closeHole();
@@ -150,7 +150,21 @@ class Field extends GameObject {
                     console.log("HOOOLE!!!");
                     this.isTargeted = false;
                     const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
-                    this.gp.scoreForTeam(scoringTeam);
+
+                    // calc points for hole
+                    let points = 1;
+                    if (action instanceof ThrowAction && action.player.getField().type == Field.TYPE_SUPER_HOT_ZONE) {
+                        points = points + 1;
+                    }
+                    if (this.strikeArea == Field.STRIKE_AREA_BACK) {
+                        points = points + 2;
+                    }
+
+                    this.gp.scoreForTeam(scoringTeam, points);
+
+                    // submit ThrowAction
+                    this.gp.getActionControl().submit(this.gp);
+
                     if (scoringTeam == this.gp.activeTeam) {
                         this.gp.startNextPush();
                     }
@@ -449,18 +463,7 @@ class Field extends GameObject {
             // sprint
         } else if (action instanceof ThrowAction) {
             action.target(this);
-            actionControl.submit(this.gp);
-
-            // if (this.getParticipatingObjects().filter(go => go instanceof Torque).length > 0) {
-            //     // HOOOLE!!!
-            //     console.log("HOOOLE!!!");
-            //     const scoringTeam = this.teamSide == this.gp.team1.id ? this.gp.team2 : this.gp.team1;
-            //     this.gp.scoreForTeam(scoringTeam);
-            //     if (scoringTeam == this.gp.activeTeam) {
-            //         this.gp.startNextPush();
-            //     }
-            //     this.gp.respawnTorque();
-            // }
+            action.throwTorque();
         }
     }
 

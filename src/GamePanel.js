@@ -1,7 +1,7 @@
 class GamePanel {
     constructor(cv) {
         this.cv = cv;
-        this.ctx = cv.getContext("2d");
+        this.ctx = this.cv.getContext("2d");
 
         this.activeClickBlockers = [];
 
@@ -14,7 +14,7 @@ class GamePanel {
         this.setBoard(board);
         // board.fields.forEach(f => this.addParticipatingObject(f));
         const originField = this.layers.getBoardFields().filter(f => f.hex.equals(new Hex(0, 0)))[0];
-        this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_ISOMETRIC);
+        this.camera = new Camera(this, Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_ISOMETRIC);
         // this.camera = new Camera(Hex.hexToPoint(new Point(0, 0), originField.hex), Camera.MODE_TOP_DOWN);
 
         this.addParticipatingObject(new Torque(this, new Hex(0, 0)));
@@ -164,7 +164,7 @@ class GamePanel {
         const clickableObjects = this.layers.getClickableObjects(this);
 
         const action = this.getAction();
-        
+
         // highlight only clickable objects and only during an active action
         boardFields.forEach(f => f.isHighlighted = (action && clickableObjects.indexOf(f) != -1));
         gameObjects.forEach(go => go.isHighlighted = (action && clickableObjects.indexOf(go) != -1));
@@ -215,12 +215,15 @@ class GamePanel {
         this.removeUIElement(topPopup);
     }
 
-    scoreForTeam(team) {
-        if (team == this.team1) {
-            this.score--;
-        } else {
-            this.score++;
+    scoreForTeam(team, points) {
+        if (points == null) {
+            points = 1;
         }
+        if (team == this.team1) {
+            points = points * -1;
+        }
+
+        this.score = this.score + points;
         console.log("score");
         console.log(this.score);
     }
